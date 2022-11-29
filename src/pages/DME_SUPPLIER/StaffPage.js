@@ -27,7 +27,6 @@ import {
 } from '@mui/material';
 // components
 import PopOver from '../../components/Popover/PopOver';
-import Label from '../../components/label';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 
@@ -234,11 +233,11 @@ export default function StaffPage() {
                         Staffs
                     </Typography>
                     <Button variant="contained" onClick={() => { setInviteOpen(true) }} startIcon={<Iconify icon="material-symbols:mark-email-read-sharp" />}>
-                        Invite New Staffs
+                        Invite New Staff
                     </Button>
                 </Stack>
 
-                <InviteModal open={inviteOpen} setOpen={setInviteOpen} handelFormSubmit={handelInviteDoctor} title="Invite Staffs" />
+                <InviteModal open={inviteOpen} setOpen={setInviteOpen} handelFormSubmit={handelInviteDoctor} title="Invite Staff" />
                 {/* -------------------------------------------------------------------------
                                    TABS
               --------------------------------------------------------------------------- */}
@@ -250,8 +249,8 @@ export default function StaffPage() {
                         variant="scrollable"
                         scrollButtons="auto"
                         aria-label="basic tabs example">
-                        <Tab label="Invited Staffs" {...a11yProps(0)} draggable="true" />
-                        <Tab label="Registered Staffs" {...a11yProps(1)} draggable="true" />
+                        <Tab label="Invited Staff" {...a11yProps(0)} draggable="true" />
+                        <Tab label="Registered Staff" {...a11yProps(1)} draggable="true" />
                     </Tabs>
 
 

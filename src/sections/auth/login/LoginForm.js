@@ -14,7 +14,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClick = () => {
-    navigate('/dashboard', { replace: true });
+    navigate('/DME-supplier/dashboard', { replace: true });
   };
 
   return (
@@ -39,8 +39,7 @@ export default function LoginForm() {
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-        <Checkbox name="remember" label="Remember me" />
-        <Link variant="subtitle2" underline="hover">
+        <Link variant="subtitle2" underline="hover" style={{ cursor: "pointer" }}>
           Forgot password?
         </Link>
       </Stack>

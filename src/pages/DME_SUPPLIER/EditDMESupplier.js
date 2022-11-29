@@ -49,6 +49,21 @@ export default function EditDMESupplier() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
+                                        {...register("npiNumber", {
+                                            required: "Field is required",
+                                            minLength: { value: 10, message: "NPI number should be at last 10 characters" },
+                                        })}
+
+                                        error={errors.npiNumber && true}
+                                        label="NPI Number*"
+                                        type={"number"}
+                                        fullWidth
+                                        variant="outlined"
+                                        helpertext={errors.npiNumber?.message}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
                                         {...register("Fname", { required: "Field is required" })}
                                         error={errors.Fname && true}
                                         id="outlined-basic"

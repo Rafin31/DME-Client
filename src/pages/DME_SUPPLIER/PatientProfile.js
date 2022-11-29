@@ -12,7 +12,6 @@ export default function PatientProfile() {
     const user = [
         {
             name: "Karim Hasan",
-            userName: "Karim986",
             email: "karim@gmail.com",
             userCategory: "Patient",
             Fname: "karim",
@@ -46,7 +45,7 @@ export default function PatientProfile() {
                     </Button>
                 </Stack>
                 {
-                    user.map(({ name, userName, email, userCategory, Fname, Lname, dob, gender, weight, city, country, state, phoneNumber, primaryInsurance, secondaryInsurance, address }) => {
+                    user.map(({ name, email, userCategory, Fname, Lname, dob, gender, weight, city, country, state, phoneNumber, primaryInsurance, secondaryInsurance, address }) => {
                         return (
                             <Box>
                                 <Stack
@@ -88,10 +87,6 @@ export default function PatientProfile() {
                                         <Typography variant='h6'>{Lname}</Typography>
                                     </Grid>
 
-                                    <Grid item xs={6} sm={6} md={4}>
-                                        <Typography variant='subtitle'>User Name</Typography>
-                                        <Typography variant='h6'>{userName}</Typography>
-                                    </Grid>
                                     <Grid item xs={6} sm={6} md={4}>
                                         <Typography variant='subtitle'>Date of Birth</Typography>
                                         <Typography variant='h6'>{dob}</Typography>

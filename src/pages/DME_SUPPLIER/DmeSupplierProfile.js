@@ -11,6 +11,7 @@ export default function DmeSupplierProfile() {
     const user = [
         {
             companyName: "DHL Fedex",
+            npiNumber: "6547641867564",
             name: "Jaydon Frankie",
             userName: "Karim986",
             email: "jaydon@gmail.com",
@@ -52,7 +53,7 @@ export default function DmeSupplierProfile() {
 
                 </Stack>
                 {
-                    user.map(({ companyName, name, userName, email, userCategory, Fname, Lname, city, country, state, zipCode, address }) => {
+                    user.map(({ companyName, npiNumber, name, userName, email, userCategory, Fname, Lname, city, country, state, zipCode, address }) => {
                         return (
                             <Box>
                                 <Stack
@@ -79,6 +80,10 @@ export default function DmeSupplierProfile() {
                                     <Grid item xs={6} sm={6} md={4}>
                                         <Typography variant='subtitle'>Company Name</Typography>
                                         <Typography variant='h6'>{companyName}</Typography>
+                                    </Grid>
+                                    <Grid item xs={6} sm={6} md={4}>
+                                        <Typography variant='subtitle'>NPI Number</Typography>
+                                        <Typography variant='h6'>{npiNumber}</Typography>
                                     </Grid>
                                     <Grid item xs={6} sm={6} md={4}>
                                         <Typography variant='subtitle'>User Name</Typography>

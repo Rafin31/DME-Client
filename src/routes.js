@@ -24,6 +24,7 @@ import Settings from './pages/DME_SUPPLIER/Settings';
 import EditOrder from './pages/DME_SUPPLIER/EditOrder';
 import PatientNotes from './pages/DME_SUPPLIER/PatientNotes';
 import UploadOrderDocuments from './pages/DME_SUPPLIER/UploadOrderDocuments';
+import SignupPage from './pages/Authentication/SignupPage';
 
 // ----------------------------------------------------------------------
 
@@ -32,11 +33,12 @@ export default function Router() {
     <Routes>
 
       <Route path='login' element={<LoginPage />} />
+      <Route path='signup' element={<SignupPage />} />
+      <Route path='/' element={<Navigate to="/login" />} />
 
       {/* --------------------------------------
                 DME Suppler Rotes 
         ----------------------------------------*/}
-      <Route path='/' element={<Navigate to="/DME-supplier/dashboard" />} />
       <Route path='/DME-supplier/dashboard' element={
         <AuthRoute>
           <DashboardLayout />

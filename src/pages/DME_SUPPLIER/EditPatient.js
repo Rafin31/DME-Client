@@ -73,20 +73,6 @@ export default function EditPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("userName", { required: "Field is required" })}
-                                        error={errors.userName && true}
-                                        id="outlined-basic"
-                                        label="User Name*"
-                                        type="text"
-                                        autoComplete="off"
-                                        fullWidth
-                                        variant="outlined"
-                                        helpertext={errors.userName?.message}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
                                         {...register("email", { required: "Field is required" })}
                                         error={errors.email && true}
                                         id="outlined-basic"
@@ -185,7 +171,7 @@ export default function EditPatient() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={6}>
                                     <TextField
                                         {...register("phoneNumber", {
                                             required: "Field is required",
