@@ -227,14 +227,16 @@ export default function PatientPage() {
                         spacing={1}
                         divider={<Divider orientation="vertical" flexItem />}>
                         <Tooltip
-                            title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > age > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance."
+                            title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Age > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
                             arrow
                             placement="left">
                             <Button
                                 variant="contained"
+                                component="label"
                                 color="success"
                                 style={{ color: "white", width: "110px" }}
                                 startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
+                                <input hidden accept="image/*" multiple type="file" />
                                 Import
                             </Button>
                         </Tooltip>
