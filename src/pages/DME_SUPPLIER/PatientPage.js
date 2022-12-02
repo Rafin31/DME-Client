@@ -226,13 +226,19 @@ export default function PatientPage() {
                         direction="row"
                         spacing={1}
                         divider={<Divider orientation="vertical" flexItem />}>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            style={{ color: "white", width: "110px" }}
-                            startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
-                            Import
-                        </Button>
+                        <Tooltip
+                            title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > age > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance."
+                            arrow
+                            placement="left">
+                            <Button
+                                variant="contained"
+                                color="success"
+                                style={{ color: "white", width: "110px" }}
+                                startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
+                                Import
+                            </Button>
+                        </Tooltip>
+
                         <Button variant="contained" startIcon={<Iconify icon="material-symbols:add" />}
                             onClick={() => { navigate('/DME-supplier/dashboard/add-patient') }}>
                             New Patient

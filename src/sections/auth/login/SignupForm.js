@@ -316,13 +316,9 @@ export default function SignupForm() {
                     </Grid>
                 </Grid>
 
-                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-                    <Link variant="subtitle2" underline="hover" style={{ cursor: "pointer" }}>
-                        Forgot password?
-                    </Link>
-                </Stack>
 
-                <Button fullWidth size="large" type="submit" variant="contained" >
+
+                <Button fullWidth size="large" type="submit" variant="contained" sx={{ my: 4 }}>
                     Signup
                 </Button>
             </form>
