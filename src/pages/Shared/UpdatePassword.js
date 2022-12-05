@@ -49,7 +49,7 @@ export default function UpdatePassword() {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("newPassword",
+                                        {...register("email",
                                             {
                                                 required: "Field is required",
                                                 minLength: { value: 8, message: "Password must be at last 8 characters" },
@@ -71,7 +71,7 @@ export default function UpdatePassword() {
                                             {
                                                 required: "Field is required",
                                                 validate: (val) => {
-                                                    if (watch('newPassword') !== val) {
+                                                    if (watch('email') !== val) {
                                                         return "Your passwords do no match";
                                                     }
                                                     return true;

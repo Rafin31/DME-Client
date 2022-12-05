@@ -25,6 +25,8 @@ import EditOrder from './pages/DME_SUPPLIER/EditOrder';
 import PatientNotes from './pages/DME_SUPPLIER/PatientNotes';
 import UploadOrderDocuments from './pages/DME_SUPPLIER/UploadOrderDocuments';
 import SignupPage from './pages/Authentication/SignupPage';
+import ForgetPassword from './pages/Shared/ResetPassword/ForgetPassword';
+import ResetPassword from './pages/Shared/ResetPassword/ResetPassword';
 
 // ----------------------------------------------------------------------
 
@@ -69,6 +71,10 @@ export default function Router() {
                 DME Suppler Rotes END
         ----------------------------------------*/}
 
+
+
+      <Route path='/app/forget-password-request' element={<ForgetPassword />} />
+      <Route path='/app/forget-password-confirmation/:token' element={<ResetPassword />} />
       <Route path='*' element={<Page404 />} />
     </Routes>
   )
