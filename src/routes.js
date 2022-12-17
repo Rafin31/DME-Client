@@ -1,6 +1,6 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
-// layouts
-import DashboardLayout from './layouts/dashboard';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+
+import DmeDashboardLayout from './layouts/dashboard';
 
 import LoginPage from './pages/Authentication/LoginPage';
 import Page404 from './pages/Shared/Page404';
@@ -12,7 +12,7 @@ import AddTasks from './pages/DME_SUPPLIER/AddTasks';
 import PatientPage from './pages/DME_SUPPLIER/PatientPage';
 import TherapistPage from './pages/DME_SUPPLIER/TherapistPage';
 import StaffPage from './pages/DME_SUPPLIER/StaffPage';
-import AuthRoute from './sections/auth/login/AuthRoute';
+import AuthRoute from './services/AuthRoute';
 import AddPatient from './pages/DME_SUPPLIER/AddPatient';
 import UploadDocuments from './pages/DME_SUPPLIER/UploadDocuments';
 import PatientProfile from './pages/DME_SUPPLIER/PatientProfile';
@@ -27,10 +27,18 @@ import UploadOrderDocuments from './pages/DME_SUPPLIER/UploadOrderDocuments';
 import SignupPage from './pages/Authentication/SignupPage';
 import ForgetPassword from './pages/Shared/ResetPassword/ForgetPassword';
 import ResetPassword from './pages/Shared/ResetPassword/ResetPassword';
+import CheckCategory from './services/CheckCategory';
+
+
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
+
+  const navigate = useNavigate()
+
+
+
   return (
     <Routes>
 
@@ -43,7 +51,9 @@ export default function Router() {
         ----------------------------------------*/}
       <Route path='/DME-supplier/dashboard' element={
         <AuthRoute>
-          <DashboardLayout />
+          <CheckCategory category={"DME-Supplier"}>
+            <DmeDashboardLayout />
+          </CheckCategory>
         </AuthRoute>
       }>
         <Route index element={<Navigate to="/DME-supplier/dashboard/app" />} />

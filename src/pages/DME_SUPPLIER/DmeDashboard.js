@@ -1,18 +1,22 @@
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
 // @mui
 import { useTheme } from '@mui/material/styles';
 
-import { Grid, Container, Typography, Stack, Button } from '@mui/material';
+import { Grid, Container, Typography, Stack, Button, Box, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
 
 // components
 import Iconify from '../../components/iconify';
 // sections
 import {
-  DmeSupplierTaks,
+  DmeSupplierTasks,
   AppWidgetSummary,
 } from '../../sections/@dashboard/app';
+import { AuthRequest } from '../../services/AuthRequest';
+
 
 
 
@@ -21,6 +25,33 @@ import {
 export default function DmeDashboard() {
   const theme = useTheme();
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [states, setStates] = useState()
+
+  let user = localStorage.getItem('user');
+  user = JSON.parse(user);
+
+  const dashBoardState = useCallback(() => {
+    AuthRequest.get(`/api/v1/dme/dashboardStates/${user.id}`).then(res => {
+      setStates(res.data.message)
+      setLoading(false)
+    })
+  }, [user])
+
+
+  useEffect(() => {
+    dashBoardState()
+  }, [])
+
+
+
+  if (loading) {
+    return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <CircularProgress />
+    </Box>
+  }
+
+
 
   return (
     <>
@@ -34,20 +65,21 @@ export default function DmeDashboard() {
         </Typography>
 
         <Grid container spacing={3}>
+
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="PATIENT" total={2} icon={'medical-icon:i-outpatient'} />
+            <AppWidgetSummary title="PATIENT" total={+(states?.patient)} icon={'medical-icon:i-outpatient'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="DOCTORS" total={5} color="info" icon={'fontisto:doctor'} />
+            <AppWidgetSummary title="DOCTORS" total={+(states?.doctors)} color="info" icon={'fontisto:doctor'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="THERAPIST" total={4} color="warning" icon={'tabler:physotherapist'} />
+            <AppWidgetSummary title="THERAPIST" total={+(states?.therapist)} color="warning" icon={'tabler:physotherapist'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="ORDERS" total={0} color="error" icon={'fluent-mdl2:activate-orders'} />
+            <AppWidgetSummary title="ORDERS" total={+(states?.orderCount)} color="error" icon={'fluent-mdl2:activate-orders'} />
           </Grid>
 
           <Grid item xs={12} md={12} lg={12}>
@@ -61,7 +93,7 @@ export default function DmeDashboard() {
                 New Tasks
               </Button>
             </Stack>
-            <DmeSupplierTaks
+            <DmeSupplierTasks
               list={[...Array(5)].map((_, index) => ({
                 id: faker.datatype.uuid(),
                 title: faker.name.jobTitle(),

@@ -1,19 +1,16 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
-
 import { useNavigate } from 'react-router-dom';
+import { userContext } from '../../../Context/AuthContext';
 import account from '../../../_mock/account';
+
 
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
-  {
-    label: 'Home',
-    path: "/"
-  },
   {
     label: 'Profile',
     path: `/DME-supplier/dashboard/DME-supplier-profile/${24}`
@@ -30,6 +27,8 @@ export default function AccountPopover() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate()
 
+  const { signOut } = useContext(userContext)
+
   const handleOpen = (event) => {
     if (!open) {
       setOpen(event.currentTarget);
@@ -40,6 +39,11 @@ export default function AccountPopover() {
   };
 
   const handleClose = (path) => {
+    if (path === '/logout') {
+      signOut()
+      setOpen(null);
+      return
+    }
     navigate(path)
     setOpen(null);
   };
@@ -107,7 +111,7 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={() => handleClose('/login')} sx={{ m: 1 }}>
+        <MenuItem onClick={() => handleClose('/logout')} sx={{ m: 1 }}>
           Logout
         </MenuItem>
       </Popover>

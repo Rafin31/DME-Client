@@ -1,11 +1,18 @@
 import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-// @mui
+import { toast } from 'react-toastify';
+import axios from 'axios';
+
 import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, Grid, FormControl, InputLabel, Select, MenuItem, Alert, Button } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
+import { AuthRequest } from '../../../services/AuthRequest';
 import { fDate } from '../../../utils/formatTime';
-// components
+
 import Iconify from '../../../components/iconify';
+
+
 
 
 
@@ -14,18 +21,46 @@ export default function SignupForm() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
     const [showField, setField] = useState("")
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
 
+
+    const queryParams = new URLSearchParams(window.location.search)
+    const invitationToken = queryParams.get("invitationToken")
+
+    const createUser = async (data) => {
+        setLoading(true)
+        await axios.post('/api/v1/users', data)
+            .then(res => {
+                reset()
+                setLoading(false)
+                toast.success("Successfully Signed Up!", {
+                    toastId: 'success1',
+                });
+                navigate('/', { replace: true });
+            })
+            .catch(error => {
+                setLoading(false)
+                toast.error(error.response.data.message, {
+                    toastId: 'error1',
+                });
+            });
+        setLoading(false)
+    }
+
+
     const toggleCategory = (event) => {
-        if (event.target.value === "patient") {
+        if (event.target.value === "patient-63861b794e45673948bb7c9f") {
             setField("patient")
         } else {
             setField("other")
         }
     }
-    const onSubmit = data => {
+
+    const onSubmit = async data => {
         const givenDate = new Date(data?.dob);
         const presentDate = new Date()
         if (givenDate > presentDate) {
@@ -36,15 +71,26 @@ export default function SignupForm() {
             data.dob = fDate(data.dob)
         }
         setDbError(false)
-        console.log(data)
-        navigate('/DME-supplier/dashboard', { replace: true });
-        reset()
+        const { userCategory, ...rest } = data
+        const finalData = {
+            ...rest,
+            fullName: data.firstName + " " + data.lastName,
+            status: "63861954b3b3ded1ee267309",
+            country: "USA",
+            userCategory: data.userCategory.split('-')[1]
+        }
+
+        if (data.password !== data.confirmPassword) {
+            setError("Password did not matched!")
+            return
+        }
+        createUser(finalData)
     };
+
 
 
     return (
         <>
-            {errors && console.log(errors)}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid
                     container
@@ -52,26 +98,26 @@ export default function SignupForm() {
                     columnSpacing={{ xs: 1, sm: 1, md: 1, lg: 1 }}>
                     <Grid item xs={6}>
                         <TextField
-                            {...register("Fname", { required: "Field is required" })}
-                            name="Fname"
+                            {...register("firstName", { required: "Field is required" })}
+                            name="firstName"
                             label="First Name"
-                            error={errors.Fname && true}
+                            error={errors.firstName && true}
                             type="text"
                             fullWidth
                             variant="outlined"
-                            helpertext={errors.Fname?.message}
+                            helperText={errors.Fname?.message}
                         />
                     </Grid>
                     <Grid item xs={6}>
                         <TextField
-                            {...register("Lname", { required: "Field is required" })}
-                            name="Lname"
+                            {...register("lastName", { required: "Field is required" })}
+                            name="lastName"
                             label="Last Name"
-                            error={errors.Lname && true}
+                            error={errors.lastName && true}
                             type="text"
                             fullWidth
                             variant="outlined"
-                            helpertext={errors.Lname?.message}
+                            helperText={errors.Lname?.message}
                         />
                     </Grid>
                     <Grid item xs={6}>
@@ -83,7 +129,7 @@ export default function SignupForm() {
                             type="email"
                             fullWidth
                             variant="outlined"
-                            helpertext={errors.email?.message}
+                            helperText={errors.email?.message}
                         />
                     </Grid>
                     <Grid item xs={6}>
@@ -94,7 +140,7 @@ export default function SignupForm() {
                             label="City*"
                             fullWidth
                             variant="outlined"
-                            helpertext={errors.city?.message}
+                            helperText={errors.city?.message}
 
                         />
                     </Grid>
@@ -106,23 +152,23 @@ export default function SignupForm() {
                             label="State*"
                             fullWidth
                             variant="outlined"
-                            helpertext={errors.state?.message}
+                            helperText={errors.state?.message}
 
                         />
                     </Grid>
                     <Grid item xs={6}>
                         <TextField
-                            {...register("zipNumber", {
+                            {...register("zip", {
                                 required: "Field is required",
                                 minLength: { value: 3, message: "Phone number should be at last 3 characters" },
                             })}
 
                             error={errors.zipNumber && true}
-                            label="Zip Number*"
+                            label="Zip code*"
                             type={"number"}
                             fullWidth
                             variant="outlined"
-                            helpertext={errors?.zipNumber?.message}
+                            helperText={errors?.zip?.message}
                         />
                     </Grid>
 
@@ -138,7 +184,7 @@ export default function SignupForm() {
                             type={"tel"}
                             fullWidth
                             variant="outlined"
-                            helpertext={errors?.phoneNumber?.message}
+                            helperText={errors?.phoneNumber?.message}
 
                         />
                     </Grid>
@@ -150,39 +196,56 @@ export default function SignupForm() {
                             error={errors.address && true}
                             fullWidth
                             multiline
-                            helpertext={errors.address?.message}
+                            helperText={errors.address?.message}
                             rows={4}
                             variant="outlined" />
                     </Grid>
-                    <Grid item xs={12}>
-                        <FormControl fullWidth>
-                            <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Sign up as*</InputLabel>
-                            <Select
-                                {...register("userCategory", { required: "Field is required" })}
-                                variant="outlined"
-                                size="small"
-                                error={errors.userCategory && true}
-                                helpertext={errors.userCategory?.message}
-                                defaultValue=""
-                                onChange={toggleCategory}
+                    {
+                        !invitationToken ?
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Sign up as*</InputLabel>
+                                    <Select
+                                        {...register("userCategory", { required: "Field is required" })}
+                                        variant="outlined"
+                                        size="small"
+                                        error={errors.userCategory && true}
+                                        helperText={errors.userCategory?.message}
+                                        defaultValue=""
+                                        onChange={toggleCategory}
 
-                            >
-                                <MenuItem value={"patient"}>Patient</MenuItem>
-                                <MenuItem value={"dmeSupplier"}>DME Supplier</MenuItem>
-                                <MenuItem value={"doctor"}>Doctor</MenuItem>
-                                <MenuItem value={"therapist"}>Therapist</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
+                                    >
+                                        <MenuItem value={"patient-63861b794e45673948bb7c9f"}>Patient</MenuItem>
+                                        <MenuItem value={"dme-63861b354e45673948bb7c9d"}>DME Supplier</MenuItem>
+                                        <MenuItem value={"doctor-638f775ea7f2be8abe01d2d4"}>Doctor</MenuItem>
+                                        <MenuItem value={"therapist-638f770aa7f2be8abe01d2d0"}>Therapist</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            :
+                            <Grid item xs={12}>
+                                <TextField
+                                    {...register("userCategory", { required: "Field is required", value: "staff" })}
+
+                                    label="User Category"
+                                    error={errors.userCategory && true}
+                                    fullWidth
+                                    multiline
+                                    defaultValue={"Staff"}
+                                    disabled
+                                    helperText={errors.userCategory?.message}
+                                    variant="outlined" />
+                            </Grid>
+                    }
 
 
-                    {showField === "other" &&
+                    {(showField === "other" || invitationToken) &&
                         <>
                             <Grid item xs={6}>
                                 <TextField
                                     {...register("npiNumber", {
                                         required: "Field is required",
-                                        minLength: { value: 10, message: "NPI number should be at last 10 characters" },
+                                        minLength: { value: 10, message: "NPI number must be 10 characters long" },
                                     })}
 
                                     error={errors.npiNumber && true}
@@ -190,11 +253,9 @@ export default function SignupForm() {
                                     type={"number"}
                                     fullWidth
                                     variant="outlined"
-                                    helpertext={errors.npiNumber?.message}
+                                    helperText={errors.npiNumber?.message}
 
                                 />
-                                {errors?.npiNumber?.type === "minLength" && <Alert sx={{ py: 0 }} severity="error">
-                                    NPI number must be at least 10 characters long </Alert>}
                             </Grid>
                             <Grid item xs={6} style={{ display: `${showField === "patient" ? "none" : "block"}` }}>
                                 <TextField
@@ -203,7 +264,7 @@ export default function SignupForm() {
                                     label="Company Name"
                                     fullWidth
                                     variant="outlined"
-                                    helpertext={errors.companyName?.message}
+                                    helperText={errors.companyName?.message}
 
                                 />
                             </Grid>
@@ -220,7 +281,7 @@ export default function SignupForm() {
                                         variant="outlined"
                                         size="small"
                                         error={errors.gender && true}
-                                        helpertext={errors.gender?.message}
+                                        helperText={errors.gender?.message}
                                         rows={2}
                                         defaultValue=""
                                         {...register("gender", { required: "Field is required" })}
@@ -241,7 +302,7 @@ export default function SignupForm() {
                                     type="text"
                                     fullWidth
                                     variant="outlined"
-                                    helpertext={errors.dob?.message}
+                                    helperText={errors.dob?.message}
                                 />
                                 {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
                             </Grid>
@@ -249,37 +310,46 @@ export default function SignupForm() {
                                 <TextField
                                     {...register("weight", { required: "Field is required" })}
                                     error={errors.weight && true}
-
                                     type={'number'}
                                     label="Weight (lbs)*"
                                     fullWidth
                                     variant="outlined"
-                                    helpertext={errors.weight?.message}
+                                    helperText={errors.weight?.message}
 
                                 />
                             </Grid>
 
                             <Grid item xs={6}>
                                 <TextField
-                                    {...register("primaryInsurance", { required: "Field is required" })}
+                                    {...register("primaryInsurance", {
+                                        required: "Field is required", minLength: {
+                                            value: 10,
+                                            message: "Must be longer than 10 characters!"
+                                        }
+                                    })}
                                     error={errors.primaryInsurance && true}
-
+                                    type={'number'}
                                     label="Primary Insurance*"
                                     fullWidth
                                     variant="outlined"
-                                    helpertext={errors.primaryInsurance?.message}
+                                    helperText={errors.primaryInsurance?.message}
 
                                 />
                             </Grid>
                             <Grid item xs={6}>
                                 <TextField
-                                    {...register("secondaryInsurance", { required: "Field is required" })}
+                                    {...register("secondaryInsurance", {
+                                        required: "Field is required", minLength: {
+                                            value: 10,
+                                            message: "Must be longer than 10 characters!"
+                                        }
+                                    })}
                                     error={errors.secondaryInsurance && true}
-
+                                    type={'number'}
                                     label="Secondary Insurance*"
                                     fullWidth
                                     variant="outlined"
-                                    helpertext={errors.secondaryInsurance?.message}
+                                    helperText={errors.secondaryInsurance?.message}
 
                                 />
                             </Grid>
@@ -290,7 +360,7 @@ export default function SignupForm() {
                         <TextField
                             {...register("password", { required: "Field is required" })}
                             error={errors.password && true}
-                            helpertext={errors.password?.message}
+                            helperText={errors.password?.message}
                             label="Password"
                             type={showPassword ? 'text' : 'password'}
                             InputProps={{
@@ -308,7 +378,7 @@ export default function SignupForm() {
                         <TextField
                             {...register("confirmPassword", { required: "Field is required" })}
                             error={errors.confirmPassword && true}
-                            helpertext={errors.confirmPassword?.message}
+                            helperText={errors.confirmPassword?.message}
                             name="confirmPassword"
                             label="Confirm Password"
                             type={'password'}
@@ -316,11 +386,13 @@ export default function SignupForm() {
                     </Grid>
                 </Grid>
 
+                {
+                    error && <Alert sx={{ mt: 5 }} severity="error">{error}</Alert>
+                }
 
-
-                <Button fullWidth size="large" type="submit" variant="contained" sx={{ my: 4 }}>
+                <LoadingButton loading={loading} fullWidth size="large" type="submit" variant="contained" sx={{ my: 4 }}>
                     Signup
-                </Button>
+                </LoadingButton>
             </form>
         </>
     );

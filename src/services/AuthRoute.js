@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, memo } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { userContext } from '../Context/AuthContext';
+
 
 
 const AuthRoute = ({ children }) => {
 
     const location = useLocation();
-    const [user, setUser] = useState(true)
+    const { isLogin } = useContext(userContext)
 
-    if (!user) {
+    if (!isLogin()) {
 
         return <Navigate to="/login" state={{ from: location }} replace />;
     }

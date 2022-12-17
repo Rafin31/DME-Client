@@ -12,13 +12,13 @@ import Scrollbar from '../../../components/scrollbar';
 
 // ----------------------------------------------------------------------
 
-DmeSupplierTaks.propTypes = {
+DmeSupplierTask.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
   list: PropTypes.array.isRequired,
 };
 
-export default function DmeSupplierTaks({ title, subheader, list, ...other }) {
+export default function DmeSupplierTask({ title, subheader, list, ...other }) {
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
