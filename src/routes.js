@@ -28,6 +28,7 @@ import SignupPage from './pages/Authentication/SignupPage';
 import ForgetPassword from './pages/Shared/ResetPassword/ForgetPassword';
 import ResetPassword from './pages/Shared/ResetPassword/ResetPassword';
 import CheckCategory from './services/CheckCategory';
+import EditTasks from './pages/DME_SUPPLIER/EditTask';
 
 
 
@@ -65,9 +66,11 @@ export default function Router() {
         <Route path='patient' element={<PatientPage />} />
         <Route path='add-patient' element={<AddPatient />} />
         <Route path='staff' element={<StaffPage />} />
+        <Route path='add-tasks' element={<AddTasks />} />
+
         <Route path='patient-document/:id' element={<UploadDocuments />} />
         <Route path='order-document/:id' element={<UploadOrderDocuments />} />
-        <Route path='add-tasks/:id' element={<AddTasks />} />
+        <Route path='edit-tasks/:id' element={<EditTasks />} />
         <Route path='patient-profile/:id' element={<PatientProfile />} />
         <Route path='edit-patient-profile/:id' element={<EditPatient />} />
         <Route path='DME-supplier-profile/:id' element={<DmeSupplierProfile />} />

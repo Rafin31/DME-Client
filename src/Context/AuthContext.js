@@ -49,12 +49,16 @@ const AuthContext = ({ children }) => {
 
     }
 
+    const loggedInUser = () => {
+        let user = localStorage.getItem('user');
+        user = JSON.parse(user);
+        return user
 
-
+    }
 
 
     return (
-        <userContext.Provider value={{ signOut, signIn, isLogin, loading }} >
+        <userContext.Provider value={{ signOut, signIn, isLogin, loading, loggedInUser }} >
             {children}
         </userContext.Provider>
     );

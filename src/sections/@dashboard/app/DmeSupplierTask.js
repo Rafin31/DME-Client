@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { FaUserAlt } from 'react-icons/fa'
 import { Box, Stack, Link, Card, Button, Divider, Typography, CardHeader, IconButton, Popover, MenuItem, TextField } from '@mui/material';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { AuthRequest } from '../../../services/AuthRequest';
 // utils
 import { fToNow, fDateTime, fDate } from '../../../utils/formatTime';
 // components
@@ -18,7 +21,7 @@ DmeSupplierTask.propTypes = {
   list: PropTypes.array.isRequired,
 };
 
-export default function DmeSupplierTask({ title, subheader, list, ...other }) {
+export default function DmeSupplierTask({ id, title, subheader, list, ...other }) {
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -33,11 +36,11 @@ export default function DmeSupplierTask({ title, subheader, list, ...other }) {
 
       <Divider />
 
-      <Box sx={{ p: 2, textAlign: 'right' }}>
+      {/* <Box sx={{ p: 2, textAlign: 'right' }}>
         <Button size="small" color="inherit" endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
           View all
         </Button>
-      </Box>
+      </Box> */}
     </Card>
   );
 }
@@ -53,8 +56,9 @@ NewsItem.propTypes = {
 };
 
 function NewsItem({ news }) {
-  const { title, patientName, description, postedAt } = news;
+  const { id, title, patientName, description, postedAt, rftch: refetch } = news;
   const [open, setOpen] = useState(null);
+  const navigate = useNavigate()
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -63,6 +67,26 @@ function NewsItem({ news }) {
   const handleCloseMenu = () => {
     setOpen(null);
   };
+
+  const handleEdit = () => {
+    navigate(`/DME-supplier/dashboard/edit-tasks/${id}`)
+  }
+  const handleDelete = () => {
+
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      AuthRequest.delete(`/api/v1/dme/task/${id}`).then(res => {
+        refetch()
+        toast.success("Task Deleted!", {
+          toastId: "success3"
+        })
+      })
+    }
+
+    setOpen(null);
+  }
+
+
+
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
@@ -106,12 +130,12 @@ function NewsItem({ news }) {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => handleEdit()}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem sx={{ color: 'error.main' }} onClick={() => handleDelete()}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>

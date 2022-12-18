@@ -6,6 +6,8 @@ import { useTheme } from '@mui/material/styles';
 
 import { Grid, Container, Typography, Stack, Button, Box, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { userContext } from '../../Context/AuthContext';
 
 
 // components
@@ -25,33 +27,34 @@ import { AuthRequest } from '../../services/AuthRequest';
 export default function DmeDashboard() {
   const theme = useTheme();
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [states, setStates] = useState()
-
-  let user = localStorage.getItem('user');
-  user = JSON.parse(user);
-
-  const dashBoardState = useCallback(() => {
-    AuthRequest.get(`/api/v1/dme/dashboardStates/${user.id}`).then(res => {
-      setStates(res.data.message)
-      setLoading(false)
-    })
-  }, [user])
 
 
-  useEffect(() => {
-    dashBoardState()
-  }, [])
+  const { loggedInUser } = useContext(userContext)
+  const user = loggedInUser()
 
 
+  const { isLoading: statesLoading, data: states } = useQuery('states',
+    async () => {
+      return AuthRequest.get(`/api/v1/dme/dashboardStates/${user.id}`).then(data => data.data.message)
+    }
+  )
 
-  if (loading) {
+  const { isLoading: taskLoading, data: tasks, refetch, isFetching } = useQuery('tasks',
+    async () => {
+      return AuthRequest.get(`/api/v1/dme/dme-task/${user.id}`).then(data => data.data.data)
+    },
+    {
+      refetchInterval: 2000,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+
+  if (statesLoading || taskLoading) {
     return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <CircularProgress />
     </Box>
   }
-
-
 
   return (
     <>
@@ -88,21 +91,28 @@ export default function DmeDashboard() {
                 Tasks
               </Typography>
               <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}
-                onClick={() => { navigate(`/DME-supplier/dashboard/add-tasks/${654}`) }}
+                onClick={() => { navigate(`/DME-supplier/dashboard/add-tasks`) }}
               >
                 New Tasks
               </Button>
             </Stack>
-            <DmeSupplierTasks
-              list={[...Array(5)].map((_, index) => ({
-                id: faker.datatype.uuid(),
-                title: faker.name.jobTitle(),
-                patientName: "KingoPOLI",
-                description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English",
-                image: `/assets/images/covers/cover_${index + 1}.jpg`,
-                postedAt: new Date(),
-              }))}
-            />
+            {
+              tasks.length !== 0 ? <DmeSupplierTasks
+                list={tasks.map((task, index) => ({
+                  id: task._id,
+                  title: task.title,
+                  patientName: task.patientId.fullName,
+                  description: task.description,
+                  image: `/assets/images/covers/cover_${index + 1}.jpg`,
+                  postedAt: task.taskDate,
+                  rftch: refetch
+                }))}
+              />
+                :
+                <div className="noTask" style={{ height: '300px', width: "100%", display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                  <p>No Task found. Please add </p>
+                </div>
+            }
           </Grid>
         </Grid>
       </Container>

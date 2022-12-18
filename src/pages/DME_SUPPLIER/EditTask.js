@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery } from 'react-query';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
 import { userContext } from '../../Context/AuthContext';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
@@ -16,9 +17,11 @@ import { AuthRequest } from '../../services/AuthRequest';
 
 
 
-export default function AddTasks() {
+export default function EditTasks() {
     const [date, setDate] = useState(new Date())
     const [data, setData] = useState()
+    const { id } = useParams()
+
     const [dateError, setError] = useState({
         status: false,
         message: " "
@@ -33,14 +36,27 @@ export default function AddTasks() {
             return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
         }
     )
-    //   add Task
+
+    const { isLoading: taskLoading, data: task, refetch } = useQuery('task',
+        async () => {
+            return AuthRequest.get(`/api/v1/dme/task/${id}`)
+                .then(data => {
+                    setDate(new Date(data.data.data[0].taskDate))
+                    return data.data.data
+                }
+                )
+        }
+    )
+
+
+    //   update Task
     const { mutateAsync, isLoading: postTaskLoading } = useMutation((task) => {
 
-        return AuthRequest.post(`/api/v1/dme/task`, task)
+        return AuthRequest.patch(`/api/v1/dme/task/${id}`, task)
             .then(res => {
-
                 reset()
-                toast.success("Task Added!", {
+                refetch()
+                toast.success("Task Updated!", {
                     toastId: 'success4'
                 })
             })
@@ -71,17 +87,22 @@ export default function AddTasks() {
         mutateAsync(data)
     };
 
+    if (taskLoading) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
 
-    console.log(data);
+
 
 
     return (
         <>
             <Helmet>
-                <title> Add Task </title>
+                <title> Edit Tasks </title>
             </Helmet>
             <Container maxWidth="xl">
-                <Typography variant="h5">Add Task</Typography>
+                <Typography variant="h5">Edit Tasks</Typography>
                 <Grid
                     container
                     spacing={0}
@@ -106,6 +127,7 @@ export default function AddTasks() {
                                             size="small"
                                             error={errors.supplier && true}
                                             rows={2}
+                                            defaultValue={task[0].patientId}
                                             {...register("patientId", { required: true })}
 
                                         >
@@ -132,6 +154,7 @@ export default function AddTasks() {
                                         id="outlined-basic"
                                         label="Title"
                                         error={errors.title && true}
+                                        defaultValue={task[0].title}
                                         fullWidth
                                         multiline
                                         helpertext={errors.title?.message}
@@ -146,6 +169,7 @@ export default function AddTasks() {
                                         error={errors.description && true}
                                         fullWidth
                                         multiline
+                                        defaultValue={task[0].description}
                                         rows={4}
                                         helpertext={errors.description?.message}
                                         variant="outlined" />
@@ -157,14 +181,17 @@ export default function AddTasks() {
                                         <DayPicker
                                             mode="single"
                                             selected={date}
-                                            onSelect={setDate}
+                                            onSelect={date => {
+                                                setDate(date)
+                                            }}
+
                                         />
                                     </Stack>
                                     {dateError?.status && <Alert severity="error">{dateError?.message}</Alert>}
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <LoadingButton loading={postTaskLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</LoadingButton>
+                                    <LoadingButton loading={postTaskLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Edit</LoadingButton>
                                 </Grid>
                             </Grid>
                         </form>
