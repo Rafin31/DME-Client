@@ -123,7 +123,6 @@ export default function EditTasks() {
                                         <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >{"Patient"}</InputLabel>
                                         <Select
                                             variant="outlined"
-                                            defaultValue=""
                                             size="small"
                                             error={errors.supplier && true}
                                             rows={2}
