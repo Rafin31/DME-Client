@@ -1,8 +1,13 @@
-import { Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 
 import { useForm } from "react-hook-form";
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useMutation, useQuery } from 'react-query';
+import { Box } from '@mui/system';
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
+import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
 
 
@@ -10,10 +15,74 @@ import Iconify from '../../components/iconify';
 
 export default function AddOrder() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const [user, setUser] = useState()
+    const [loading, setLoading] = useState(false)
+
+    let loggedUser = localStorage.getItem('user');
+    loggedUser = JSON.parse(loggedUser);
+
+    const { id } = loggedUser
+
+    const loadUserInfo = useCallback(() => {
+
+
+
+        AuthRequest.get(`/api/v1/users/${id}`)
+            .then(res => {
+                setUser(res.data.data)
+                setLoading(false)
+            })
+    })
+
+    useEffect(() => {
+        setLoading(true);
+        loadUserInfo()
+    }, [])
+
+    const { isLoading: patientLoading, data: patients } = useQuery('patient',
+        async () => {
+            return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+        }
+    )
+
+    const { mutateAsync, isLoading: createOrderLoading } = useMutation((order) => {
+
+        return AuthRequest.post(`/api/v1/order`, order)
+            .then(res => {
+                reset()
+                toast.success("Order Created!", {
+                    toastId: 'success5'
+                })
+            })
+            .catch((err) => {
+                toast.error("Something went wrong!", {
+                    toastId: 'error3'
+                })
+            })
+    })
+
+
+    if (!user || patientLoading) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
     const onSubmit = data => {
-        console.log(data)
+        const { patientId, description, note } = data
+        const order = {
+            dmeSupplierId: id,
+            patientId,
+            description,
+            note,
+            status: "New-Referral"
+        }
+        console.log(order)
+        mutateAsync(order)
         reset()
     };
+
+
     return (
         <>
             <Helmet>
@@ -43,7 +112,7 @@ export default function AddOrder() {
                                         label="DME Supplier"
                                         fullWidth
                                         variant="outlined"
-                                        defaultValue={"Jaydon"}
+                                        defaultValue={user?.fullName}
                                         helpertext={errors.supplier?.message}
                                         InputProps={{
                                             readOnly: true,
@@ -52,23 +121,37 @@ export default function AddOrder() {
                                     />
                                 </Grid>
 
+
                                 <Grid item xs={12} style={{ margin: "10px 0px" }}>
                                     <FormControl fullWidth>
-                                        <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Patient</InputLabel>
+                                        <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >{"Patient"}</InputLabel>
                                         <Select
                                             variant="outlined"
-                                            size="small"
                                             defaultValue=""
-                                            error={errors.patient && true}
+                                            size="small"
+                                            error={errors.supplier && true}
                                             rows={2}
-                                            {...register("patient", { required: true })}
+                                            {...register("patientId", { required: true })}
 
                                         >
-                                            <MenuItem value={1}>Option 1</MenuItem>
-                                            <MenuItem value={2}>Option 2</MenuItem>
+                                            {
+                                                !patientLoading ?
+
+
+                                                    patients.map((patient, index) => {
+                                                        return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
+                                                    })
+
+                                                    :
+                                                    <Box style={{ height: "50px", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                        <CircularProgress />
+                                                    </Box>
+                                            }
                                         </Select>
                                     </FormControl>
                                 </Grid>
+
+
                                 <Grid item xs={12} >
                                     <TextField
                                         {...register("description", { required: true })}
@@ -83,7 +166,7 @@ export default function AddOrder() {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("notes", { required: true })}
+                                        {...register("note", { required: true })}
                                         id="outlined-basic"
                                         label="Notes"
                                         error={errors.notes && true}
@@ -94,7 +177,7 @@ export default function AddOrder() {
                                         variant="outlined" />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</Button>
+                                    <LoadingButton loading={createOrderLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</LoadingButton>
                                 </Grid>
                             </Grid>
                         </form>

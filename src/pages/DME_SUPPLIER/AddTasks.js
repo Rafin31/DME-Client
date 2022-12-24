@@ -71,10 +71,6 @@ export default function AddTasks() {
         mutateAsync(data)
     };
 
-
-    console.log(data);
-
-
     return (
         <>
             <Helmet>
