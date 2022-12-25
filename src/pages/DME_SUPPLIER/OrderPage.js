@@ -421,11 +421,11 @@ export default function OrderPage() {
                                                                                 { label: "Add Note" },
                                                                                 { label: "Status" },
                                                                                 { label: "Documents" },
-                                                                                { label: "Delete" }
                                                                             ]}
                                                                             id={row._id}
                                                                         />
                                                                     </TableCell>
+
                                                                 </TableRow>
                                                             );
                                                         })}

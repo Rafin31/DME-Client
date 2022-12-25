@@ -1,21 +1,90 @@
-import { Alert, Avatar, Box, Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { deepOrange } from '@mui/material/colors';
 import { useForm } from 'react-hook-form';
+import { LoadingButton } from '@mui/lab';
+import { useParams } from 'react-router-dom';
+import { useMutation, useQuery } from 'react-query';
+import { toast } from 'react-toastify';
+import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
-import { fDate } from '../../utils/formatTime';
+
 
 export default function EditOrder() {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
-    const [dbError, setDbError] = useState(false)
+    const [user, setUser] = useState()
+    const [loading, setLoading] = useState(false)
+
+    let loggedUser = localStorage.getItem('user');
+    loggedUser = JSON.parse(loggedUser);
+
+    const { id } = loggedUser
+    const { id: orderId } = useParams()
+
+    const loadUserInfo = useCallback(() => {
+        AuthRequest.get(`/api/v1/users/${id}`)
+            .then(res => {
+                setUser(res.data.data)
+                setLoading(false)
+            })
+    }, [id])
+
+    const { isLoading: orderLoading, data: order } = useQuery('order',
+        async () => {
+            return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
+        }
+    )
+
+    const { isLoading: patientLoading, data: patients } = useQuery('patient',
+        async () => {
+            return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+        }
+    )
+
+    const { mutateAsync, isLoading: updateOrderLoading } = useMutation((order) => {
+
+        return AuthRequest.patch(`/api/v1/order/${orderId}`, order)
+            .then(res => {
+                reset()
+                toast.success("Order Updated!", res, {
+                    toastId: 'success6'
+                })
+            })
+            .catch((err) => {
+                toast.error("Something went wrong!", {
+                    toastId: 'error4'
+                })
+            })
+    })
+
     if (errors) {
         console.log(errors);
     }
     const onSubmit = data => {
-        console.log(data)
+        const { patientId, note, description, status } = data
+        const orderData = {
+            dmeSupplierId: id,
+            patientId,
+            note,
+            description,
+            status
+        }
+        mutateAsync(orderData)
         reset()
     };
+
+    useEffect(() => {
+        setLoading(true);
+        loadUserInfo()
+    }, [loadUserInfo])
+
+
+    if (!user || orderLoading || patientLoading) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
     return (
         <>
             <Helmet>
@@ -45,7 +114,7 @@ export default function EditOrder() {
                                         label="DME Supplier"
                                         fullWidth
                                         variant="outlined"
-                                        defaultValue={"Jaydon"}
+                                        defaultValue={user?.fullName}
                                         helpertext={errors.supplier?.message}
                                         InputProps={{
                                             readOnly: true,
@@ -60,16 +129,19 @@ export default function EditOrder() {
                                         <Select
                                             variant="outlined"
                                             size="small"
-                                            defaultValue=""
                                             error={errors.patient && true}
                                             rows={2}
-                                            {...register("patient",
+                                            {...register("patientId",
                                                 { required: "Filed Required" })}
                                             helpertext={errors.patient?.message}
+                                            defaultValue={order.patientId._id}
 
                                         >
-                                            <MenuItem value={1}>Option 1</MenuItem>
-                                            <MenuItem value={2}>Option 2</MenuItem>
+                                            {
+                                                patients.map((patient, index) => {
+                                                    return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
+                                                })
+                                            }
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -79,46 +151,87 @@ export default function EditOrder() {
                                         <Select
                                             variant="outlined"
                                             size="small"
-                                            defaultValue=""
                                             error={errors.orderStatus && true}
                                             rows={2}
-                                            {...register("orderStatus",
+                                            {...register("status",
                                                 { required: "Filed Required" }
                                             )}
                                             helpertext={errors.orderStatus?.message}
+                                            defaultValue={order.status}
                                         >
-                                            <MenuItem value={"evaluation"}>Evaluation</MenuItem>
-                                            <MenuItem value={"cancelled"}>Cancelled</MenuItem>
+                                            {
+                                                order.status === "New-Referral" &&
+                                                <MenuItem value={"Evaluation"}>Evaluation</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Evaluation" &&
+                                                <MenuItem value={"Evaluation-Completed"}>Evaluation Completed</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Evaluation-Completed" &&
+                                                <MenuItem value={"Paper-Work-In-Process"}>Paper-Work-In-Process</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Paper-Work-In-Process" &&
+                                                <MenuItem value={"Prior-Auth-Status"}>Prior Auth Status</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Prior-Auth-Status" &&
+                                                <MenuItem value={"Prior-Auth-Receive"}>Prior Auth Receive</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Prior-Auth-Receive" &&
+                                                <MenuItem value={"Holding-RTO"}>Holding RTO</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Holding-RTO" &&
+                                                <MenuItem value={"RTO"}>RTO</MenuItem>
+                                            }
+                                            {
+                                                order.status === "RTO" &&
+                                                <MenuItem value={"Delivered"}>Delivered</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Delivered" &&
+                                                <MenuItem value={"Authorization-Expiration-F/U"}>Authorization Expiration F/U</MenuItem>
+                                            }
+                                            {
+                                                order.status === "Authorization-Expiration-F/U" &&
+                                                <MenuItem value={"Order-Request"}>Order Request</MenuItem>
+                                            }
+                                            <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
+
                                         </Select>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} >
                                     <TextField
-                                        {...register("description",
-                                            { required: "Filed Required" })}
+                                        {...register("description")}
                                         id="outlined-basic"
                                         label="Description"
                                         error={errors.description && true}
                                         fullWidth
                                         multiline
+                                        defaultValue={order?.description}
                                         rows={4}
                                         helpertext={errors.description?.message}
                                         variant="outlined" />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("notes", { required: "Filed Required" })}
+                                        {...register("note")}
                                         id="outlined-basic"
                                         label="Notes"
                                         error={errors.notes && true}
                                         fullWidth
                                         multiline
                                         helpertext={errors.notes?.message}
+                                        defaultValue={order?.notes?.note}
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</Button>
+                                    <LoadingButton loading={updateOrderLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Update</LoadingButton>
                                 </Grid>
                             </Grid>
                         </form>

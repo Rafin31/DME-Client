@@ -32,12 +32,12 @@ export default function AddOrder() {
                 setUser(res.data.data)
                 setLoading(false)
             })
-    })
+    }, [id])
 
     useEffect(() => {
         setLoading(true);
         loadUserInfo()
-    }, [])
+    }, [loadUserInfo])
 
     const { isLoading: patientLoading, data: patients } = useQuery('patient',
         async () => {

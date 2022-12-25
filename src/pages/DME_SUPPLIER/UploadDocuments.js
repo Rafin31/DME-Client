@@ -1,19 +1,22 @@
 
 import { Helmet } from 'react-helmet-async';
-import { React, useRef } from 'react';
-import { Button, Card, Container, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { React, useRef, useState } from 'react';
+import { Box, Button, Card, CircularProgress, Container, Grid, IconButton, Stack, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { Link, useParams } from "react-router-dom";
+import { useQuery } from 'react-query';
 import Iconify from '../../components/iconify';
+import { AuthRequest } from '../../services/AuthRequest';
 
 
 
 
 export default function UploadDocuments() {
 
-    const { id } = useParams()
+    const { orderId } = useParams()
     const submitButtonRef = useRef(null)
+
 
     const handleUploadButtonClick = (e) => {
         e.preventDefault()
@@ -27,6 +30,7 @@ export default function UploadDocuments() {
         console.log(!!formData.entries().next().value) // check if file uploaded or not
     }
 
+
     return (
         <>
             <Helmet>
@@ -36,11 +40,11 @@ export default function UploadDocuments() {
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h5">Upload Documents for Patient
                         <Link
-                            to={`/DME-supplier/dashboard/patient-profile/${id}`}
+                            to={`/DME-supplier/dashboard/patient-profile/32463`}
                             style={{ color: "black", cursor: "pointer", marginLeft: "10px" }}
                             color="inherit" variant="subtitle2" underline="hover" nowrap="true"
                             target="_blank" rel="noopener noreferrer"
-                        >Karim Hasan
+                        >{"KARIM HASAN"}
                         </Link>
                     </Typography>
                     <form onSubmit={(e) => handleFormSubmit(e)}>
