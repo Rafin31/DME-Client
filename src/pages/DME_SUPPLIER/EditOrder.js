@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { LoadingButton } from '@mui/lab';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useNavigation, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { AuthRequest } from '../../services/AuthRequest';
@@ -14,6 +14,7 @@ export default function EditOrder() {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
     const [user, setUser] = useState()
     const [loading, setLoading] = useState(false)
+    const navigate = useNavigate();
 
     let loggedUser = localStorage.getItem('user');
     loggedUser = JSON.parse(loggedUser);
@@ -49,6 +50,7 @@ export default function EditOrder() {
                 toast.success("Order Updated!", res, {
                     toastId: 'success6'
                 })
+                navigate(-1)
             })
             .catch((err) => {
                 toast.error("Something went wrong!", {

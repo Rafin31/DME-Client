@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const AuthRequest = axios.create(
     {
-        baseURL: "http://localhost:5000",
+        baseURL: process.env.server,
         headers: {
             "Content-type": "application/json"
         }

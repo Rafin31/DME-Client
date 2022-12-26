@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery } from 'react-query';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import { userContext } from '../../Context/AuthContext';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
@@ -23,6 +24,7 @@ export default function AddTasks() {
         status: false,
         message: " "
     })
+    const navigate = useNavigate()
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
     const { loggedInUser } = useContext(userContext)
@@ -43,6 +45,7 @@ export default function AddTasks() {
                 toast.success("Task Added!", {
                     toastId: 'success4'
                 })
+                navigate(-1)
             })
     })
 

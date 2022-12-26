@@ -7,6 +7,7 @@ import { useMutation, useQuery } from 'react-query';
 import { Box } from '@mui/system';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
+import { useNavigate } from 'react-router-dom';
 import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
 
@@ -17,6 +18,7 @@ export default function AddOrder() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [user, setUser] = useState()
     const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
 
     let loggedUser = localStorage.getItem('user');
     loggedUser = JSON.parse(loggedUser);
@@ -53,6 +55,7 @@ export default function AddOrder() {
                 toast.success("Order Created!", {
                     toastId: 'success5'
                 })
+                navigate(-1)
             })
             .catch((err) => {
                 toast.error("Something went wrong!", {

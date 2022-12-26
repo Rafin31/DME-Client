@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // @mui
 import {
@@ -18,11 +18,15 @@ import {
   TableContainer,
   TablePagination,
   Box,
+  CircularProgress,
 } from '@mui/material';
 // components
 
+import { useQuery } from 'react-query';
+import { toast } from 'react-toastify';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
+import { AuthRequest } from '../../services/AuthRequest';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
 import InviteModal from '../Shared/InviteModal';
@@ -39,89 +43,90 @@ import AddPatienttToDoctor from '../Shared/AddPatientToDoctorModal';
 const TABLE_HEAD = [
   { id: 'Fname', label: 'First Name', alignRight: false },
   { id: 'Lname', label: 'Last Name', alignRight: false },
+  { id: 'fullName', label: 'Full Name', alignRight: false },
   { id: 'email', label: 'Email', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
   // { id: '' },
 ];
 
-const doctors = [
-  {
-    Fname: "Rafin ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
-  {
-    Fname: "loewm ",
-    Lname: "asdas ",
-    email: "rere@gmail.com",
-  },
+// const doctors = [
+//   {
+//     Fname: "Rafin ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
+//   {
+//     Fname: "loewm ",
+//     Lname: "asdas ",
+//     email: "rere@gmail.com",
+//   },
 
-]
+// ]
 
 
 // ----------------------------------------------------------------------
@@ -150,7 +155,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.Fname.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -172,15 +177,89 @@ export default function DoctorPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [user, setUser] = useState()
+  const [loading, setLoading] = useState(false)
+
+  const [invitedDoctorId, setInvitedDoctor] = useState()
+
+
+  const { isLoading: doctorLoading, data: doctors } = useQuery('doctorsTemp',
+    async () => {
+      return AuthRequest.get(`/api/v1/doctor/`).then(data => data.data.data)
+    }
+  )
+
+
+  const { isLoading: patientLoading, data: patients } = useQuery('patient',
+    async () => {
+      return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+    }
+  )
+
+  let loggedUser = localStorage.getItem('user');
+  loggedUser = JSON.parse(loggedUser);
+
+  const { id } = loggedUser
+
+  const loadUserInfo = useCallback(() => {
+
+
+
+    AuthRequest.get(`/api/v1/users/${id}`)
+      .then(res => {
+        setUser(res.data.data)
+        setLoading(false)
+      })
+  }, [id])
+
+  useEffect(() => {
+    setLoading(true);
+    loadUserInfo()
+  }, [loadUserInfo])
+
+
+  if (!doctors || doctorLoading || patientLoading || !user) {
+    return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <CircularProgress />
+    </Box>
+  }
+
   // Function to get invited doctor email  
-  const handelInviteDoctor = (e) => {
+  const handelInviteDoctor = async (e) => {
     e.preventDefault()
-    console.log(e.target.invitedEmail.value)
-    setInviteOpen(false)
+    await AuthRequest.post(`/api/v1/dme/invite-doctor`, { email: e.target.invitedEmail.value }).then((res) => {
+      if (res.status === 200) {
+        toast.success(`Invitation sent to ${e.target.invitedEmail.value}`, {
+          toastId: 'success7'
+        })
+        setInviteOpen(false)
+      } else {
+        toast.error(`Something went wrong!`, {
+          toastId: 'error7'
+        })
+        setInviteOpen(false)
+      }
+
+
+    })
   };
-  const handelAddPatientToDoctor = (e) => {
+  const handelAddPatientToDoctor = async (e) => {
     e.preventDefault()
-    console.log(e.target.addPatientToDoctor.value)
+    const data = {
+      patientUserId: e.target.addPatientToDoctor.value,
+      doctorUserId: invitedDoctorId,
+    }
+    await AuthRequest.post(`/api/v1/dme/add-patient-to-doctor`, data)
+      .then(res => {
+        toast.success('Doctor successfully assigned to the patient', {
+          toastId: "success9"
+        })
+      })
+      .catch(err => {
+        toast.error(err.response.data.data, {
+          toastId: "error9"
+        })
+      })
     setAddPatientOpen(false)
   };
 
@@ -221,36 +300,6 @@ export default function DoctorPage() {
   const isNotFound = !filteredUsers.length && !!filterName;
 
 
-
-  // ---------------------------------Tabs-------------------------------------
-
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
-    );
-  }
-
-  TabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-  };
-
-
   return (
     <>
       <Helmet>
@@ -269,10 +318,10 @@ export default function DoctorPage() {
           </Button>
         </Stack>
 
-        <InviteModal open={inviteOpen} setOpen={setInviteOpen} handelFormSubmit={handelInviteDoctor} title="Invite Doctors" />
+        <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteDoctor} title="Invite Doctors" />
 
         <AddPatienttToDoctor open={addPatientOpen} setOpen={setAddPatientOpen}
-          handelFormSubmit={handelAddPatientToDoctor} title="Add Patient to Doctor" />
+          handelFormSubmit={handelAddPatientToDoctor} patients={patients} user={user} title="Add Patient to Doctor" />
 
 
         <Card className='new-referal'>
@@ -282,7 +331,7 @@ export default function DoctorPage() {
               padding: "10px 5px",
               width: "220px"
             }}
-            placeholder="Search by First Name"
+            placeholder="Search by Name"
             value={filterName}
             onChange={handleFilterByName} />
 
@@ -300,28 +349,32 @@ export default function DoctorPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, Fname, Lname, email } = row;
-                    const selectedUser = selected.indexOf(Fname) !== -1;
+                    const { userId } = row;
+                    const selectedUser = selected.indexOf(userId.fullName) !== -1;
 
                     return (
-                      <TableRow hover key={id} tabIndex={-1} selected={selectedUser}>
+                      <TableRow hover key={userId._id} tabIndex={-1} selected={selectedUser}>
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={10}>
                             {/* <Avatar alt={name} src={avatarUrl} /> */}
                             <Typography style={{ paddingLeft: "20px" }} variant="subtitle2" nowrap="true">
-                              {Fname}
+                              {userId.firstName}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{Lname}</TableCell>
+                        <TableCell align="left">{userId.lastName}</TableCell>
+                        <TableCell align="left">{userId.fullName}</TableCell>
 
-                        <TableCell align="left">{email}</TableCell>
+                        <TableCell align="left">{userId.email}</TableCell>
 
                         <TableCell>
 
-                          <Button onClick={() => { setAddPatientOpen(true) }} variant="contained" size='small' startIcon={<Iconify icon="eva:plus-fill" />}>
+                          <Button
+                            onClick={() => { setAddPatientOpen(true) }}
+                            onMouseUp={() => setInvitedDoctor(userId._id)}
+                            variant="contained" size='small' startIcon={<Iconify icon="eva:plus-fill" />}>
                             Add Patient
                           </Button>
 

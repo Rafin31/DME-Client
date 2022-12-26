@@ -15,7 +15,7 @@ const style = {
 
 };
 
-export default function AddPatienttToTherapist({ open, setOpen, handelFormSubmit, title }) {
+export default function AddPatientToTherapist({ open, setOpen, handelFormSubmit, patients, user, title }) {
     return (
         <div>
             <Modal
@@ -39,7 +39,7 @@ export default function AddPatienttToTherapist({ open, setOpen, handelFormSubmit
                                 type={'text'}
                                 fullWidth
                                 name="dme_supplier_name"
-                                defaultValue={"Jaydon Frankie"}
+                                defaultValue={user.fullName}
                                 InputProps={{
                                     readOnly: true,
                                 }}
@@ -53,10 +53,13 @@ export default function AddPatienttToTherapist({ open, setOpen, handelFormSubmit
                                     size="small"
                                     required
                                     defaultValue=""
-                                    name='addPatientToDoctor'
+                                    name='addPatientToTherapist'
                                 >
-                                    <MenuItem value={1}>Patient 1</MenuItem>
-                                    <MenuItem value={2}>Patient 2</MenuItem>
+                                    {
+                                        patients.map((patient, index) => {
+                                            return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
+                                        })
+                                    }
                                 </Select>
                             </FormControl>
 

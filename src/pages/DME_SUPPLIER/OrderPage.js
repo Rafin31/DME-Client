@@ -75,16 +75,19 @@ function getComparator(order, orderBy) {
 }
 
 function applySortFilter(array, comparator, query) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) return order;
-        return a[1] - b[1];
-    });
-    if (query) {
-        return filter(array, (_user) => _user.patientId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    if (array) {
+        const stabilizedThis = array?.map((el, index) => [el, index]);
+        stabilizedThis?.sort((a, b) => {
+            const order = comparator(a[0], b[0]);
+            if (order !== 0) return order;
+            return a[1] - b[1];
+        });
+        if (query) {
+            return filter(array, (_user) => _user.patientId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        }
+        return stabilizedThis?.map((el) => el[0]);
     }
-    return stabilizedThis.map((el) => el[0]);
+    return 0
 }
 
 export default function OrderPage() {
@@ -136,9 +139,15 @@ export default function OrderPage() {
         setFilterName(event.target.value);
     };
 
+    let loggedUser = localStorage.getItem('user');
+    loggedUser = JSON.parse(loggedUser);
+
+    const { id } = loggedUser
+
+
     const { isLoading: statesLoading, data: orders } = useQuery('orders',
         async () => {
-            return AuthRequest.get(`/api/v1/order`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/order/dme-supplier/${id}`).then(data => data.data.data)
         }
     )
 
@@ -155,64 +164,68 @@ export default function OrderPage() {
         </Box>
     }
 
-    const newReferralOrder = orders.filter((order) => order.status === "New-Referral")
-    const cancelledOrder = orders.filter((order) => order.status === "Cancelled")
-    const evaluationOrder = orders.filter((order) => order.status === "Evaluation")
-    const evaluationCompletedOrder = orders.filter((order) => order.status === "Evaluation-Completed")
-    const paperWorkOrder = orders.filter((order) => order.status === "Paper-Work-In-Process")
-    const priorAuthOrder = orders.filter((order) => order.status === "Prior-Auth-Status")
-    const priorAuthReceiveOrder = orders.filter((order) => order.status === "Prior-Auth-Receive")
-    const holdingRtoOrder = orders.filter((order) => order.status === "Holding-RTO")
-    const rtoOrder = orders.filter((order) => order.status === "RTO")
-    const deliveredOrder = orders.filter((order) => order.status === "Delivered")
-    const authorizationExpirationOrder = orders.filter((order) => order.status === "Authorization-Expiration-F/U")
-    const requestOrder = orders.filter((order) => order.status === "Order-Request")
-    const pendingOrder = orders.filter((order) => order.status === "Pending")
+    if (orders !== "No order found!") {
+
+        var newReferralOrder = orders?.filter((order) => order.status === "New-Referral")
+        var cancelledOrder = orders?.filter((order) => order.status === "Cancelled")
+        var evaluationOrder = orders?.filter((order) => order.status === "Evaluation")
+        var evaluationCompletedOrder = orders?.filter((order) => order.status === "Evaluation-Completed")
+        var paperWorkOrder = orders?.filter((order) => order.status === "Paper-Work-In-Process")
+        var priorAuthOrder = orders?.filter((order) => order.status === "Prior-Auth-Status")
+        var priorAuthReceiveOrder = orders?.filter((order) => order.status === "Prior-Auth-Receive")
+        var holdingRtoOrder = orders?.filter((order) => order.status === "Holding-RTO")
+        var rtoOrder = orders?.filter((order) => order.status === "RTO")
+        var deliveredOrder = orders?.filter((order) => order.status === "Delivered")
+        var authorizationExpirationOrder = orders?.filter((order) => order.status === "Authorization-Expiration-F/U")
+        var requestOrder = orders?.filter((order) => order.status === "Order-Request")
+        var pendingOrder = orders?.filter((order) => order.status === "Pending")
 
 
-    const newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrder.length) : 0;
-    const cancelledOrderEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cancelledOrder.length) : 0;
-    const evaluationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationOrder.length) : 0;
-    const evaluationCompletedOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationCompletedOrder.length) : 0;
-    const paperWorkOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - paperWorkOrder.length) : 0;
-    const priorAuthOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthOrder.length) : 0;
-    const priorAuthReceiveOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthReceiveOrder.length) : 0;
-    const holdingRtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - holdingRtoOrder.length) : 0;
-    const rtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rtoOrder.length) : 0;
-    const deliveredOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - deliveredOrder.length) : 0;
-    const authorizationExpirationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - authorizationExpirationOrder.length) : 0;
-    const requestOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - requestOrder.length) : 0;
-    const pendingOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - pendingOrder.length) : 0;
+        var newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrder.length) : 0;
+        var cancelledOrderEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cancelledOrder.length) : 0;
+        var evaluationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationOrder.length) : 0;
+        var evaluationCompletedOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationCompletedOrder.length) : 0;
+        var paperWorkOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - paperWorkOrder.length) : 0;
+        var priorAuthOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthOrder.length) : 0;
+        var priorAuthReceiveOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthReceiveOrder.length) : 0;
+        var holdingRtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - holdingRtoOrder.length) : 0;
+        var rtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rtoOrder.length) : 0;
+        var deliveredOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - deliveredOrder.length) : 0;
+        var authorizationExpirationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - authorizationExpirationOrder.length) : 0;
+        var requestOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - requestOrder.length) : 0;
+        var pendingOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - pendingOrder.length) : 0;
 
 
-    const filteredNewReferralOrders = applySortFilter(newReferralOrder, getComparator(order, orderBy), filterName);
-    const filteredCancelledOrders = applySortFilter(cancelledOrder, getComparator(order, orderBy), filterName);
-    const filteredEvaluationOrder = applySortFilter(evaluationOrder, getComparator(order, orderBy), filterName);
-    const filteredEvaluationCompletedOrder = applySortFilter(evaluationCompletedOrder, getComparator(order, orderBy), filterName);
-    const filteredPaperWorkOrder = applySortFilter(paperWorkOrder, getComparator(order, orderBy), filterName);
-    const filteredPriorAuthOrder = applySortFilter(priorAuthOrder, getComparator(order, orderBy), filterName);
-    const filteredPriorAuthReceiveOrder = applySortFilter(priorAuthReceiveOrder, getComparator(order, orderBy), filterName);
-    const filteredHoldingRtoOrder = applySortFilter(holdingRtoOrder, getComparator(order, orderBy), filterName);
-    const filteredRtoOrder = applySortFilter(rtoOrder, getComparator(order, orderBy), filterName);
-    const filteredDeliveredOrder = applySortFilter(deliveredOrder, getComparator(order, orderBy), filterName);
-    const filteredAuthorizationExpirationOrder = applySortFilter(authorizationExpirationOrder, getComparator(order, orderBy), filterName);
-    const filteredRequestOrder = applySortFilter(requestOrder, getComparator(order, orderBy), filterName);
-    const filteredPendingOrder = applySortFilter(pendingOrder, getComparator(order, orderBy), filterName);
+        var filteredNewReferralOrders = applySortFilter(newReferralOrder, getComparator(order, orderBy), filterName);
+        var filteredCancelledOrders = applySortFilter(cancelledOrder, getComparator(order, orderBy), filterName);
+        var filteredEvaluationOrder = applySortFilter(evaluationOrder, getComparator(order, orderBy), filterName);
+        var filteredEvaluationCompletedOrder = applySortFilter(evaluationCompletedOrder, getComparator(order, orderBy), filterName);
+        var filteredPaperWorkOrder = applySortFilter(paperWorkOrder, getComparator(order, orderBy), filterName);
+        var filteredPriorAuthOrder = applySortFilter(priorAuthOrder, getComparator(order, orderBy), filterName);
+        var filteredPriorAuthReceiveOrder = applySortFilter(priorAuthReceiveOrder, getComparator(order, orderBy), filterName);
+        var filteredHoldingRtoOrder = applySortFilter(holdingRtoOrder, getComparator(order, orderBy), filterName);
+        var filteredRtoOrder = applySortFilter(rtoOrder, getComparator(order, orderBy), filterName);
+        var filteredDeliveredOrder = applySortFilter(deliveredOrder, getComparator(order, orderBy), filterName);
+        var filteredAuthorizationExpirationOrder = applySortFilter(authorizationExpirationOrder, getComparator(order, orderBy), filterName);
+        var filteredRequestOrder = applySortFilter(requestOrder, getComparator(order, orderBy), filterName);
+        var filteredPendingOrder = applySortFilter(pendingOrder, getComparator(order, orderBy), filterName);
 
 
-    const newReferralIsNotFound = !filteredNewReferralOrders.length && !!filterName;
-    const cancelledOrderIsNotFound = !filteredCancelledOrders.length && !!filterName;
-    const evaluationOrderIsNotFound = !filteredEvaluationOrder.length && !!filterName;
-    const evaluationCompletedOrderIsNotFound = !filteredEvaluationCompletedOrder.length && !!filterName;
-    const paperWorkOrderIsNotFound = !filteredPaperWorkOrder.length && !!filterName;
-    const priorAuthOrderIsNotFound = !filteredPriorAuthOrder.length && !!filterName;
-    const priorAuthReceiveOrderIsNotFound = !filteredPriorAuthReceiveOrder.length && !!filterName;
-    const holdingRtoOrderIsNotFound = !filteredHoldingRtoOrder.length && !!filterName;
-    const rtoOrderIsNotFound = !filteredRtoOrder.length && !!filterName;
-    const deliveredOrderIsNotFound = !filteredDeliveredOrder.length && !!filterName;
-    const authorizationExpirationOrderIsNotFound = !filteredAuthorizationExpirationOrder.length && !!filterName;
-    const requestOrderIsNotFound = !filteredRequestOrder.length && !!filterName;
-    const pendingOrderIsNotFound = !filteredPendingOrder.length && !!filterName;
+        var newReferralIsNotFound = !filteredNewReferralOrders.length && !!filterName;
+        var cancelledOrderIsNotFound = !filteredCancelledOrders.length && !!filterName;
+        var evaluationOrderIsNotFound = !filteredEvaluationOrder.length && !!filterName;
+        var evaluationCompletedOrderIsNotFound = !filteredEvaluationCompletedOrder.length && !!filterName;
+        var paperWorkOrderIsNotFound = !filteredPaperWorkOrder.length && !!filterName;
+        var priorAuthOrderIsNotFound = !filteredPriorAuthOrder.length && !!filterName;
+        var priorAuthReceiveOrderIsNotFound = !filteredPriorAuthReceiveOrder.length && !!filterName;
+        var holdingRtoOrderIsNotFound = !filteredHoldingRtoOrder.length && !!filterName;
+        var rtoOrderIsNotFound = !filteredRtoOrder.length && !!filterName;
+        var deliveredOrderIsNotFound = !filteredDeliveredOrder.length && !!filterName;
+        var authorizationExpirationOrderIsNotFound = !filteredAuthorizationExpirationOrder.length && !!filterName;
+        var requestOrderIsNotFound = !filteredRequestOrder.length && !!filterName;
+        var pendingOrderIsNotFound = !filteredPendingOrder.length && !!filterName;
+    }
+
 
 
     // ---------------------------------Tabs-------------------------------------
@@ -254,6 +267,7 @@ export default function OrderPage() {
         setValue(newValue);
 
     };
+
 
 
 
@@ -304,163 +318,140 @@ export default function OrderPage() {
                     </Tabs>
 
                     {
-                        [
-                            filteredNewReferralOrders,
-                            filteredCancelledOrders,
-                            filteredEvaluationOrder,
-                            filteredEvaluationCompletedOrder,
-                            filteredPaperWorkOrder,
-                            filteredPriorAuthOrder,
-                            filteredPriorAuthReceiveOrder,
-                            filteredHoldingRtoOrder,
-                            filteredRtoOrder,
-                            filteredDeliveredOrder,
-                            filteredAuthorizationExpirationOrder,
-                            filteredRequestOrder,
-                            filteredPendingOrder
-                        ].map((tab, index) => {
-                            return <TabPanel key={index} value={value} index={index} >
-                                <Card>
-                                    <input type="text"
-                                        style={{
-                                            margin: "20px 15px",
-                                            padding: "10px 5px",
-                                            width: "220px"
-                                        }}
-                                        ref={searchFieldRef}
-                                        placeholder="Search Orders by Patient Name"
-                                        value={filterName}
-                                        onChange={handleFilterByName} />
+                        orders !== "No order found!" ?
+                            [
+                                filteredNewReferralOrders,
+                                filteredCancelledOrders,
+                                filteredEvaluationOrder,
+                                filteredEvaluationCompletedOrder,
+                                filteredPaperWorkOrder,
+                                filteredPriorAuthOrder,
+                                filteredPriorAuthReceiveOrder,
+                                filteredHoldingRtoOrder,
+                                filteredRtoOrder,
+                                filteredDeliveredOrder,
+                                filteredAuthorizationExpirationOrder,
+                                filteredRequestOrder,
+                                filteredPendingOrder
+                            ].map((tab, index) => {
+                                return <TabPanel key={index} value={value} index={index} >
+                                    <Card>
+                                        <input type="text"
+                                            style={{
+                                                margin: "20px 15px",
+                                                padding: "10px 5px",
+                                                width: "220px"
+                                            }}
+                                            ref={searchFieldRef}
+                                            placeholder="Search Orders by Patient Name"
+                                            value={filterName}
+                                            onChange={handleFilterByName} />
 
-                                    <Scrollbar>
-                                        <TableContainer sx={{ minWidth: 800 }}>
-                                            <Table size="small">
-                                                <UserListHead
-                                                    order={order}
-                                                    orderBy={orderBy}
-                                                    headLabel={TABLE_HEAD}
-                                                    rowCount={newReferralOrder.length}
-                                                    numSelected={selected.length}
-                                                    onRequestSort={handleRequestSort}
-                                                />
-                                                <TableBody>
-                                                    {
-
-                                                        tab.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                                            const { _id, patientId, status, notes, description } = row;
-                                                            const selectedUser = selected.indexOf(row._id) !== -1;
-                                                            console.log(row)
-                                                            return (
-                                                                <TableRow hover key={_id} tabIndex={-1} selected={selectedUser}>
-
-
-                                                                    <TableCell component="th" scope="row" padding="none">
-                                                                        <Stack direction="row" alignItems="center" spacing={10}>
-                                                                            {/* <Avatar alt={name} src={avatarUrl} /> */}
-                                                                            <Link to={`/DME-supplier/dashboard/patient-profile/${patientId._id}`}
-                                                                                style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
-                                                                                <Tooltip title="Profile">
-                                                                                    <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
-                                                                                        {patientId.fullName}
-                                                                                    </Typography>
-                                                                                </Tooltip>
-                                                                            </Link>
-
-                                                                        </Stack>
-                                                                    </TableCell>
-
-                                                                    <TableCell align="left">{patientId.email}</TableCell>
-
-                                                                    {
-                                                                        description ?
-                                                                            <TableCell align="left">{description}</TableCell>
-                                                                            :
-                                                                            <TableCell align="left">No Description Available</TableCell>
-                                                                    }
-
-                                                                    {notes && notes?.length !== 0 ?
-                                                                        <TableCell width="30%" align="left">
-                                                                            <ReactShowMoreText
-                                                                                lines={1}
-                                                                                more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                                less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                                anchorClass=""
-                                                                                expanded={false}
-                                                                            >
-                                                                                {notes?.note}
-                                                                            </ReactShowMoreText >
-                                                                        </TableCell>
-                                                                        :
-                                                                        <TableCell width="30%" align="left">
-                                                                            <ReactShowMoreText
-                                                                                lines={1}
-                                                                                more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                                less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                                anchorClass=""
-                                                                                expanded={false}
-                                                                            >
-                                                                                {"No Notes available"}
-                                                                            </ReactShowMoreText >
-                                                                        </TableCell>
-                                                                    }
-                                                                    <TableCell align="left">
-                                                                        <Label
-                                                                            color={
-                                                                                status === 'Pending' || status === 'Cancelled' ? 'warning' : 'success'}>{sentenceCase(status)}</Label>
-                                                                    </TableCell>
-                                                                    <TableCell align="left">{"Not Mentioned"}</TableCell>
-
-
-
-                                                                    <TableCell >
-                                                                        <PopOver
-                                                                            key={row._id}
-                                                                            source='order-page'
-                                                                            option={[
-                                                                                { label: "Edit" },
-                                                                                { label: "Add Note" },
-                                                                                { label: "Status" },
-                                                                                { label: "Documents" },
-                                                                            ]}
-                                                                            id={row._id}
-                                                                        />
-                                                                    </TableCell>
-
-                                                                </TableRow>
-                                                            );
-                                                        })}
-                                                    {newReferralEmptyRows > 0 || (
-                                                        <TableRow style={{ height: 53 * newReferralEmptyRows }}>
-                                                            <TableCell colSpan={6} />
-                                                        </TableRow>
-                                                    )}
-                                                </TableBody>
-
-                                                {newReferralIsNotFound && (
+                                        <Scrollbar>
+                                            <TableContainer sx={{ minWidth: 800 }}>
+                                                <Table size="small">
+                                                    <UserListHead
+                                                        order={order}
+                                                        orderBy={orderBy}
+                                                        headLabel={TABLE_HEAD}
+                                                        rowCount={newReferralOrder.length}
+                                                        numSelected={selected.length}
+                                                        onRequestSort={handleRequestSort}
+                                                    />
                                                     <TableBody>
-                                                        <TableRow>
-                                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                                                <Paper
-                                                                    sx={{
-                                                                        textAlign: 'center',
-                                                                    }}
-                                                                >
-                                                                    <Typography component={'span'} variant="h6" paragraph>
-                                                                        Not found
-                                                                    </Typography>
+                                                        {
 
-                                                                    <Typography variant="body2">
-                                                                        No results found for &nbsp;
-                                                                        <strong>&quot;{filterName}&quot;</strong>.
-                                                                        <br /> Try checking for typos or using complete words.
-                                                                    </Typography>
-                                                                </Paper>
-                                                            </TableCell>
-                                                        </TableRow>
+                                                            tab.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                                                                const { _id, patientId, status, notes, description } = row;
+                                                                const selectedUser = selected.indexOf(row._id) !== -1;
+                                                                console.log(row)
+                                                                return (
+                                                                    <TableRow hover key={_id} tabIndex={-1} selected={selectedUser}>
+
+
+                                                                        <TableCell component="th" scope="row" padding="none">
+                                                                            <Stack direction="row" alignItems="center" spacing={10}>
+                                                                                {/* <Avatar alt={name} src={avatarUrl} /> */}
+                                                                                <Link to={`/DME-supplier/dashboard/patient-profile/${patientId._id}`}
+                                                                                    style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
+                                                                                    <Tooltip title="Profile">
+                                                                                        <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                                                            {patientId.fullName}
+                                                                                        </Typography>
+                                                                                    </Tooltip>
+                                                                                </Link>
+
+                                                                            </Stack>
+                                                                        </TableCell>
+
+                                                                        <TableCell align="left">{patientId.email}</TableCell>
+
+                                                                        {
+                                                                            description ?
+                                                                                <TableCell align="left">{description}</TableCell>
+                                                                                :
+                                                                                <TableCell align="left">No Description Available</TableCell>
+                                                                        }
+
+                                                                        {notes && notes?.length !== 0 ?
+                                                                            <TableCell width="30%" align="left">
+                                                                                <ReactShowMoreText
+                                                                                    lines={1}
+                                                                                    more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                                    less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                                    anchorClass=""
+                                                                                    expanded={false}
+                                                                                >
+                                                                                    {notes?.note}
+                                                                                </ReactShowMoreText >
+                                                                            </TableCell>
+                                                                            :
+                                                                            <TableCell width="30%" align="left">
+                                                                                <ReactShowMoreText
+                                                                                    lines={1}
+                                                                                    more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                                    less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                                    anchorClass=""
+                                                                                    expanded={false}
+                                                                                >
+                                                                                    {"No Notes available"}
+                                                                                </ReactShowMoreText >
+                                                                            </TableCell>
+                                                                        }
+                                                                        <TableCell align="left">
+                                                                            <Label
+                                                                                color={
+                                                                                    status === 'Pending' || status === 'Cancelled' ? 'warning' : 'success'}>{sentenceCase(status)}</Label>
+                                                                        </TableCell>
+                                                                        <TableCell align="left">{"Not Mentioned"}</TableCell>
+
+
+
+                                                                        <TableCell >
+                                                                            <PopOver
+                                                                                key={row._id}
+                                                                                source='order-page'
+                                                                                option={[
+                                                                                    { label: "Edit" },
+                                                                                    { label: "Add Note" },
+                                                                                    { label: "Status" },
+                                                                                    { label: "Documents" },
+                                                                                ]}
+                                                                                id={row._id}
+                                                                            />
+                                                                        </TableCell>
+
+                                                                    </TableRow>
+                                                                );
+                                                            })}
+                                                        {newReferralEmptyRows > 0 || (
+                                                            <TableRow style={{ height: 53 * newReferralEmptyRows }}>
+                                                                <TableCell colSpan={6} />
+                                                            </TableRow>
+                                                        )}
                                                     </TableBody>
-                                                )}
-                                                {filteredNewReferralOrders.length === 0 && !newReferralIsNotFound &&
-                                                    (
+
+                                                    {newReferralIsNotFound && (
                                                         <TableBody>
                                                             <TableRow>
                                                                 <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -470,30 +461,66 @@ export default function OrderPage() {
                                                                         }}
                                                                     >
                                                                         <Typography component={'span'} variant="h6" paragraph>
-                                                                            No New Referral order has been added
+                                                                            Not found
                                                                         </Typography>
 
+                                                                        <Typography variant="body2">
+                                                                            No results found for &nbsp;
+                                                                            <strong>&quot;{filterName}&quot;</strong>.
+                                                                            <br /> Try checking for typos or using complete words.
+                                                                        </Typography>
                                                                     </Paper>
                                                                 </TableCell>
                                                             </TableRow>
                                                         </TableBody>
                                                     )}
-                                            </Table>
-                                        </TableContainer>
-                                    </Scrollbar>
+                                                    {filteredNewReferralOrders.length === 0 && !newReferralIsNotFound &&
+                                                        (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                No New Referral order has been added
+                                                                            </Typography>
 
-                                    <TablePagination
-                                        rowsPerPageOptions={[5, 10, 25]}
-                                        component="div"
-                                        count={newReferralOrder.length}
-                                        rowsPerPage={rowsPerPage}
-                                        page={page}
-                                        onPageChange={handleChangePage}
-                                        onRowsPerPageChange={handleChangeRowsPerPage}
-                                    />
-                                </Card>
-                            </TabPanel>
-                        })
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )}
+                                                </Table>
+                                            </TableContainer>
+                                        </Scrollbar>
+
+                                        <TablePagination
+                                            rowsPerPageOptions={[5, 10, 25]}
+                                            component="div"
+                                            count={newReferralOrder.length}
+                                            rowsPerPage={rowsPerPage}
+                                            page={page}
+                                            onPageChange={handleChangePage}
+                                            onRowsPerPageChange={handleChangeRowsPerPage}
+                                        />
+                                    </Card>
+                                </TabPanel>
+                            })
+                            :
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
+
+                                        <p
+                                        >Not orders found</p>
+
+
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
                     }
 
 

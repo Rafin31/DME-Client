@@ -16,7 +16,7 @@ const style = {
 
 };
 
-export default function InviteModal({ open, setOpen, handelFormSubmit, title }) {
+export default function InviteModal({ open, setOpen, user = { user }, handelFormSubmit, title }) {
     return (
         <div>
             <Modal
@@ -40,7 +40,7 @@ export default function InviteModal({ open, setOpen, handelFormSubmit, title }) 
                                 type={'text'}
                                 fullWidth
                                 name="dme_supplier_name"
-                                defaultValue={"Jaydon Frankie"}
+                                defaultValue={user.fullName}
                                 InputProps={{
                                     readOnly: true,
                                 }}

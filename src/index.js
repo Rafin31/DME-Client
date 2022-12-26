@@ -13,7 +13,7 @@ import { AuthContext } from './Context/AuthContext';
 
 
 const queryClient = new QueryClient()
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = process.env.server;
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // @mui
 import {
@@ -23,15 +23,19 @@ import {
     TablePagination,
     Box,
     useTheme,
+    CircularProgress,
 } from '@mui/material';
 // components
+import { useQuery } from 'react-query';
+import { toast } from 'react-toastify';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
 import PopOver from '../../components/Popover/PopOver';
+import { AuthRequest } from '../../services/AuthRequest';
 import InviteModal from '../Shared/InviteModal';
-import AddPatienttToTherapist from '../Shared/AddPatientToTherapistModal';
+import AddPatientToTherapist from '../Shared/AddPatientToTherapistModal';
 
 
 // mock
@@ -42,89 +46,12 @@ import AddPatienttToTherapist from '../Shared/AddPatientToTherapistModal';
 const TABLE_HEAD = [
     { id: 'Fname', label: 'First Name', alignRight: false },
     { id: 'Lname', label: 'Last Name', alignRight: false },
+    { id: 'fullName', label: 'Full Name', alignRight: false },
     { id: 'email', label: 'Email', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
     // { id: '' },
 ];
 
-const doctors = [
-    {
-        Fname: "Rafin ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-    {
-        Fname: "loewm ",
-        Lname: "asdas ",
-        email: "rere@gmail.com",
-    },
-
-]
 
 
 // ----------------------------------------------------------------------
@@ -153,7 +80,7 @@ function applySortFilter(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.Fname.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
@@ -178,15 +105,90 @@ export default function TherapistPage() {
     const theme = useTheme();
 
 
-    const handelInviteTherapist = (e) => {
+    const [user, setUser] = useState()
+    const [loading, setLoading] = useState(false)
+
+    const [invitedTherapistId, setInvitedTherapist] = useState()
+
+
+    const { isLoading: therapistLoading, data: therapist } = useQuery('therapist',
+        async () => {
+            return AuthRequest.get(`/api/v1/therapist/`).then(data => data.data.data)
+        }
+    )
+
+
+    const { isLoading: patientLoading, data: patients } = useQuery('patient',
+        async () => {
+            return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+        }
+    )
+
+    let loggedUser = localStorage.getItem('user');
+    loggedUser = JSON.parse(loggedUser);
+
+    const { id } = loggedUser
+
+    const loadUserInfo = useCallback(() => {
+
+
+
+        AuthRequest.get(`/api/v1/users/${id}`)
+            .then(res => {
+                setUser(res.data.data)
+                setLoading(false)
+            })
+    }, [id])
+
+    useEffect(() => {
+        setLoading(true);
+        loadUserInfo()
+    }, [loadUserInfo])
+
+
+    if (therapistLoading || patientLoading || !user) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+    const handelInviteTherapist = async (e) => {
         e.preventDefault()
-        console.log(e.target.invitedEmail.value)
-        setInviteOpen(false)
+        await AuthRequest.post(`/api/v1/dme/invite-therapist`, { email: e.target.invitedEmail.value }).then((res) => {
+            if (res.status === 200) {
+                toast.success(`Invitation sent to ${e.target.invitedEmail.value}`, {
+                    toastId: 'success7'
+                })
+                setInviteOpen(false)
+            } else {
+                toast.error(`Something went wrong!`, {
+                    toastId: 'error7'
+                })
+                setInviteOpen(false)
+            }
+
+
+        })
     };
 
-    const handelAddPatientToTherapist = (e) => {
+    const handelAddPatientToTherapist = async (e) => {
+
         e.preventDefault()
-        console.log(e.target.addPatientToDoctor.value)
+        const data = {
+            patientUserId: e.target.addPatientToTherapist.value,
+            therapistUserId: invitedTherapistId,
+        }
+        await AuthRequest.post(`/api/v1/dme/add-patient-to-therapist`, data)
+            .then(res => {
+                toast.success('Therapist successfully assigned to the patient', {
+                    toastId: "success10"
+                })
+            })
+            .catch(err => {
+                toast.error(err.response.data.data, {
+                    toastId: "error10"
+                })
+            })
         setAddPatientOpen(false)
     };
 
@@ -198,7 +200,7 @@ export default function TherapistPage() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = doctors.map((n) => n.name);
+            const newSelecteds = therapist.map((n) => n.name);
             setSelected(newSelecteds);
             return;
         }
@@ -221,41 +223,12 @@ export default function TherapistPage() {
 
     };
 
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - doctors.length) : 0;
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - therapist.length) : 0;
 
-    const filteredUsers = applySortFilter(doctors, getComparator(order, orderBy), filterName);
+    const filteredUsers = applySortFilter(therapist, getComparator(order, orderBy), filterName);
 
     const isNotFound = !filteredUsers.length && !!filterName;
 
-
-
-    // ---------------------------------Tabs-------------------------------------
-
-    function TabPanel(props) {
-        const { children, value, index, ...other } = props;
-
-        return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`simple-tabpanel-${index}`}
-                aria-labelledby={`simple-tab-${index}`}
-                {...other}
-            >
-                {value === index && (
-                    <Box sx={{ p: 3 }}>
-                        <Typography>{children}</Typography>
-                    </Box>
-                )}
-            </div>
-        );
-    }
-
-    TabPanel.propTypes = {
-        children: PropTypes.node,
-        index: PropTypes.number.isRequired,
-        value: PropTypes.number.isRequired,
-    };
 
     return (
         <>
@@ -274,13 +247,11 @@ export default function TherapistPage() {
                     </Button>
                 </Stack>
 
-                <InviteModal open={inviteOpen} setOpen={setInviteOpen} handelFormSubmit={handelInviteTherapist} title="Invite Therapist" />
+                <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteTherapist} title="Invite Therapist" />
 
-                <AddPatienttToTherapist open={addPatientOpen} setOpen={setAddPatientOpen} handelFormSubmit={handelAddPatientToTherapist} title="Add Patient" />
+                <AddPatientToTherapist open={addPatientOpen} setOpen={setAddPatientOpen} handelFormSubmit={handelAddPatientToTherapist} patients={patients} user={user} title="Add Patient" />
 
                 <Card className='new-referal'>
-                    {/* <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName}
-                placeholder={"Search Orders"} /> */}
 
                     <input type="text"
                         style={{
@@ -299,15 +270,15 @@ export default function TherapistPage() {
                                     order={order}
                                     orderBy={orderBy}
                                     headLabel={TABLE_HEAD}
-                                    rowCount={doctors.length}
+                                    rowCount={therapist.length}
                                     numSelected={selected.length}
                                     onRequestSort={handleRequestSort}
                                     onSelectAllClick={handleSelectAllClick}
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const { id, Fname, Lname, email } = row;
-                                        const selectedUser = selected.indexOf(Fname) !== -1;
+                                        const { userId } = row;
+                                        const selectedUser = selected.indexOf(userId.fullName) !== -1;
 
                                         return (
                                             <TableRow hover key={id} tabIndex={-1} selected={selectedUser}>
@@ -315,17 +286,21 @@ export default function TherapistPage() {
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
                                                         <Typography style={{ paddingLeft: "20px" }} variant="subtitle2" nowrap="true">
-                                                            {Fname}
+                                                            {userId.firstName}
                                                         </Typography>
                                                     </Stack>
                                                 </TableCell>
 
-                                                <TableCell align="left">{Lname}</TableCell>
+                                                <TableCell align="left">{userId.lastName}</TableCell>
+                                                <TableCell align="left">{userId.fullName}</TableCell>
 
-                                                <TableCell align="left">{email}</TableCell>
+                                                <TableCell align="left">{userId.email}</TableCell>
 
                                                 <TableCell >
-                                                    <Button onClick={() => { setAddPatientOpen(true) }} variant="contained" size='small' startIcon={<Iconify icon="eva:plus-fill" />}>
+                                                    <Button
+                                                        onClick={() => { setAddPatientOpen(true) }}
+                                                        onMouseUp={() => setInvitedTherapist(userId._id)}
+                                                        variant="contained" size='small' startIcon={<Iconify icon="eva:plus-fill" />}>
                                                         Add Patient
                                                     </Button>
                                                 </TableCell>
@@ -369,7 +344,7 @@ export default function TherapistPage() {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={doctors.length}
+                        count={therapist.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

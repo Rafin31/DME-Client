@@ -51,9 +51,9 @@ export default function UploadOrderDocuments() {
             })
     })
 
-    const { mutateAsync: deleteAsync, isLoading: deleteLoading } = useMutation((orderId) => {
+    const deleteDocumentRequest = async (docId, orderId) => {
 
-        return AuthRequest.delete(`/api/v1/dme/delete-document/${orderId}?document=order-documents`, { orderId })
+        await AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=order-documents`, { data: { orderId } })
             .then(res => {
                 toast.success("Deleted!", res, {
                     toastId: 'success6'
@@ -65,7 +65,7 @@ export default function UploadOrderDocuments() {
                     toastId: 'error4'
                 })
             })
-    })
+    }
 
     const handleUploadButtonClick = (e) => {
         e.preventDefault()
@@ -90,15 +90,15 @@ export default function UploadOrderDocuments() {
     }
 
     const downloadDocument = async (doc) => {
-        const url = `http://localhost:5000/api/v1/dme/get-document?document=order-documents/${doc.split('/')[1]}`
+        const url = `${process.env.server}/api/v1/dme/get-document?document=order-documents/${doc.split('/')[1]}`
         const a = document.createElement('a');
         a.href = url
-        a.download = 'employees.json';
+        a.download = doc.split('/')[1];
         a.click();
     }
 
     const deleteDocument = async (docId) => {
-        deleteAsync(docId)
+        deleteDocumentRequest(docId, orderId)
     }
 
     // 
