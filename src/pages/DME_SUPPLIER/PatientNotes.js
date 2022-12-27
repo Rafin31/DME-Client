@@ -1,8 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // @mui
 import {
@@ -22,6 +22,7 @@ import {
     TablePagination,
     Box,
     useTheme,
+    CircularProgress,
 } from '@mui/material';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -29,7 +30,9 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 
 // components
+import { useQuery } from 'react-query';
 import ReactShowMoreText from 'react-show-more-text';
+import { toast } from 'react-toastify';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 // sections
@@ -38,6 +41,8 @@ import PopOver from '../../components/Popover/PopOver';
 import InviteModal from '../Shared/InviteModal';
 import { fDateTime } from '../../utils/formatTime';
 import AddNotesToPatientModal from '../Shared/AddNotesToPatientModal';
+import { AuthRequest } from '../../services/AuthRequest';
+
 
 
 // mock
@@ -51,22 +56,6 @@ const TABLE_HEAD = [
     { id: 'action', label: 'Action', alignRight: false },
     // { id: '' },
 ];
-
-const notes = [
-    {
-        id: 1,
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum malesuada metus sed lacinia aliquet. Nulla a tristique mauris. Fusce sit amet orci fringilla, volutpat ligula sed, congue augue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc at rutrum massa. Cras in consectetur lorem. Cras pulvinar laoreet magna, eu aliquet eros condimentum eget. Maecenas in sapien porta, sodales massa ac, molestie mi. Sed eleifend justo ut sem viverra pharetra.",
-        timeStamp: fDateTime(new Date()),
-    },
-    {
-        id: 2,
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum malesuada metus sed lacinia aliquet. Nulla a tristique mauris. Fusce sit amet orci fringilla, volutpat ligula sed, congue augue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc at rutrum massa. Cras in consectetur lorem. Cras pulvinar laoreet magna, eu aliquet eros condimentum eget. Maecenas in sapien porta, sodales massa ac, molestie mi. Sed eleifend justo ut sem viverra pharetra.",
-        timeStamp: fDateTime(new Date("2/11/2022 4:50 PM")),
-    },
-
-
-]
-
 
 // ----------------------------------------------------------------------
 
@@ -94,7 +83,7 @@ function applySortFilter(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.timeStamp.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.note.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
@@ -114,15 +103,105 @@ export default function PatientNotes() {
     const [filterName, setFilterName] = useState('');
 
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [user, setUser] = useState()
+    const [loading, setLoading] = useState()
+    const [isEdit, setEdit] = useState(false)
+    const [editNoteId, setEditNoteId] = useState(false)
 
     const theme = useTheme();
 
 
-    const handelAddNotesToPatient = (e) => {
+    let loggedUser = localStorage.getItem('user');
+    loggedUser = JSON.parse(loggedUser);
+
+    const { id: writerId } = loggedUser
+    const { id: patientId } = useParams()
+    const data = { writerId, patientId }
+
+
+    const loadUserInfo = useCallback(() => {
+
+
+
+        AuthRequest.get(`/api/v1/users/${writerId}`)
+            .then(res => {
+                setUser(res.data.data)
+                setLoading(false)
+            })
+    }, [writerId])
+
+    useEffect(() => {
+        setLoading(true);
+        loadUserInfo()
+    }, [loadUserInfo])
+
+
+    const { isLoading: noteLoading, refetch, data: notes } = useQuery('notes',
+        async () => {
+            console.log(data)
+            return AuthRequest.get(`/api/v1/dme/notes-dme-patient?writerId=${writerId}&patientId=${patientId}`)
+                .then(data => data.data.data)
+        }
+    )
+
+    if (!notes || !user) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+
+    const handelAddNotesToPatient = async (e) => {
         e.preventDefault()
-        console.log(e.target.PatientNote.value)
-        setAddNotesOpen(false)
+        if (!isEdit) {
+            await AuthRequest.post(`/api/v1/dme/notes`, {
+                ...data,
+                note: e.target.PatientNote.value
+            }).then(res => {
+                toast.success("Note Added", {
+                    toastId: "success12"
+                })
+                refetch()
+                setAddNotesOpen(false)
+            }).catch(err => {
+                toast.error("Something Went Wrong!", {
+                    toastId: "error12"
+                })
+            })
+        } else {
+            await AuthRequest.patch(`/api/v1/dme/notes/${editNoteId}`, {
+                ...data,
+                note: e.target.PatientNote.value
+            }).then(res => {
+                toast.success("Note Updated", {
+                    toastId: "success13"
+                })
+                refetch()
+                setEdit(false)
+                setAddNotesOpen(false)
+            }).catch(err => {
+                toast.error("Something Went Wrong!", {
+                    toastId: "error13"
+                })
+            })
+        }
+
     };
+
+    const handleDelete = async (id) => {
+        await AuthRequest.delete(`/api/v1/dme/notes/${id}`)
+            .then(res => {
+                toast.success("Note deleted", {
+                    toastId: "success13"
+                })
+                refetch()
+                setAddNotesOpen(false)
+            }).catch(err => {
+                toast.error("Something Went Wrong!", {
+                    toastId: "error13"
+                })
+            })
+    }
 
 
     const handleRequestSort = (event, property) => {
@@ -214,7 +293,7 @@ export default function PatientNotes() {
                     </Button>
                 </Stack>
 
-                <AddNotesToPatientModal open={addNotesOpen} setOpen={setAddNotesOpen} handelFormSubmit={handelAddNotesToPatient} data={{ notes: "" }} title="Add Note" />
+                <AddNotesToPatientModal open={addNotesOpen} setOpen={setAddNotesOpen} handelFormSubmit={handelAddNotesToPatient} data={{ notes: "" }} title="Add Note" user={user} />
 
                 <Card className='new-referal'>
                     <input type="text"
@@ -223,7 +302,7 @@ export default function PatientNotes() {
                             padding: "10px 5px",
                             width: "220px"
                         }}
-                        placeholder="Search by Date/Time"
+                        placeholder="Search by Description"
                         value={filterName}
                         onChange={handleFilterByName} />
 
@@ -241,28 +320,28 @@ export default function PatientNotes() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const { id, description, timeStamp } = row;
-                                        const selectedUser = selected.indexOf(timeStamp) !== -1;
+                                        const { _id, note, createdAt } = row;
+                                        const selectedUser = selected.indexOf(note) !== -1;
 
                                         return (
-                                            <TableRow hover key={id} tabIndex={-1} selected={selectedUser}>
+                                            <TableRow hover key={_id} tabIndex={-1} selected={selectedUser}>
                                                 <TableCell sx={{ width: "50%" }} component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={0}>
                                                         <Typography style={{ paddingLeft: "20px" }} variant="subtitle2" wrap="true">
                                                             <ReactShowMoreText
-                                                                lines={2}
+                                                                lines={0}
                                                                 more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
                                                                 less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
                                                                 anchorClass=""
                                                                 expanded={false}
                                                             >
-                                                                {description}
+                                                                {note}
                                                             </ReactShowMoreText>
                                                         </Typography>
                                                     </Stack>
                                                 </TableCell>
 
-                                                <TableCell align="left">{timeStamp}</TableCell>
+                                                <TableCell align="left">{fDateTime(createdAt)}</TableCell>
 
                                                 <TableCell >
                                                     <PopOver
@@ -271,7 +350,10 @@ export default function PatientNotes() {
                                                             { label: "Edit" },
                                                             { label: "Delete" }
                                                         ]}
-                                                        id={id}
+                                                        id={_id}
+                                                        deleteFunction={handleDelete}
+                                                        setEdit={setEdit}
+                                                        setEditNoteId={setEditNoteId}
                                                         setOpen={setAddNotesOpen}
                                                     />
                                                 </TableCell>

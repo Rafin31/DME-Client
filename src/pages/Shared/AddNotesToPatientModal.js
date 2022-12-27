@@ -15,7 +15,7 @@ const style = {
 
 };
 
-export default function AddNotesToPatientModal({ open, setOpen, handelFormSubmit, title, data }) {
+export default function AddNotesToPatientModal({ open, setOpen, handelFormSubmit, title, data, user }) {
     return (
         <div>
             <Modal
@@ -39,7 +39,7 @@ export default function AddNotesToPatientModal({ open, setOpen, handelFormSubmit
                                 type={'text'}
                                 fullWidth
                                 name="dme_supplier_name"
-                                defaultValue={"Jaydon Frankie"}
+                                defaultValue={user.fullName}
                                 InputProps={{
                                     readOnly: true,
                                 }}

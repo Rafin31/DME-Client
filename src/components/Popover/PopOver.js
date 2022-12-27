@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Iconify from '../iconify';
 
 
-export default function PopOver({ source = "null", option, id, setOpen = null }) {
+export default function PopOver({ source = "null", option, id, setOpen = null, ...other }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const navigate = useNavigate()
     const open = Boolean(anchorEl);
@@ -46,7 +46,12 @@ export default function PopOver({ source = "null", option, id, setOpen = null })
 
         else if (source === "patient-notes-page") {
             if (lebel === "Edit") {
+                other.setEdit(true)
+                other.setEditNoteId(id)
                 setOpen(true)
+            }
+            if (lebel === "Delete") {
+                other.deleteFunction(id)
             }
         }
 

@@ -2,14 +2,41 @@ import { useForm } from "react-hook-form";
 import { Helmet } from 'react-helmet-async';
 import { React, useState } from 'react';
 import { Alert, Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { toast } from "react-toastify";
+import { LoadingButton } from "@mui/lab";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "react-query";
 import Iconify from '../../components/iconify';
 import { fDate } from "../../utils/formatTime";
+import { AuthRequest } from "../../services/AuthRequest";
 
 
 
 export default function AddPatient() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
+    const navigate = useNavigate()
+
+
+    const { mutateAsync, isLoading: addPatientLoading } = useMutation((patient) => {
+
+        return AuthRequest.post(`/api/v1/users`, patient)
+            .then(res => {
+                toast.success("Patient Added Successful!", res, {
+                    toastId: 'success11'
+                })
+                reset()
+                navigate(-1)
+            })
+            .catch((err) => {
+                toast.error(err?.response?.data?.message, {
+                    toastId: 'error11'
+                })
+            })
+    })
+
+
+
     const onSubmit = data => {
         const givenDate = new Date(data?.dob);
         const presentDate = new Date()
@@ -19,9 +46,18 @@ export default function AddPatient() {
         }
         data.dob = fDate(data.dob)
         setDbError(false)
-        console.log(data)
-        reset()
+        data = {
+            ...data,
+            fullName: data.firstName + " " + data.lastName,
+            secondaryInsurance: (+data.secondaryInsurance),
+            primaryInsurance: (+data.primaryInsurance),
+            userCategory: "63861b794e45673948bb7c9f",
+            status: "63861954b3b3ded1ee267309",
+        }
+        mutateAsync(data)
+        // console.log(data)
     };
+
     return (
         <>
             <Helmet>
@@ -45,7 +81,7 @@ export default function AddPatient() {
                             >
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("Fname", { required: "Field is required" })}
+                                        {...register("firstName", { required: "Field is required" })}
                                         error={errors.Fname && true}
                                         label="First Name*"
                                         type="text"
@@ -57,7 +93,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("Lname", { required: "Field is required" })}
+                                        {...register("lastName", { required: "Field is required" })}
                                         error={errors.Lname && true}
 
                                         label="Last Name*"
@@ -98,6 +134,24 @@ export default function AddPatient() {
                                         fullWidth
                                         variant="outlined"
                                         helpertext={errors.password?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("confirmPassword",
+                                            {
+                                                required: "Field is required",
+                                            }
+
+                                        )}
+                                        error={errors.password && true}
+
+                                        label="Confirm Password*"
+                                        type={'password'}
+                                        fullWidth
+                                        variant="outlined"
+                                        helpertext={errors.confirmPassword?.message}
 
                                     />
                                 </Grid>
@@ -205,7 +259,7 @@ export default function AddPatient() {
                                     <TextField
                                         {...register("primaryInsurance", { required: "Field is required" })}
                                         error={errors.primaryInsurance && true}
-
+                                        type="number"
                                         label="Primary Insurance*"
                                         fullWidth
                                         variant="outlined"
@@ -217,7 +271,7 @@ export default function AddPatient() {
                                     <TextField
                                         {...register("secondaryInsurance", { required: "Field is required" })}
                                         error={errors.secondaryInsurance && true}
-
+                                        type="number"
                                         label="Secondary Insurance*"
                                         fullWidth
                                         variant="outlined"
@@ -239,7 +293,7 @@ export default function AddPatient() {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</Button>
+                                    <LoadingButton loading={addPatientLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</LoadingButton>
                                 </Grid>
                             </Grid>
 

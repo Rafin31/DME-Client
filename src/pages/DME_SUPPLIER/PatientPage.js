@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 
 // @mui
@@ -25,14 +25,18 @@ import {
     Box,
     Divider,
     Tooltip,
+    CircularProgress,
 } from '@mui/material';
 // components
+import { toast } from 'react-toastify';
+import { useMutation, useQuery } from 'react-query';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 import PopOver from '../../components/Popover/PopOver';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
 import { fDate } from '../../utils/formatTime';
+import { AuthRequest } from '../../services/AuthRequest';
 
 const TABLE_HEAD = [
     { id: 'dob', label: 'Date of Birth', alignRight: false },
@@ -42,54 +46,6 @@ const TABLE_HEAD = [
     { id: 'action', label: 'Action', alignRight: false },
     // { id: '' },
 ];
-
-const patient = [
-    {
-        id: 1,
-        dob: fDate('1/2/1998'),
-        Fname: "Putin Khan",
-        email: "rere@gmail.com",
-        gender: "Male"
-    },
-    {
-        id: 2,
-        dob: fDate('8/24/1986'),
-        Fname: "Messi Hasan",
-        email: "rere@gmail.com",
-        gender: "Male"
-    },
-    {
-        id: 3,
-        dob: fDate('10/9/1998'),
-        Fname: "parim Khan",
-        email: "rere@gmail.com",
-        gender: "Male"
-    },
-    {
-        id: 4,
-        dob: fDate('8/31/1998'),
-        Fname: "karim Jinna",
-        email: "rere@gmail.com",
-        gender: "Male"
-    },
-    {
-        id: 5,
-        dob: fDate('2/9/2001'),
-        Fname: "chatu Khan",
-        email: "rere@gmail.com",
-        gender: "Male"
-    },
-    {
-        id: 6,
-        dob: fDate('4/19/1986'),
-        Fname: "king Khan",
-        email: "rere@gmail.com",
-        gender: "Male"
-    },
-
-
-]
-
 
 // ----------------------------------------------------------------------
 
@@ -117,7 +73,7 @@ function applySortFilter(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.Fname.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
@@ -138,6 +94,80 @@ export default function PatientPage() {
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const navigate = useNavigate()
+
+    const importButtonRef = useRef(null)
+
+
+
+    const { isLoading: patientLoading, refetch, data: patient } = useQuery('patient',
+        async () => {
+            return AuthRequest.get(`/api/v1/patient/`).then(data => data.data.data)
+        }
+    )
+
+    const { mutateAsync, isLoading: importPatientLoading } = useMutation((importPatient) => {
+
+        return AuthRequest.post(`/api/v1/users/import-patient`, importPatient,
+            {
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        )
+            .then(res => {
+                toast.success("Import Successful!", res, {
+                    toastId: 'success11'
+                })
+                refetch()
+            })
+            .catch((err) => {
+                toast.error(err?.response?.data?.message, {
+                    toastId: 'error11'
+                })
+            })
+    })
+
+
+    if (!patient || importPatientLoading) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+    const handleImportButtonClick = (e) => {
+        e.preventDefault()
+        importButtonRef.current.click()
+    }
+    const handleImportFormSubmit = (e) => {
+        e.preventDefault()
+        const file = e.target.importFile.files[0]
+        const formData = new FormData()
+        formData.append('patient-list', file)
+
+        if (!!formData.entries().next().value) {
+            mutateAsync(formData)
+
+        } else {
+            toast.warning('Please Upload documents', {
+                toastId: "warning1"
+            })
+        }
+    }
+
+    const exportPatient = async () => {
+
+        const resp = await AuthRequest.get("/api/v1/users/export-patient", {
+            responseType: 'arraybuffer',
+            headers: { 'Content-Type': 'blob' },
+        })
+
+        const link = document.createElement('a');
+        const fileName = 'Patient-List.xlsx';
+        link.setAttribute('download', fileName);
+        link.href = URL.createObjectURL(new Blob([resp.data]));
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
 
     const handleCloseMenu = () => {
         setOpen(null);
@@ -217,7 +247,7 @@ export default function PatientPage() {
             </Helmet>
 
             <Container maxWidth="xl">
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                <Stack sx={{ flexDirection: { xs: "column", md: "row" } }} alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
                         Patients
                     </Typography>
@@ -226,20 +256,39 @@ export default function PatientPage() {
                         direction="row"
                         spacing={1}
                         divider={<Divider orientation="vertical" flexItem />}>
+
                         <Tooltip
                             title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Age > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
                             arrow
                             placement="left">
+                            <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
+                        </Tooltip>
+
+                        <form onSubmit={(e) => handleImportFormSubmit(e)}>
                             <Button
                                 variant="contained"
                                 component="label"
                                 color="success"
                                 style={{ color: "white", width: "110px" }}
                                 startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
-                                <input hidden accept="image/*" multiple type="file" />
                                 Import
+                                <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
                             </Button>
-                        </Tooltip>
+                            <input ref={importButtonRef} hidden type="submit" />
+                        </form>
+
+
+                        <Button
+                            variant="contained"
+                            component="label"
+                            color="warning"
+                            style={{ color: "white", width: "110px" }}
+                            onClick={() => { exportPatient() }}
+                            startIcon={<Iconify icon="mdi:calendar-export" />}>
+                            Export
+                        </Button>
+
+
 
                         <Button variant="contained" startIcon={<Iconify icon="material-symbols:add" />}
                             onClick={() => { navigate('/DME-supplier/dashboard/add-patient') }}>
@@ -273,11 +322,11 @@ export default function PatientPage() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const { id, Fname, dob, email, gender } = row;
-                                        const selectedUser = selected.indexOf(Fname) !== -1;
+                                        const { userId, dob, gender } = row;
+                                        const selectedUser = selected.indexOf(userId.fullName) !== -1;
 
                                         return (
-                                            <TableRow hover key={id} tabIndex={-1} selected={selectedUser}>
+                                            <TableRow hover key={userId._id} tabIndex={-1} selected={selectedUser}>
                                                 <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
@@ -289,14 +338,14 @@ export default function PatientPage() {
 
                                                 <TableCell align="left">
                                                     <Tooltip title="Profile">
-                                                        <Link to={`/DME-supplier/dashboard/patient-profile/${id}`}
+                                                        <Link to={`/DME-supplier/dashboard/patient-profile/${userId._id}`}
                                                             style={{ display: "inline", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
-                                                            {Fname}
+                                                            {userId.fullName}
                                                         </Link>
                                                     </Tooltip>
                                                 </TableCell>
 
-                                                <TableCell align="left">{email}</TableCell>
+                                                <TableCell align="left">{userId.email}</TableCell>
                                                 <TableCell align="left">{gender}</TableCell>
 
                                                 <TableCell >
@@ -308,7 +357,7 @@ export default function PatientPage() {
                                                             { label: "Documents" },
                                                             { label: "Delete" }
                                                         ]}
-                                                        id={id}
+                                                        id={userId._id}
                                                     />
                                                 </TableCell>
                                             </TableRow>

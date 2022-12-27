@@ -1,17 +1,56 @@
-import { Alert, Avatar, Box, Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Avatar, Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { deepOrange } from '@mui/material/colors';
 import { useForm } from 'react-hook-form';
+import { useMutation, useQuery } from 'react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
 import Iconify from '../../components/iconify';
 import { fDate } from '../../utils/formatTime';
+import { AuthRequest } from '../../services/AuthRequest';
 
 export default function EditPatient() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
-    if (errors) {
-        console.log(errors);
+    const { id: patientId } = useParams()
+    const navigate = useNavigate()
+
+    const { isLoading: userLoading, refetch, data: user } = useQuery('user',
+        async () => {
+            return AuthRequest.get(`/api/v1/users/${patientId}`).then(data => data.data.data)
+        }
+    )
+
+    const { mutateAsync, isLoading: updatePatientLoading } = useMutation((patient) => {
+
+        return AuthRequest.patch(`/api/v1/users/${patientId}`, patient)
+            .then(res => {
+                toast.success("Patient Updated Successful!", res, {
+                    toastId: 'success12'
+                })
+                reset()
+                refetch()
+                navigate(-1)
+            })
+            .catch((err) => {
+                toast.error(err?.response?.data?.message, {
+                    toastId: 'error12'
+                })
+            })
+    })
+
+
+
+    if (!user) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
     }
+
+    const gender = user.details.gender;
+
     const onSubmit = data => {
         const givenDate = new Date(data?.dob);
         const presentDate = new Date()
@@ -20,17 +59,26 @@ export default function EditPatient() {
             return
         }
         data.dob = fDate(data.dob)
+        data = {
+            ...data,
+            fullName: data.firstName + " " + data.lastName,
+            secondaryInsurance: (+data.secondaryInsurance),
+            primaryInsurance: (+data.primaryInsurance),
+        }
+        delete data.email
+
         setDbError(false)
-        console.log(data)
-        reset()
+        mutateAsync(data)
     };
+
+
     return (
         <>
             <Helmet>
                 <title> Edit - Patient Profile </title>
             </Helmet>
             <Container maxWidth="xl">
-                <Typography variant="h5">Edit - Patient Profile</Typography>
+                <Typography variant="h5">Update Patient</Typography>
                 <Grid
                     container
                     spacing={0}
@@ -47,12 +95,12 @@ export default function EditPatient() {
                             >
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("Fname", { required: "Field is required" })}
+                                        {...register("firstName", { required: "Field is required" })}
                                         error={errors.Fname && true}
-                                        id="outlined-basic"
                                         label="First Name*"
                                         type="text"
                                         fullWidth
+                                        defaultValue={user.firstName}
                                         variant="outlined"
                                         helpertext={errors.Fname?.message}
 
@@ -60,12 +108,13 @@ export default function EditPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("Lname", { required: "Field is required" })}
+                                        {...register("lastName", { required: "Field is required" })}
                                         error={errors.Lname && true}
-                                        id="outlined-basic"
+
                                         label="Last Name*"
                                         type="text"
                                         fullWidth
+                                        defaultValue={user.lastName}
                                         variant="outlined"
                                         helpertext={errors.Lname?.message}
 
@@ -75,11 +124,11 @@ export default function EditPatient() {
                                     <TextField
                                         {...register("email", { required: "Field is required" })}
                                         error={errors.email && true}
-                                        id="outlined-basic"
+
                                         label="Email*"
                                         autoComplete="false"
-                                        defaultValue={"demo@minimals.cc"}
                                         type={'email'}
+                                        defaultValue={user.email}
                                         fullWidth
                                         variant="outlined"
                                         helpertext={errors.email?.message}
@@ -87,18 +136,21 @@ export default function EditPatient() {
                                             readOnly: true,
                                         }}
 
+
                                     />
                                 </Grid>
+
+
                                 <Grid item xs={6}>
                                     <FormControl fullWidth>
                                         <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Gender*</InputLabel>
                                         <Select
                                             variant="outlined"
                                             size="small"
-                                            defaultValue=""
                                             error={errors.gender && true}
                                             helpertext={errors.gender?.message}
                                             rows={2}
+                                            defaultValue={gender.toLowerCase()}
                                             {...register("gender", { required: "Field is required" })}
                                         >
                                             <MenuItem value={"male"}>Male</MenuItem>
@@ -107,17 +159,19 @@ export default function EditPatient() {
                                         </Select>
                                     </FormControl>
                                 </Grid>
+
                                 <Grid item xs={6}>
                                     <TextField
                                         {...register("dob", { required: "Field is required" })}
                                         error={errors.dob && true}
-                                        id="outlined-basic"
+
                                         label="Date of Birth*"
                                         onFocus={(e) => { (e.target.type = "date") }}
                                         onBlur={(e) => { (e.target.type = "text") }}
                                         type="text"
                                         fullWidth
                                         variant="outlined"
+                                        defaultValue={user.details.dob}
                                         helpertext={errors.dob?.message}
                                     />
                                     {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
@@ -126,11 +180,12 @@ export default function EditPatient() {
                                     <TextField
                                         {...register("weight", { required: "Field is required" })}
                                         error={errors.weight && true}
-                                        id="outlined-basic"
+
                                         type={'number'}
                                         label="Weight (lbs)*"
                                         fullWidth
                                         variant="outlined"
+                                        defaultValue={user.details.weight}
                                         helpertext={errors.weight?.message}
 
                                     />
@@ -139,10 +194,11 @@ export default function EditPatient() {
                                     <TextField
                                         {...register("country", { required: "Field is required" })}
                                         error={errors.country && true}
-                                        id="outlined-basic"
+
                                         label="Country*"
                                         fullWidth
                                         variant="outlined"
+                                        defaultValue={user.details.country}
                                         helpertext={errors.country?.message}
 
                                     />
@@ -151,10 +207,11 @@ export default function EditPatient() {
                                     <TextField
                                         {...register("city", { required: "Field is required" })}
                                         error={errors.city && true}
-                                        id="outlined-basic"
+
                                         label="City*"
                                         fullWidth
                                         variant="outlined"
+                                        defaultValue={user.details.city}
                                         helpertext={errors.city?.message}
 
                                     />
@@ -163,10 +220,11 @@ export default function EditPatient() {
                                     <TextField
                                         {...register("state", { required: "Field is required" })}
                                         error={errors.state && true}
-                                        id="outlined-basic"
+
                                         label="State*"
                                         fullWidth
                                         variant="outlined"
+                                        defaultValue={user.details.state}
                                         helpertext={errors.state?.message}
 
                                     />
@@ -177,12 +235,13 @@ export default function EditPatient() {
                                             required: "Field is required",
                                             minLength: { value: 6, message: "Phone number should be at last 6 characters" },
                                         })}
-                                        id="outlined-basic"
+
                                         error={errors.phoneNumber && true}
                                         label="Phone Number*"
                                         type={"tel"}
                                         fullWidth
                                         variant="outlined"
+                                        defaultValue={user.details?.phoneNumber}
                                         helpertext={errors?.phoneNumber?.message}
 
                                     />
@@ -193,9 +252,10 @@ export default function EditPatient() {
                                     <TextField
                                         {...register("primaryInsurance", { required: "Field is required" })}
                                         error={errors.primaryInsurance && true}
-                                        id="outlined-basic"
+                                        type="number"
                                         label="Primary Insurance*"
                                         fullWidth
+                                        defaultValue={user.details?.primaryInsurance}
                                         variant="outlined"
                                         helpertext={errors.primaryInsurance?.message}
 
@@ -205,9 +265,10 @@ export default function EditPatient() {
                                     <TextField
                                         {...register("secondaryInsurance", { required: "Field is required" })}
                                         error={errors.secondaryInsurance && true}
-                                        id="outlined-basic"
+                                        type="number"
                                         label="Secondary Insurance*"
                                         fullWidth
+                                        defaultValue={user.details?.secondaryInsurance}
                                         variant="outlined"
                                         helpertext={errors.secondaryInsurance?.message}
 
@@ -216,18 +277,19 @@ export default function EditPatient() {
                                 <Grid item xs={12}>
                                     <TextField
                                         {...register("address", { required: "Field is required" })}
-                                        id="outlined-basic"
+
                                         label="Address"
                                         error={errors.address && true}
                                         fullWidth
                                         multiline
                                         helpertext={errors.address?.message}
+                                        defaultValue={user.details?.address}
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >Confirm</Button>
+                                    <LoadingButton loading={updatePatientLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Update</LoadingButton>
                                 </Grid>
                             </Grid>
 
