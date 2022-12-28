@@ -13,27 +13,28 @@ import { fDateTime } from '../../utils/formatTime';
 
 
 
-export default function UploadOrderDocuments() {
+export default function UploadPatientDocuments() {
 
-    const { id: orderId } = useParams()
+    const { id: patientId } = useParams()
     const submitButtonRef = useRef(null)
     const [user, setUser] = useState()
     const [loading, setLoading] = useState(false)
+
     const navigate = useNavigate()
 
     let loggedUser = localStorage.getItem('user');
     loggedUser = JSON.parse(loggedUser);
 
 
-    const { isLoading: orderLoading, refetch, data: order } = useQuery('order',
+    const { isLoading: patient3Loading, refetch, data: patient3 } = useQuery('patient3',
         async () => {
-            return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/users/${patientId}`).then(data => data.data.data)
         }
     )
 
-    const { mutateAsync, isLoading: orderDocumentsLoading } = useMutation((orderDocuments) => {
+    const { mutateAsync, isLoading: patientDocumentsLoading } = useMutation((patientDocuments) => {
 
-        return AuthRequest.post(`/api/v1/dme/upload-order-document`, orderDocuments,
+        return AuthRequest.post(`/api/v1/dme/upload-patient-document/${patientId}`, patientDocuments,
             {
                 headers: { "Content-Type": "multipart/form-data" }
             }
@@ -41,27 +42,25 @@ export default function UploadOrderDocuments() {
             .then(res => {
                 refetch()
                 toast.success("Uploaded!", res, {
-                    toastId: 'success6'
+                    toastId: 'success7'
                 })
-
             })
             .catch((err) => {
                 refetch()
                 toast.error(err.response.data.message, {
-                    toastId: 'error4'
+                    toastId: 'error6'
                 })
             })
     })
 
-    const deleteDocumentRequest = async (docId, orderId) => {
+    const deleteDocumentRequest = async (docId, patientId) => {
 
-        await AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=order-documents`, { data: { orderId } })
+        await AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=patient-document`, { data: { patientId } })
             .then(res => {
                 refetch()
                 toast.success("Deleted!", res, {
                     toastId: 'success6'
                 })
-
             })
             .catch((err) => {
                 refetch()
@@ -79,22 +78,21 @@ export default function UploadOrderDocuments() {
         e.preventDefault()
         const file = e.target.uploadFile.files[0]
         const formData = new FormData()
-        formData.append('order-document', file)
+        formData.append('patient-document', file)
 
         if (!!formData.entries().next().value) {
-            formData.append('uploaderId', order.patientId._id)
-            formData.append('orderId', orderId)
+            formData.append('uploaderId', loggedUser.id)
             mutateAsync(formData)
 
         } else {
-            toast.warning('Upload documents', {
-                toastId: "warning1"
+            toast.warning('Please Upload documents', {
+                toastId: "warning3"
             })
         }
     }
 
     const downloadDocument = async (doc) => {
-        const url = `${process.env.REACT_APP_SERVER}/api/v1/dme/get-document?document=order-documents/${doc.split('/')[1]}`
+        const url = `${process.env.REACT_APP_SERVER}/api/v1/dme/get-document?document=patient-documents/${doc.split('/')[1]}`
         const a = document.createElement('a');
         a.href = url
         a.download = doc.split('/')[1];
@@ -102,11 +100,11 @@ export default function UploadOrderDocuments() {
     }
 
     const deleteDocument = async (docId) => {
-        deleteDocumentRequest(docId, orderId)
+        deleteDocumentRequest(docId, patientId)
     }
 
     // 
-    if (orderLoading || orderDocumentsLoading) {
+    if (patient3Loading || patientDocumentsLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -115,19 +113,18 @@ export default function UploadOrderDocuments() {
     return (
         <>
             <Helmet>
-                <title> Order Documents </title>
+                <title> Patient Documents </title>
             </Helmet>
             <Container maxWidth="xl">
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                    <Typography variant="h5">Upload Order Documents for
+                    <Typography variant="h5">Upload Patient Documents for
                         <Link
-                            to={`/DME-supplier/dashboard/patient-profile/${order.patientId._id}`}
+                            to={`/DME-supplier/dashboard/patient-profile/${patient3._id}`}
                             style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
                             color="inherit" variant="subtitle2" underline="hover" nowrap="true"
                             target="_blank" rel="noopener noreferrer"
-                        >{order.patientId.fullName}
+                        >{patient3.fullName}
                         </Link>
-                        Order
                     </Typography>
                     <form onSubmit={(e) => handleFormSubmit(e)}>
                         <Button variant="contained" component="label" startIcon={<Iconify icon="material-symbols:cloud-upload" />}>
@@ -146,7 +143,7 @@ export default function UploadOrderDocuments() {
                     style={{ minHeight: '100vh', marginTop: '40px' }}
                 >
                     {
-                        order.document.map((data, index) => {
+                        patient3.details.document.map((data, index) => {
                             return (
                                 <Card
                                     key={index}

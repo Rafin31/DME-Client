@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const AuthRequest = axios.create(
     {
-        baseURL: process.env.server,
+        baseURL: process.env.REACT_APP_SERVER,
         headers: {
             "Content-type": "application/json"
         }

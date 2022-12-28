@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import PropTypes from 'prop-types';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
 import {
@@ -24,8 +24,11 @@ import {
     TablePagination,
     Tabs,
     Tab,
+    CircularProgress,
 } from '@mui/material';
 // components
+import { useQuery } from 'react-query';
+import { toast } from 'react-toastify';
 import PopOver from '../../components/Popover/PopOver';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
@@ -33,6 +36,8 @@ import Scrollbar from '../../components/scrollbar';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
 import InviteModal from '../Shared/InviteModal';
+import { AuthRequest } from '../../services/AuthRequest';
+
 
 
 
@@ -43,29 +48,15 @@ const INVITED_STAFF_TABLE_HEAD = [
     { id: 'email', label: ' Email', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
-const INVITED_STAFF_LIST = [
-    {
-        id: 1,
-        email: "KingoPoli@gmail.com",
-    },
 
-]
 const REGISTERED_STAFF_TABLE_HEAD = [
     { id: 'Fname', label: 'First Name', alignRight: false },
     { id: 'Lname', label: 'Last Name', alignRight: false },
+    { id: 'fullName', label: 'Full Name', alignRight: false },
     { id: 'email', label: 'Staff Email', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
 
-const REGISTERED_STAFF_LIST = [
-    {
-        id: 1,
-        Fname: "KingoPoli",
-        Lname: "Khaan",
-        email: "KingoPoli@gmail.com",
-    },
-
-]
 
 
 function descendingComparator(a, b, orderBy) {
@@ -104,7 +95,7 @@ function applySortFilterRegisteredStaff(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.email.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
@@ -132,9 +123,106 @@ export default function StaffPage() {
 
     const navigate = useNavigate()
 
-    const handelInviteDoctor = (e) => {
+    const [user, setUser] = useState()
+    const [loading, setLoading] = useState()
+
+
+    let loggedUser = localStorage.getItem('user');
+    loggedUser = JSON.parse(loggedUser);
+
+    const { id } = loggedUser
+
+    const loadUserInfo = useCallback(() => {
+        AuthRequest.get(`/api/v1/users/${id}`)
+            .then(res => {
+                setUser(res.data.data)
+                setLoading(false)
+            })
+    }, [id])
+
+    useEffect(() => {
+        setLoading(true);
+        loadUserInfo()
+    }, [loadUserInfo])
+
+    useEffect(() => {
+        if (searchFieldRef.current) {
+            searchFieldRef.current.focus();
+        }
+    }, [filterName, searchFieldRef])
+
+
+
+    const { isLoading: invitedStaff, refetch, data: INVITED_STAFF_LIST } = useQuery('INVITED_STAFF_LIST',
+        async () => {
+            return AuthRequest.get(`/api/v1/staff/invited-staff/${id}`).then(data => data.data.data)
+        }
+    )
+    const { isLoading: registeredStaff, refetch: refetchRegisteredStaff, data: REGISTERED_STAFF_LIST } = useQuery('REGISTERED_STAFF_LIST',
+        async () => {
+            return AuthRequest.get(`/api/v1/staff`).then(data => data.data.data)
+        }
+    )
+
+
+
+    if (!user || !INVITED_STAFF_LIST || !REGISTERED_STAFF_LIST) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+    const handelDeleteInvitedStaff = async (token) => {
+
+        await AuthRequest.delete(`/api/v1/staff/delete-invited-staff/${token}`)
+            .then(res => {
+                refetch()
+                toast.success(`Invitation Deleted`, {
+                    toastId: "success13"
+                })
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+
+    const handelDeleteRegisteredStaff = async (id) => {
+
+        await AuthRequest.delete(`/api/v1/staff/delete-registered-staff/${id}`)
+            .then(res => {
+                refetchRegisteredStaff()
+                toast.success(`Staff Deleted`, {
+                    toastId: "success16"
+                })
+            })
+            .catch((err) => {
+                toast.error(`Something Went Wrong`, {
+                    toastId: "error17"
+                })
+            })
+
+    }
+
+
+    const handelInviteStaff = async (e) => {
         e.preventDefault()
-        console.log(e.target.invitedEmail.value)
+
+        await AuthRequest.post(`/api/v1/dme/invite-staff`, {
+            dmeSupplierEmail: loggedUser.email,
+            staffEmail: e.target.invitedEmail.value
+        }).then(res => {
+            refetch()
+            toast.success(`Invitation sent to ${e.target.invitedEmail.value}`, {
+                toastId: "success12"
+            })
+        })
+            .catch((err) => {
+                refetch()
+                toast.error(err.response?.data?.data?.split('email:')[1], {
+                    toastId: "error19"
+                })
+            })
+
         setInviteOpen(false)
     };
 
@@ -173,6 +261,7 @@ export default function StaffPage() {
     const filteredRegisteredStaffs = applySortFilterRegisteredStaff(REGISTERED_STAFF_LIST, getComparator(order, orderBy), filterName);
 
     const isNotFound = !filteredInvitedStaffs.length && !!filterName;
+    const isNotFoundRegistered = !filteredRegisteredStaffs.length && !!filterName;
 
     // ---------------------------------Tabs-------------------------------------
 
@@ -215,12 +304,6 @@ export default function StaffPage() {
     };
 
 
-    useEffect(() => {
-        if (searchFieldRef.current) {
-            searchFieldRef.current.focus();
-        }
-    }, [filterName, handleFilterByName, searchFieldRef])
-
     return (
         <>
             <Helmet>
@@ -237,7 +320,7 @@ export default function StaffPage() {
                     </Button>
                 </Stack>
 
-                <InviteModal open={inviteOpen} setOpen={setInviteOpen} handelFormSubmit={handelInviteDoctor} title="Invite Staff" />
+                <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteStaff} title="Invite Staff" />
                 {/* -------------------------------------------------------------------------
                                    TABS
               --------------------------------------------------------------------------- */}
@@ -257,268 +340,274 @@ export default function StaffPage() {
                     {/* -------------------------------------------------------------------------
                                        1st
                    --------------------------------------------------------------------------- */}
+
+
                     <TabPanel value={value} index={0} >
-                        <Card>
-                            <input type="text"
-                                style={{
-                                    margin: "20px 15px",
-                                    padding: "10px 5px",
-                                    width: "220px"
-                                }}
-                                ref={searchFieldRef}
-                                placeholder="Search by Email"
-                                value={filterName}
-                                onChange={handleFilterByName} />
+                        {
+                            INVITED_STAFF_LIST.length !== 0 ?
+                                <Card>
+                                    <input type="text"
+                                        style={{
+                                            margin: "20px 15px",
+                                            padding: "10px 5px",
+                                            width: "220px"
+                                        }}
+                                        ref={searchFieldRef}
+                                        placeholder="Search by Email"
+                                        value={filterName}
+                                        onChange={handleFilterByName} />
 
-                            <Scrollbar>
-                                <TableContainer sx={{ minWidth: 800 }}>
-                                    <Table size="small">
-                                        <UserListHead
-                                            order={order}
-                                            orderBy={orderBy}
-                                            headLabel={INVITED_STAFF_TABLE_HEAD}
-                                            rowCount={INVITED_STAFF_LIST.length}
-                                            numSelected={selected.length}
-                                            onRequestSort={handleRequestSort}
-                                            onSelectAllClick={handleSelectAllClick}
-                                        />
-                                        <TableBody>
-                                            {filteredInvitedStaffs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                                const { id, email } = row;
-                                                const selectedUser = selected.indexOf(email) !== -1;
+                                    <Scrollbar>
+                                        <TableContainer sx={{ minWidth: 800 }}>
+                                            <Table size="small">
+                                                <UserListHead
+                                                    order={order}
+                                                    orderBy={orderBy}
+                                                    headLabel={INVITED_STAFF_TABLE_HEAD}
+                                                    rowCount={INVITED_STAFF_LIST.length}
+                                                    numSelected={selected.length}
+                                                    onRequestSort={handleRequestSort}
+                                                    onSelectAllClick={handleSelectAllClick}
+                                                />
+                                                <TableBody>
+                                                    {filteredInvitedStaffs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                                                        const { _id, email, inviteToken } = row;
+                                                        const selectedUser = selected.indexOf(email) !== -1;
 
-                                                return (
-                                                    <TableRow hover key={id} tabIndex={-1} selected={selectedUser}>
+                                                        return (
+                                                            <TableRow hover key={_id} tabIndex={-1} selected={selectedUser}>
 
-                                                        <TableCell component="th" scope="row" padding="none">
-                                                            <Stack direction="row" alignItems="center" spacing={10}>
-                                                                <Typography component={'span'} style={{ paddingLeft: "20px" }} variant="subtitle2" nowrap="true">
-                                                                    {email}
-                                                                </Typography>
-                                                            </Stack>
-                                                        </TableCell>
-                                                        <TableCell >
-                                                            <PopOver
-                                                                option={[
-                                                                    { label: "Delete" }
-                                                                ]}
-                                                                id={id}
-                                                            />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })}
-                                            {emptyRows > 0 && (
-                                                <TableRow style={{ height: 53 * emptyRows }}>
-                                                    <TableCell colSpan={6} />
-                                                </TableRow>
-                                            )}
-                                        </TableBody>
+                                                                <TableCell component="th" scope="row" padding="none">
+                                                                    <Stack direction="row" alignItems="center" spacing={10}>
+                                                                        <Typography component={'span'} style={{ paddingLeft: "20px" }} variant="subtitle2" nowrap="true">
+                                                                            {email}
+                                                                        </Typography>
+                                                                    </Stack>
+                                                                </TableCell>
+                                                                <TableCell >
+                                                                    <PopOver
+                                                                        source={"invited-staff-page"}
+                                                                        option={[
+                                                                            { label: "Delete" }
+                                                                        ]}
+                                                                        handelDeleteInvitedStaff={handelDeleteInvitedStaff}
+                                                                        id={inviteToken}
+                                                                    />
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })}
+                                                    {emptyRows > 0 && (
+                                                        <TableRow style={{ height: 53 * emptyRows }}>
+                                                            <TableCell colSpan={6} />
+                                                        </TableRow>
+                                                    )}
+                                                </TableBody>
 
-                                        {isNotFound && (
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                                        <Paper
-                                                            sx={{
-                                                                textAlign: 'center',
-                                                            }}
-                                                        >
-                                                            <Typography component={'span'} variant="h6" paragraph>
-                                                                Not found
-                                                            </Typography>
+                                                {isNotFound && (
+                                                    <TableBody>
+                                                        <TableRow>
+                                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                <Paper
+                                                                    sx={{
+                                                                        textAlign: 'center',
+                                                                    }}
+                                                                >
+                                                                    <Typography component={'span'} variant="h6" paragraph>
+                                                                        Not found
+                                                                    </Typography>
+                                                                    <br />
 
-                                                            <Typography component={'span'} variant="body2">
-                                                                No results found for &nbsp;
-                                                                <strong>&quot;{filterName}&quot;</strong>.
-                                                                <br /> Try checking for typos or using complete words.
-                                                            </Typography>
-                                                        </Paper>
-                                                    </TableCell>
-                                                </TableRow>
-                                            </TableBody>
-                                        )}
-                                        {INVITED_STAFF_LIST.length === 0 && (
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                                        <Paper
-                                                            sx={{
-                                                                textAlign: 'center',
-                                                            }}
-                                                        >
+                                                                    <Typography component={'span'} variant="body2">
+                                                                        No results found for &nbsp;
+                                                                        <strong>&quot;{filterName}&quot;</strong>.
+                                                                        <br /> Try checking for typos or using complete words.
+                                                                    </Typography>
+                                                                </Paper>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                )}
+                                                {INVITED_STAFF_LIST.length === 0 && (
+                                                    <TableBody>
+                                                        <TableRow>
+                                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                <Paper
+                                                                    sx={{
+                                                                        textAlign: 'center',
+                                                                    }}
+                                                                >
 
-                                                            <Typography component={'span'} variant="body2">
-                                                                No one is invited yet
-                                                            </Typography>
-                                                        </Paper>
-                                                    </TableCell>
-                                                </TableRow>
-                                            </TableBody>
-                                        )}
-                                    </Table>
-                                </TableContainer>
-                            </Scrollbar>
+                                                                    <Typography component={'span'} variant="body2">
+                                                                        No one is invited yet
+                                                                    </Typography>
+                                                                </Paper>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                )}
+                                            </Table>
+                                        </TableContainer>
+                                    </Scrollbar>
 
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25]}
-                                component="div"
-                                count={INVITED_STAFF_LIST.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                            />
-                        </Card>
+                                    <TablePagination
+                                        rowsPerPageOptions={[5, 10, 25]}
+                                        component="div"
+                                        count={INVITED_STAFF_LIST.length}
+                                        rowsPerPage={rowsPerPage}
+                                        page={page}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={handleChangeRowsPerPage}
+                                    />
+                                </Card>
+                                :
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
+
+                                            <p
+                                            >Not User found</p>
+
+
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                        }
                     </TabPanel>
+
 
                     {/* -------------------------------------------------------------------------
                                        2nd
                    --------------------------------------------------------------------------- */}
+
+
                     <TabPanel value={value} index={1} >
-                        <Card>
-                            <input type="text"
-                                style={{
-                                    margin: "20px 15px",
-                                    padding: "10px 5px",
-                                    width: "220px"
-                                }}
-                                ref={searchFieldRef}
-                                placeholder="Search by Email"
-                                value={filterName}
-                                onChange={handleFilterByName} />
+                        {
+                            REGISTERED_STAFF_LIST.length !== 0 ?
+                                <Card>
+                                    <input type="text"
+                                        style={{
+                                            margin: "20px 15px",
+                                            padding: "10px 5px",
+                                            width: "220px"
+                                        }}
+                                        ref={searchFieldRef}
+                                        placeholder="Search by Email"
+                                        value={filterName}
+                                        onChange={handleFilterByName} />
 
-                            <Scrollbar>
-                                <TableContainer sx={{ minWidth: 800 }}>
-                                    <Table size="small">
-                                        <UserListHead
-                                            order={order}
-                                            orderBy={orderBy}
-                                            headLabel={REGISTERED_STAFF_TABLE_HEAD}
-                                            rowCount={REGISTERED_STAFF_LIST.length}
-                                            numSelected={selected.length}
-                                            onRequestSort={handleRequestSort}
-                                            onSelectAllClick={handleSelectAllClick}
-                                        />
-                                        <TableBody>
-                                            {filteredRegisteredStaffs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                                const { id, Fname, email, Lname } = row;
-                                                const selectedUser = selected.indexOf(filterName) !== -1;
+                                    <Scrollbar>
+                                        <TableContainer sx={{ minWidth: 800 }}>
+                                            <Table size="small">
+                                                <UserListHead
+                                                    order={order}
+                                                    orderBy={orderBy}
+                                                    headLabel={REGISTERED_STAFF_TABLE_HEAD}
+                                                    rowCount={REGISTERED_STAFF_LIST.length}
+                                                    numSelected={selected.length}
+                                                    onRequestSort={handleRequestSort}
+                                                    onSelectAllClick={handleSelectAllClick}
+                                                />
+                                                <TableBody>
+                                                    {filteredRegisteredStaffs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                                                        const { userId } = row;
+                                                        const selectedUser = selected.indexOf(userId.fullName) !== -1;
 
-                                                return (
-                                                    <TableRow hover key={id} tabIndex={-1} selected={selectedUser}>
-                                                        {/* <TableCell padding="checkbox">
-                                                                <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
-                                                                 </TableCell> */}
-
-                                                        <TableCell component="th" scope="row" padding="none">
-                                                            <Stack direction="row" alignItems="center" spacing={10}>
-                                                                {/* <Avatar alt={name} src={avatarUrl} /> */}
-                                                                <Typography component={'span'} style={{ paddingLeft: "20px" }} variant="subtitle2" nowrap="true">
-                                                                    {Fname}
-                                                                </Typography>
-                                                            </Stack>
-                                                        </TableCell>
-
-                                                        <TableCell align="left">{Lname}</TableCell>
-                                                        <TableCell align="left">{email}</TableCell>
+                                                        return (
+                                                            <TableRow hover key={userId._id} tabIndex={-1} selected={selectedUser}>
 
 
-                                                        <TableCell >
-                                                            <PopOver
-                                                                option={[
-                                                                    { label: "Edit" },
-                                                                    { label: "Add Note" },
-                                                                    { label: "Status" },
-                                                                    { label: "Delete" }
-                                                                ]}
-                                                                id={id}
-                                                            />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })}
-                                            {emptyRows > 0 && (
-                                                <TableRow style={{ height: 53 * emptyRows }}>
-                                                    <TableCell colSpan={6} />
-                                                </TableRow>
-                                            )}
-                                        </TableBody>
+                                                                <TableCell component="th" scope="row" padding="none">
+                                                                    <Stack direction="row" alignItems="center" spacing={10}>
+                                                                        {/* <Avatar alt={name} src={avatarUrl} /> */}
+                                                                        <Typography component={'span'} style={{ paddingLeft: "20px" }} variant="subtitle2" nowrap="true">
+                                                                            {userId.firstName}
+                                                                        </Typography>
+                                                                    </Stack>
+                                                                </TableCell>
 
-                                        {isNotFound && (
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                                        <Paper
-                                                            sx={{
-                                                                textAlign: 'center',
-                                                            }}
-                                                        >
-                                                            <Typography component={'span'} variant="h6" paragraph>
-                                                                Not found
-                                                            </Typography>
+                                                                <TableCell align="left">{userId.lastName}</TableCell>
+                                                                <TableCell align="left">{userId.fullName}</TableCell>
+                                                                <TableCell align="left">{userId.email}</TableCell>
 
-                                                            <Typography component={'span'} variant="body2">
-                                                                No results found for &nbsp;
-                                                                <strong>&quot;{filterName}&quot;</strong>.
-                                                                <br /> Try checking for typos or using complete words.
-                                                            </Typography>
-                                                        </Paper>
-                                                    </TableCell>
-                                                </TableRow>
-                                            </TableBody>
-                                        )}
-                                    </Table>
-                                </TableContainer>
-                            </Scrollbar>
 
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25]}
-                                component="div"
-                                count={INVITED_STAFF_LIST.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                            />
-                        </Card>
+                                                                <TableCell >
+                                                                    <PopOver
+                                                                        source={"staff-registered-page"}
+                                                                        option={[
+                                                                            { label: "Edit" },
+                                                                            { label: "Delete" }
+                                                                        ]}
+                                                                        id={userId._id}
+                                                                        handelDeleteRegisteredStaff={handelDeleteRegisteredStaff}
+                                                                    />
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })}
+                                                    {emptyRows > 0 && (
+                                                        <TableRow style={{ height: 53 * emptyRows }}>
+                                                            <TableCell colSpan={6} />
+                                                        </TableRow>
+                                                    )}
+                                                </TableBody>
+
+                                                {isNotFoundRegistered && (
+                                                    <TableBody>
+                                                        <TableRow>
+                                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                <Paper
+                                                                    sx={{
+                                                                        textAlign: 'center',
+                                                                    }}
+                                                                >
+                                                                    <Typography component={'span'} variant="h6" paragraph>
+                                                                        Not found
+                                                                    </Typography>
+                                                                    <br />
+                                                                    <Typography component={'span'} variant="body2">
+                                                                        No results found for &nbsp;
+                                                                        <strong>&quot;{filterName}&quot;</strong>.
+                                                                        <br /> Try checking for typos or using complete words.
+                                                                    </Typography>
+                                                                </Paper>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                )}
+                                            </Table>
+                                        </TableContainer>
+                                    </Scrollbar>
+
+                                    <TablePagination
+                                        rowsPerPageOptions={[5, 10, 25]}
+                                        component="div"
+                                        count={INVITED_STAFF_LIST.length}
+                                        rowsPerPage={rowsPerPage}
+                                        page={page}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={handleChangeRowsPerPage}
+                                    />
+                                </Card>
+                                :
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
+
+                                            <p
+                                            >Not User found</p>
+
+
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+
+                        }
                     </TabPanel>
+
 
                 </Box>
             </Container>
-
-
-            {/* Edit Delete Pop Over */}
-
-            {/* <PopOver
-                open={Boolean(open)}
-                anchorEl={open}
-                style={{ border: '2px solid red' }}
-                onClose={handleCloseMenu}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                PaperProps={{
-                    sx: {
-                        p: 1,
-                        width: 140,
-                        '& .MuiMenuItem-root': {
-                            px: 1,
-                            typography: 'body2',
-                            borderRadius: 0.75,
-                        },
-                    },
-                }}
-            >
-                <MenuItem>
-                    <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-                    Edit
-                </MenuItem>
-
-                <MenuItem sx={{ color: 'error.main' }}>
-                    <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-                    Delete
-                </MenuItem>
-            </PopOver> */}
         </>
     );
 }

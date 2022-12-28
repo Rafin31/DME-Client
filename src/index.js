@@ -13,7 +13,7 @@ import { AuthContext } from './Context/AuthContext';
 
 
 const queryClient = new QueryClient()
-axios.defaults.baseURL = process.env.server;
+axios.defaults.baseURL = process.env.REACT_APP_SERVER;
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

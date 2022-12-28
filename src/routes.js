@@ -14,7 +14,7 @@ import TherapistPage from './pages/DME_SUPPLIER/TherapistPage';
 import StaffPage from './pages/DME_SUPPLIER/StaffPage';
 import AuthRoute from './services/AuthRoute';
 import AddPatient from './pages/DME_SUPPLIER/AddPatient';
-import UploadDocuments from './pages/DME_SUPPLIER/UploadDocuments';
+import UploadPatientDocuments from './pages/DME_SUPPLIER/UploadPatientDocuments';
 import PatientProfile from './pages/DME_SUPPLIER/PatientProfile';
 import EditPatient from './pages/DME_SUPPLIER/EditPatient';
 import DmeSupplierProfile from './pages/DME_SUPPLIER/DmeSupplierProfile';
@@ -29,6 +29,7 @@ import ForgetPassword from './pages/Shared/ResetPassword/ForgetPassword';
 import ResetPassword from './pages/Shared/ResetPassword/ResetPassword';
 import CheckCategory from './services/CheckCategory';
 import EditTasks from './pages/DME_SUPPLIER/EditTask';
+import EditStaffPage from './pages/DME_SUPPLIER/EditStaffPage';
 
 
 
@@ -68,13 +69,14 @@ export default function Router() {
         <Route path='staff' element={<StaffPage />} />
         <Route path='add-tasks' element={<AddTasks />} />
 
-        <Route path='patient-document/:id' element={<UploadDocuments />} />
+        <Route path='patient-document/:id' element={<UploadPatientDocuments />} />
         <Route path='order-document/:id' element={<UploadOrderDocuments />} />
         <Route path='edit-tasks/:id' element={<EditTasks />} />
         <Route path='patient-profile/:id' element={<PatientProfile />} />
         <Route path='edit-patient-profile/:id' element={<EditPatient />} />
         <Route path='DME-supplier-profile/:id' element={<DmeSupplierProfile />} />
         <Route path='edit-dme-supplier-profile/:id' element={<EditDMESupplier />} />
+        <Route path='edit-staff-profile/:id' element={<EditStaffPage />} />
         <Route path='update-password/:id' element={<UpdatePassword />} />
         <Route path='edit-order/:id' element={<EditOrder />} />
         <Route path='add-patient-note/:id' element={<PatientNotes />} />

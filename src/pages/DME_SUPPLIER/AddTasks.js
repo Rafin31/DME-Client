@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { userContext } from '../../Context/AuthContext';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
+import { fDateTime } from '../../utils/formatTime';
 
 
 
@@ -69,7 +70,7 @@ export default function AddTasks() {
             return
         }
         const { patient, ...other } = data
-        data = { ...other, taskDate: new Date(givenDate), dmeSupplierId: user.id }
+        data = { ...other, taskDate: fDateTime(givenDate), dmeSupplierId: user.id }
         setData(data)
         mutateAsync(data)
     };

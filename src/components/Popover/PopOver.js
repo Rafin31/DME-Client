@@ -24,8 +24,9 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Edit") {
                 navigate(`/DME-supplier/dashboard/edit-patient-profile/${id}`)
             }
-            if (lebel === "Add Note") {
+            if (lebel === "Note") {
                 navigate(`/DME-supplier/dashboard/add-patient-note/${id}`)
+
             }
         }
 
@@ -52,6 +53,19 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             }
             if (lebel === "Delete") {
                 other.deleteFunction(id)
+            }
+        }
+        else if (source === "invited-staff-page") {
+            if (lebel === "Delete") {
+                other.handelDeleteInvitedStaff(id)
+            }
+        }
+        else if (source === "staff-registered-page") {
+            if (lebel === "Edit") {
+                navigate(`/DME-supplier/dashboard/edit-staff-profile/${id}`)
+            }
+            if (lebel === "Delete") {
+                other.handelDeleteRegisteredStaff(id)
             }
         }
 

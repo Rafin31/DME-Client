@@ -138,13 +138,19 @@ export default function PatientNotes() {
 
     const { isLoading: noteLoading, refetch, data: notes } = useQuery('notes',
         async () => {
-            console.log(data)
             return AuthRequest.get(`/api/v1/dme/notes-dme-patient?writerId=${writerId}&patientId=${patientId}`)
                 .then(data => data.data.data)
         }
     )
 
-    if (!notes || !user) {
+    const { isLoading: patientLoading, data: patient2 } = useQuery('patient2',
+        async () => {
+            return AuthRequest.get(`/api/v1/users/${patientId}`)
+                .then(data => data.data.data)
+        }
+    )
+
+    if (!notes || !user || !patient2) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -285,7 +291,7 @@ export default function PatientNotes() {
                             style={{ color: "black", cursor: "pointer", marginLeft: "6px" }}
                             color="inherit" variant="subtitle2" underline="hover" nowrap="true"
                             target="_blank" rel="noopener noreferrer"
-                        >Karim Hasan</Link>
+                        >{patient2.fullName}</Link>
                     </Typography>
                     <Button variant="contained" onClick={() => { setAddNotesOpen(true) }} startIcon={
                         <Iconify icon="material-symbols:add" />}>

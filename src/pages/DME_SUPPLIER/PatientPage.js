@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 
 // @mui
@@ -38,6 +38,7 @@ import { UserListHead } from '../../sections/@dashboard/user';
 import { fDate } from '../../utils/formatTime';
 import { AuthRequest } from '../../services/AuthRequest';
 
+
 const TABLE_HEAD = [
     { id: 'dob', label: 'Date of Birth', alignRight: false },
     { id: 'Fname', label: 'Full  Name', alignRight: false },
@@ -66,7 +67,7 @@ function getComparator(order, orderBy) {
 }
 
 function applySortFilter(array, comparator, query) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
+    const stabilizedThis = array?.map((el, index) => [el, index]);
     stabilizedThis.sort((a, b) => {
         const order = comparator(a[0], b[0]);
         if (order !== 0) return order;
@@ -126,7 +127,7 @@ export default function PatientPage() {
     })
 
 
-    if (!patient || importPatientLoading) {
+    if (!patient || importPatientLoading || patientLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -353,9 +354,8 @@ export default function PatientPage() {
                                                         source="patient-page"
                                                         option={[
                                                             { label: "Edit" },
-                                                            { label: "Add Note" },
+                                                            { label: "Note" },
                                                             { label: "Documents" },
-                                                            { label: "Delete" }
                                                         ]}
                                                         id={userId._id}
                                                     />

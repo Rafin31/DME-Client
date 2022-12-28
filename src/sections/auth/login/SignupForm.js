@@ -62,6 +62,7 @@ export default function SignupForm() {
 
     const onSubmit = async data => {
         const givenDate = new Date(data?.dob);
+        let finalData;
         const presentDate = new Date()
         if (givenDate > presentDate) {
             setDbError(true)
@@ -70,20 +71,34 @@ export default function SignupForm() {
         if (showField === "patient") {
             data.dob = fDate(data.dob)
         }
-        setDbError(false)
-        const { userCategory, ...rest } = data
-        const finalData = {
-            ...rest,
-            fullName: data.firstName + " " + data.lastName,
-            status: "63861954b3b3ded1ee267309",
-            country: "USA",
-            userCategory: data.userCategory.split('-')[1]
-        }
-
         if (data.password !== data.confirmPassword) {
             setError("Password did not matched!")
             return
         }
+
+        setDbError(false)
+        const { userCategory, ...rest } = data
+
+        if (invitationToken) {
+            finalData = {
+                ...rest,
+                fullName: data.firstName + " " + data.lastName,
+                status: "63861954b3b3ded1ee267309",
+                country: "USA",
+                userCategory: "638f7714a7f2be8abe01d2d2",
+                inviteToken: invitationToken
+            }
+        } else {
+            finalData = {
+                ...rest,
+                fullName: data.firstName + " " + data.lastName,
+                status: "63861954b3b3ded1ee267309",
+                country: "USA",
+                userCategory: data.userCategory.split('-')[1]
+            }
+        }
+
+
         createUser(finalData)
     };
 
