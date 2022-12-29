@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 //
 import Header from './header';
 import Nav from './nav';
+import { AuthRequest } from '../../services/AuthRequest';
 
 // ----------------------------------------------------------------------
 
@@ -33,13 +34,43 @@ const Main = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function DmeDashboardLayout() {
+
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState()
+  const [loading, setLoading] = useState(false)
+
+  let loggedInUser = localStorage.getItem('user');
+  loggedInUser = JSON.parse(loggedInUser);
+
+  const { id } = loggedInUser
+
+  const loadUserInfo = useCallback(() => {
+
+    AuthRequest.get(`/api/v1/users/${id}`)
+      .then(res => {
+        setUser(res.data.data)
+        setLoading(false)
+      })
+
+  })
+
+
+  useEffect(() => {
+    setLoading(true)
+    loadUserInfo()
+  }, [])
+
+
   return (
 
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} />
+      <Header onOpenNav={() => setOpen(true)} id={id} />
 
-      <Nav openNav={open} onCloseNav={() => setOpen(false)} />
+      <Nav openNav={open} onCloseNav={() => setOpen(false)}
+        user={user}
+        setUser={setUser}
+        loading={loading}
+        setLoading={setLoading} />
 
       <Main>
         <Outlet />

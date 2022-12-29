@@ -1,20 +1,20 @@
 import PropTypes from 'prop-types';
 
-import { useEffect, useState, useContext, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack, CircularProgress } from '@mui/material';
+import { Box, Link, Button, Drawer, Typography, Avatar, CircularProgress } from '@mui/material';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { userContext } from '../../../Context/AuthContext';
+
 // mock
 import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
-import { AuthRequest } from '../../../services/AuthRequest';
+
 // components
-import Logo from '../../../components/logo';
+
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
@@ -41,14 +41,10 @@ Nav.propTypes = {
   onCloseNav: PropTypes.func,
 };
 
-export default function Nav({ openNav, onCloseNav }) {
+export default function Nav({ openNav, onCloseNav, user, loading }) {
 
   const { pathname } = useLocation();
-  const [user, setUser] = useState()
-  const [loading, setLoading] = useState(false)
 
-
-  const { isLogin } = useContext(userContext)
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -59,28 +55,6 @@ export default function Nav({ openNav, onCloseNav }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  const loadUserInfo = useCallback(() => {
-
-    let user = localStorage.getItem('user');
-    user = JSON.parse(user);
-
-    const { id } = user
-
-    AuthRequest.get(`/api/v1/users/${id}`)
-      .then(res => {
-        setUser(res.data.data)
-        setLoading(false)
-      })
-
-  })
-
-
-
-  useEffect(() => {
-    setLoading(true)
-    loadUserInfo()
-  }, [])
-
 
   const renderContent = (
     <Scrollbar
@@ -90,9 +64,6 @@ export default function Nav({ openNav, onCloseNav }) {
         '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
       }}
     >
-      {/* <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-        <Logo />
-      </Box> */}
 
       {
         !loading ?
@@ -100,8 +71,12 @@ export default function Nav({ openNav, onCloseNav }) {
             <Typography variant="h4" style={{ textAlign: "center", paddingTop: "10px" }}>{user?.category}</Typography>
             <Link underline="none">
               <StyledAccount>
-                {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
-                <AccountCircleIcon style={{ fontSize: "40px" }} />
+                {
+                  user?.details?.banner ?
+                    <Avatar src={`${process.env.REACT_APP_SERVER}/documents/uploads/${user?.details?.banner}`} alt="photoURL" />
+                    :
+                    <AccountCircleIcon style={{ fontSize: "40px" }} />
+                }
 
                 <Box sx={{ ml: 2 }}>
                   <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>

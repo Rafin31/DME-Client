@@ -11,9 +11,8 @@ const AuthRequest = axios.create(
 
 AuthRequest.interceptors.request.use((config) => {
 
-    // const token = `Bearer ${localStorage.getItem('accessToken')}`
-    // const token = `Bearer test`
-    // config.headers.authorization = token
+    const token = `Bearer ${localStorage.getItem('accessToken')}`
+    config.headers.authorization = token
     return config;
 
 }, (error) => {

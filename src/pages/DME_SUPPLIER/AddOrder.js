@@ -80,7 +80,6 @@ export default function AddOrder() {
             note,
             status: "New-Referral"
         }
-        console.log(order)
         mutateAsync(order)
         reset()
     };

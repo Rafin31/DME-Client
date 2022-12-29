@@ -16,7 +16,7 @@ const style = {
 };
 
 export default function AddPatienttToDoctor({ open, setOpen, handelFormSubmit, patients, user, title }) {
-    console.log(patients);
+
     return (
         <div>
             <Modal

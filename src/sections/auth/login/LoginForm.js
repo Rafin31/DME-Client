@@ -83,7 +83,7 @@ export default function LoginForm() {
           />
 
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-            <Link to={'/app/forget-password-request'} variant="subtitle2" style={{ cursor: "pointer", color: "black", textDecoration: "none" }}>
+            <Link to={'forget-password-request'} variant="subtitle2" style={{ cursor: "pointer", color: "black", textDecoration: "none" }}>
               Forgot password?
             </Link>
           </Stack>

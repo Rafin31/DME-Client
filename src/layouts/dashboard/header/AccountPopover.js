@@ -8,26 +8,24 @@ import { userContext } from '../../../Context/AuthContext';
 import account from '../../../_mock/account';
 
 
-// ----------------------------------------------------------------------
-
-const MENU_OPTIONS = [
-  {
-    label: 'Profile',
-    path: `/DME-supplier/dashboard/DME-supplier-profile/${24}`
-  },
-  {
-    label: 'Settings',
-    path: `/DME-supplier/dashboard/settings/${32465}`
-  },
-];
-
-// ----------------------------------------------------------------------
-
-export default function AccountPopover() {
+export default function AccountPopover({ id }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate()
 
   const { signOut } = useContext(userContext)
+
+
+  const MENU_OPTIONS = [
+    {
+      label: 'Profile',
+      path: `/DME-supplier/dashboard/DME-supplier-profile/${id}`
+    },
+    {
+      label: 'Settings',
+      path: `/DME-supplier/dashboard/settings/${id}`
+    },
+  ];
+
 
   const handleOpen = (event) => {
     if (!open) {

@@ -3,19 +3,54 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { deepOrange } from '@mui/material/colors';
 import { useForm } from 'react-hook-form';
-import Iconify from '../../components/iconify';
-import { fDate } from '../../utils/formatTime';
+import { useMutation } from 'react-query';
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
+import { useNavigate, useParams } from 'react-router-dom';
+import { AuthRequest } from '../../services/AuthRequest';
 
 export default function Settings() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const navigate = useNavigate()
     const [dbError, setDbError] = useState(false)
+    const { id } = useParams()
+
+
+    const { mutateAsync, isLoading: bannerLoading } = useMutation((banner) => {
+
+        return AuthRequest.post(`/api/v1/dme/banner/${id}`, banner,
+            {
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        )
+            .then(res => {
+
+                window.location.reload(false);
+
+            })
+            .catch((err) => {
+                toast.error(err?.response?.data?.message, {
+                    toastId: 'error4'
+                })
+            })
+    })
+
+
     const onSubmit = data => {
 
         const file = data.companyBanner[0]
         const formData = new FormData()
-        formData.append('file', file)
-        console.log(!!formData.entries().next().value) // check if file uploaded or not
-        reset()
+        formData.append('dme-banner', file)
+
+        if (!!formData.entries().next().value) {
+            mutateAsync(formData)
+            reset()
+        } else {
+            toast.error("Please upload first", {
+                toastId: 'error49'
+            })
+        }
+
     };
     return (
         <>
@@ -59,7 +94,7 @@ export default function Settings() {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >Confirm</Button>
+                                    <LoadingButton loading={bannerLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >Upload</LoadingButton>
                                 </Grid>
                             </Grid>
 

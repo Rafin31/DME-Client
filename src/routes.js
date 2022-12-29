@@ -30,6 +30,7 @@ import ResetPassword from './pages/Shared/ResetPassword/ResetPassword';
 import CheckCategory from './services/CheckCategory';
 import EditTasks from './pages/DME_SUPPLIER/EditTask';
 import EditStaffPage from './pages/DME_SUPPLIER/EditStaffPage';
+import AllOrderNotes from './pages/Shared/AllOrderNotes';
 
 
 
@@ -47,6 +48,11 @@ export default function Router() {
       <Route path='login' element={<LoginPage />} />
       <Route path='signup' element={<SignupPage />} />
       <Route path='/' element={<Navigate to="/login" />} />
+
+      <Route path='login/forget-password-request' element={<ForgetPassword />} />
+      <Route path='forget-password-confirmation/:token' element={<ResetPassword />} />
+
+
 
       {/* --------------------------------------
                 DME Suppler Rotes 
@@ -81,16 +87,14 @@ export default function Router() {
         <Route path='edit-order/:id' element={<EditOrder />} />
         <Route path='add-patient-note/:id' element={<PatientNotes />} />
         <Route path='settings/:id' element={<Settings />} />
+        <Route path='order-note-log/:id' element={<AllOrderNotes />} />
       </Route>
       {/* --------------------------------------
                 DME Suppler Rotes END
         ----------------------------------------*/}
 
-
-
-      <Route path='/app/forget-password-request' element={<ForgetPassword />} />
-      <Route path='/app/forget-password-confirmation/:token' element={<ResetPassword />} />
       <Route path='*' element={<Page404 />} />
+
     </Routes>
   )
 }

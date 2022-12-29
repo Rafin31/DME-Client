@@ -6,7 +6,12 @@ import { Button, Container, Grid, TextField, Typography } from '@mui/material';
 // hooks
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { useMutation } from 'react-query';
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
+import { useNavigate, useParams } from 'react-router-dom';
 import useResponsive from '../../../hooks/useResponsive';
+import { AuthRequest } from '../../../services/AuthRequest';
 
 // components
 
@@ -42,10 +47,37 @@ const StyledContent = styled('div')(({ theme }) => ({
 export default function ResetPassword() {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
+    const navigate = useNavigate()
+    const { token } = useParams()
+
+    const { mutateAsync, isLoading: dataLoading } = useMutation((data) => {
+
+        return AuthRequest.post(`/api/v1/users/reset-password-operation`, data)
+            .then(res => {
+
+                navigate('/login')
+                toast.success("Password successfully reset. Please login", {
+                    toastId: 'success'
+                })
+
+            })
+            .catch((err) => {
+                toast.error(err?.response?.data?.data, {
+                    toastId: 'error96'
+                })
+            })
+    })
+
     const onSubmit = data => {
-        console.log(data)
+
+        const finalData = {
+            ...data,
+            token
+        }
+        mutateAsync(finalData);
         reset()
     };
+
     const mdUp = useResponsive('up', 'md');
 
     return (
@@ -75,37 +107,37 @@ export default function ResetPassword() {
                             >
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("currentPassword", { required: "Field is required" })}
-                                        error={errors.currentPassword && true}
+                                        {...register("newPassword", { required: "Field is required" })}
+                                        error={errors.newPassword && true}
                                         id="outlined-basic"
                                         label="New Password*"
                                         type="Password"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.currentPassword?.message}
+                                        helperText={errors.newPassword?.message}
 
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("email",
+                                        {...register("confirmPassword",
                                             {
                                                 required: "Field is required",
                                                 minLength: { value: 8, message: "Password must be at last 8 characters" },
                                             }
                                         )}
-                                        error={errors.newPassword && true}
+                                        error={errors.confirmPassword && true}
                                         id="outlined-basic"
                                         label="Confirm Password*"
                                         type="password"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.newPassword?.message}
+                                        helperText={errors.confirmPassword?.message}
 
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >Confirm</Button>
+                                    <LoadingButton loading={dataLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >Confirm</LoadingButton>
                                 </Grid>
                             </Grid>
 

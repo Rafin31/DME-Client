@@ -364,7 +364,6 @@ export default function OrderPage() {
                                                             tab.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                                                                 const { _id, patientId, status, notes, description } = row;
                                                                 const selectedUser = selected.indexOf(row._id) !== -1;
-                                                                console.log(row)
                                                                 return (
                                                                     <TableRow hover key={_id} tabIndex={-1} selected={selectedUser}>
 
@@ -434,6 +433,7 @@ export default function OrderPage() {
                                                                                 option={[
                                                                                     { label: "Edit" },
                                                                                     { label: "Add Note" },
+                                                                                    { label: "Note Log" },
                                                                                     { label: "Status" },
                                                                                     { label: "Documents" },
                                                                                 ]}

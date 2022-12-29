@@ -40,6 +40,9 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Add Note") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}`)
             }
+            if (lebel === "Note Log") {
+                navigate(`/DME-supplier/dashboard/order-note-log/${id}`)
+            }
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}`)
             }

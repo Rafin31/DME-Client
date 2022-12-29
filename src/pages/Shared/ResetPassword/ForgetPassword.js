@@ -6,7 +6,11 @@ import { Button, Container, Grid, TextField, Typography } from '@mui/material';
 // hooks
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { useMutation } from 'react-query';
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
 import useResponsive from '../../../hooks/useResponsive';
+import { AuthRequest } from '../../../services/AuthRequest';
 
 // components
 
@@ -42,10 +46,32 @@ const StyledContent = styled('div')(({ theme }) => ({
 export default function ForgetPassword() {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
+
+    const { mutateAsync, isLoading: emailLoading } = useMutation((email) => {
+
+        return AuthRequest.post(`/api/v1/users/reset-password-request`, email)
+            .then(res => {
+
+                toast.success(`A verification mail has been sent to ${email.email}`, {
+                    toastId: 'success6565'
+                })
+                reset()
+
+            })
+            .catch((err) => {
+                toast.error(err?.response?.data?.data, {
+                    toastId: 'error4'
+                })
+            })
+    })
+
+
     const onSubmit = data => {
-        console.log(data)
-        reset()
+
+        mutateAsync(data)
     };
+
+
     const mdUp = useResponsive('up', 'md');
 
     return (
@@ -80,7 +106,6 @@ export default function ForgetPassword() {
                                         {...register("email",
                                             {
                                                 required: "Field is required",
-                                                minLength: { value: 8, message: "Password must be at last 8 characters" },
                                             }
                                         )}
                                         error={errors.email && true}
@@ -94,9 +119,9 @@ export default function ForgetPassword() {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >
-                                        Confirm
-                                    </Button>
+                                    <LoadingButton loading={emailLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >
+                                        Send Verification Email
+                                    </LoadingButton>
                                 </Grid>
                             </Grid>
 

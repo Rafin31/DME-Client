@@ -1,25 +1,77 @@
-import { Alert, Avatar, Box, Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Avatar, Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useMutation, useQuery } from 'react-query';
 import { deepOrange } from '@mui/material/colors';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import Iconify from '../../components/iconify';
 import { fDate } from '../../utils/formatTime';
+import { AuthRequest } from '../../services/AuthRequest';
+
 
 export default function EditDMESupplier() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
-    const onSubmit = data => {
-        console.log(data)
-        reset()
+    const navigate = useNavigate()
+
+
+    const { id } = useParams()
+
+
+    const { isLoading: userLoading, refetch, data: user } = useQuery('user',
+        async () => {
+            return AuthRequest.get(`/api/v1/users/${id}`).then(data => data.data.data)
+        }
+    )
+
+    const { mutateAsync, isLoading: profileLoading } = useMutation((profile) => {
+
+        return AuthRequest.patch(`/api/v1/users/${id}`, profile).then(res => {
+            refetch()
+            reset()
+            navigate(-1)
+            toast.success("Profile Updated!", {
+                toastId: "success15"
+            })
+        }).catch(err => {
+            toast.error("Something Went Wrong!", {
+                toastId: "error15"
+            })
+        })
+    })
+
+
+
+    const onSubmit = async (data) => {
+        delete data.email
+        const updatedData = {
+            ...data,
+            fullName: data.firstName + " " + data.lastName,
+        }
+        mutateAsync(updatedData)
     };
+
+
+    if (!user) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+
+
+
+
     return (
         <>
             <Helmet>
-                <title> Edit - DME Supplier Profile </title>
+                <title> Edit - Profile </title>
             </Helmet>
             <Container maxWidth="xl">
-                <Typography variant="h5">Edit - DME Supplier Profile</Typography>
+                <Typography variant="h5">Edit - Profile</Typography>
                 <Grid
                     container
                     spacing={0}
@@ -44,6 +96,7 @@ export default function EditDMESupplier() {
                                         fullWidth
                                         variant="outlined"
                                         helpertext={errors.companyName?.message}
+                                        defaultValue={user.details.companyName}
 
                                     />
                                 </Grid>
@@ -60,31 +113,49 @@ export default function EditDMESupplier() {
                                         fullWidth
                                         variant="outlined"
                                         helpertext={errors.npiNumber?.message}
+                                        defaultValue={user.details.npiNumber}
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("Fname", { required: "Field is required" })}
-                                        error={errors.Fname && true}
+                                        {...register("phoneNumber", {
+                                            minLength: { value: 10, message: "Phone Number should be at last 10 characters" },
+                                        })}
+
+                                        error={errors.phoneNumber && true}
+                                        label="Phone Number*"
+                                        type={"text"}
+                                        fullWidth
+                                        variant="outlined"
+                                        helpertext={errors.phoneNumber?.message}
+                                        defaultValue={user.details.phoneNumber}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("firstName", { required: "Field is required" })}
+                                        error={errors.firstName && true}
                                         id="outlined-basic"
                                         label="First Name*"
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.Fname?.message}
+                                        helpertext={errors.firstName?.message}
+                                        defaultValue={user.firstName}
 
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("Lname", { required: "Field is required" })}
-                                        error={errors.Lname && true}
+                                        {...register("lastName", { required: "Field is required" })}
+                                        error={errors.lastName && true}
                                         id="outlined-basic"
                                         label="Last Name*"
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.Lname?.message}
+                                        helpertext={errors.lastName?.message}
+                                        defaultValue={user.lastName}
 
                                     />
                                 </Grid>
@@ -95,7 +166,7 @@ export default function EditDMESupplier() {
                                         id="outlined-basic"
                                         label="Email*"
                                         autoComplete="false"
-                                        defaultValue={"demo@minimals.cc"}
+                                        defaultValue={user.email}
                                         type={'email'}
                                         fullWidth
                                         variant="outlined"
@@ -115,6 +186,7 @@ export default function EditDMESupplier() {
                                         fullWidth
                                         variant="outlined"
                                         helpertext={errors.country?.message}
+                                        defaultValue={user.details.country}
 
                                     />
                                 </Grid>
@@ -127,6 +199,7 @@ export default function EditDMESupplier() {
                                         fullWidth
                                         variant="outlined"
                                         helpertext={errors.city?.message}
+                                        defaultValue={user.details.city}
 
                                     />
                                 </Grid>
@@ -139,22 +212,24 @@ export default function EditDMESupplier() {
                                         fullWidth
                                         variant="outlined"
                                         helpertext={errors.state?.message}
+                                        defaultValue={user.details.state}
 
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("zipCode", {
+                                        {...register("zip", {
                                             required: "Field is required",
                                             minLength: { value: 3, message: "Zip Code should be at last 3 characters" },
                                         })}
                                         id="outlined-basic"
-                                        error={errors.zipCode && true}
+                                        error={errors.zip && true}
                                         label="Zip Code*"
                                         type={"number"}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors?.zipCode?.message}
+                                        helpertext={errors?.zip?.message}
+                                        defaultValue={user.details.zip}
 
                                     />
 
@@ -169,11 +244,13 @@ export default function EditDMESupplier() {
                                         multiline
                                         helpertext={errors.address?.message}
                                         rows={4}
+                                        defaultValue={user.details.address}
                                         variant="outlined" />
+
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >Confirm</Button>
+                                    <LoadingButton loading={profileLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" >Confirm</LoadingButton>
                                 </Grid>
                             </Grid>
 

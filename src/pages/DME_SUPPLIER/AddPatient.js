@@ -55,7 +55,7 @@ export default function AddPatient() {
             status: "63861954b3b3ded1ee267309",
         }
         mutateAsync(data)
-        // console.log(data)
+
     };
 
     return (
