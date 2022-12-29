@@ -68,7 +68,7 @@ export default function Nav({ openNav, onCloseNav, user, loading }) {
       {
         !loading ?
           <Box sx={{ mb: 2, mx: 1.5, my: 2 }}>
-            <Typography variant="h4" style={{ textAlign: "center", paddingTop: "10px" }}>{user?.category}</Typography>
+            <Typography variant="h4" style={{ textAlign: "center", paddingTop: "10px" }}>{user?.details.companyName}</Typography>
             <Link underline="none">
               <StyledAccount>
                 {

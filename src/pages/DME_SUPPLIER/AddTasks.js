@@ -8,6 +8,7 @@ import { useMutation, useQuery } from 'react-query';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { userContext } from '../../Context/AuthContext';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
@@ -75,12 +76,29 @@ export default function AddTasks() {
         mutateAsync(data)
     };
 
+
+
+
     return (
         <>
             <Helmet>
                 <title> Add Task </title>
             </Helmet>
             <Container maxWidth="xl">
+
+
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
+
+
+
+
                 <Typography variant="h5">Add Task</Typography>
                 <Grid
                     container

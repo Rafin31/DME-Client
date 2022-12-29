@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../../components/iconify';
 import { fDate } from '../../utils/formatTime';
@@ -78,6 +79,15 @@ export default function EditPatient() {
                 <title> Edit - Patient Profile </title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
+
                 <Typography variant="h5">Update Patient</Typography>
                 <Grid
                     container

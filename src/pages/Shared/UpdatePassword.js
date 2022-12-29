@@ -4,8 +4,9 @@ import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-toastify';
 import { deepOrange } from '@mui/material/colors';
 import { useForm } from 'react-hook-form';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useMutation } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../../components/iconify';
 import { fDate } from '../../utils/formatTime';
@@ -16,7 +17,7 @@ export default function UpdatePassword() {
     const { id } = useParams()
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
-
+    const navigate = useNavigate()
 
     const { signOut } = useContext(userContext)
 
@@ -56,6 +57,15 @@ export default function UpdatePassword() {
                 <title>Update Password</title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
                 <Typography variant="h5">Update Password</Typography>
                 <Grid
                     container

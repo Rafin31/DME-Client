@@ -5,6 +5,7 @@ import { useMutation, useQuery } from 'react-query';
 import { deepOrange } from '@mui/material/colors';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import Iconify from '../../components/iconify';
@@ -71,6 +72,15 @@ export default function EditDMESupplier() {
                 <title> Edit - Profile </title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
+
                 <Typography variant="h5">Edit - Profile</Typography>
                 <Grid
                     container

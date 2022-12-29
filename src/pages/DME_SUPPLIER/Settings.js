@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { deepOrange } from '@mui/material/colors';
 import { useForm } from 'react-hook-form';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useMutation } from 'react-query';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
@@ -58,6 +59,15 @@ export default function Settings() {
                 <title> Settings </title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
+
                 <Typography variant="h5">Settings</Typography>
                 <Grid
                     container

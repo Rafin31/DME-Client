@@ -166,48 +166,48 @@ export default function OrderPage() {
 
     if (orders !== "No order found!") {
 
-        var newReferralOrder = orders?.filter((order) => order.status === "New-Referral")
-        var cancelledOrder = orders?.filter((order) => order.status === "Cancelled")
-        var evaluationOrder = orders?.filter((order) => order.status === "Evaluation")
-        var evaluationCompletedOrder = orders?.filter((order) => order.status === "Evaluation-Completed")
-        var paperWorkOrder = orders?.filter((order) => order.status === "Paper-Work-In-Process")
-        var priorAuthOrder = orders?.filter((order) => order.status === "Prior-Auth-Status")
-        var priorAuthReceiveOrder = orders?.filter((order) => order.status === "Prior-Auth-Receive")
-        var holdingRtoOrder = orders?.filter((order) => order.status === "Holding-RTO")
-        var rtoOrder = orders?.filter((order) => order.status === "RTO")
-        var deliveredOrder = orders?.filter((order) => order.status === "Delivered")
-        var authorizationExpirationOrder = orders?.filter((order) => order.status === "Authorization-Expiration-F/U")
-        var requestOrder = orders?.filter((order) => order.status === "Order-Request")
+        var newReferralOrders = orders?.filter((order) => order.status === "New-Referral")
+        var cancelledOrders = orders?.filter((order) => order.status === "Cancelled")
+        var evaluationOrders = orders?.filter((order) => order.status === "Evaluation")
+        var evaluationCompletedOrders = orders?.filter((order) => order.status === "Evaluation-Completed")
+        var paperWorkOrders = orders?.filter((order) => order.status === "Paper-Work-In-Process")
+        var priorAuthOrders = orders?.filter((order) => order.status === "Prior-Auth-Status")
+        var priorAuthReceiveOrders = orders?.filter((order) => order.status === "Prior-Auth-Receive")
+        var holdingRtoOrders = orders?.filter((order) => order.status === "Holding-RTO")
+        var rtoOrders = orders?.filter((order) => order.status === "RTO")
+        var deliveredOrders = orders?.filter((order) => order.status === "Delivered")
+        var authorizationExpirationOrders = orders?.filter((order) => order.status === "Authorization-Expiration-F/U")
+        var requestOrders = orders?.filter((order) => order.status === "Order-Request")
         var pendingOrder = orders?.filter((order) => order.status === "Pending")
 
 
-        var newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrder.length) : 0;
-        var cancelledOrderEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cancelledOrder.length) : 0;
-        var evaluationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationOrder.length) : 0;
-        var evaluationCompletedOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationCompletedOrder.length) : 0;
-        var paperWorkOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - paperWorkOrder.length) : 0;
-        var priorAuthOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthOrder.length) : 0;
-        var priorAuthReceiveOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthReceiveOrder.length) : 0;
-        var holdingRtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - holdingRtoOrder.length) : 0;
-        var rtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rtoOrder.length) : 0;
-        var deliveredOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - deliveredOrder.length) : 0;
-        var authorizationExpirationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - authorizationExpirationOrder.length) : 0;
-        var requestOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - requestOrder.length) : 0;
+        var newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrders.length) : 0;
+        var cancelledOrderEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cancelledOrders.length) : 0;
+        var evaluationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationOrders.length) : 0;
+        var evaluationCompletedOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluationCompletedOrders.length) : 0;
+        var paperWorkOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - paperWorkOrders.length) : 0;
+        var priorAuthOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthOrders.length) : 0;
+        var priorAuthReceiveOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - priorAuthReceiveOrders.length) : 0;
+        var holdingRtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - holdingRtoOrders.length) : 0;
+        var rtoOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rtoOrders.length) : 0;
+        var deliveredOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - deliveredOrders.length) : 0;
+        var authorizationExpirationOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - authorizationExpirationOrders.length) : 0;
+        var requestOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - requestOrders.length) : 0;
         var pendingOrderRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - pendingOrder.length) : 0;
 
 
-        var filteredNewReferralOrders = applySortFilter(newReferralOrder, getComparator(order, orderBy), filterName);
-        var filteredCancelledOrders = applySortFilter(cancelledOrder, getComparator(order, orderBy), filterName);
-        var filteredEvaluationOrder = applySortFilter(evaluationOrder, getComparator(order, orderBy), filterName);
-        var filteredEvaluationCompletedOrder = applySortFilter(evaluationCompletedOrder, getComparator(order, orderBy), filterName);
-        var filteredPaperWorkOrder = applySortFilter(paperWorkOrder, getComparator(order, orderBy), filterName);
-        var filteredPriorAuthOrder = applySortFilter(priorAuthOrder, getComparator(order, orderBy), filterName);
-        var filteredPriorAuthReceiveOrder = applySortFilter(priorAuthReceiveOrder, getComparator(order, orderBy), filterName);
-        var filteredHoldingRtoOrder = applySortFilter(holdingRtoOrder, getComparator(order, orderBy), filterName);
-        var filteredRtoOrder = applySortFilter(rtoOrder, getComparator(order, orderBy), filterName);
-        var filteredDeliveredOrder = applySortFilter(deliveredOrder, getComparator(order, orderBy), filterName);
-        var filteredAuthorizationExpirationOrder = applySortFilter(authorizationExpirationOrder, getComparator(order, orderBy), filterName);
-        var filteredRequestOrder = applySortFilter(requestOrder, getComparator(order, orderBy), filterName);
+        var filteredNewReferralOrders = applySortFilter(newReferralOrders, getComparator(order, orderBy), filterName);
+        var filteredCancelledOrders = applySortFilter(cancelledOrders, getComparator(order, orderBy), filterName);
+        var filteredEvaluationOrder = applySortFilter(evaluationOrders, getComparator(order, orderBy), filterName);
+        var filteredEvaluationCompletedOrder = applySortFilter(evaluationCompletedOrders, getComparator(order, orderBy), filterName);
+        var filteredPaperWorkOrder = applySortFilter(paperWorkOrders, getComparator(order, orderBy), filterName);
+        var filteredPriorAuthOrder = applySortFilter(priorAuthOrders, getComparator(order, orderBy), filterName);
+        var filteredPriorAuthReceiveOrder = applySortFilter(priorAuthReceiveOrders, getComparator(order, orderBy), filterName);
+        var filteredHoldingRtoOrder = applySortFilter(holdingRtoOrders, getComparator(order, orderBy), filterName);
+        var filteredRtoOrder = applySortFilter(rtoOrders, getComparator(order, orderBy), filterName);
+        var filteredDeliveredOrder = applySortFilter(deliveredOrders, getComparator(order, orderBy), filterName);
+        var filteredAuthorizationExpirationOrder = applySortFilter(authorizationExpirationOrders, getComparator(order, orderBy), filterName);
+        var filteredRequestOrder = applySortFilter(requestOrders, getComparator(order, orderBy), filterName);
         var filteredPendingOrder = applySortFilter(pendingOrder, getComparator(order, orderBy), filterName);
 
 
@@ -350,14 +350,16 @@ export default function OrderPage() {
                                         <Scrollbar>
                                             <TableContainer sx={{ minWidth: 800 }}>
                                                 <Table size="small">
+
                                                     <UserListHead
                                                         order={order}
                                                         orderBy={orderBy}
                                                         headLabel={TABLE_HEAD}
-                                                        rowCount={newReferralOrder.length}
+                                                        rowCount={newReferralOrders.length}
                                                         numSelected={selected.length}
                                                         onRequestSort={handleRequestSort}
                                                     />
+
                                                     <TableBody>
                                                         {
 
@@ -444,14 +446,16 @@ export default function OrderPage() {
                                                                     </TableRow>
                                                                 );
                                                             })}
+
                                                         {newReferralEmptyRows > 0 || (
                                                             <TableRow style={{ height: 53 * newReferralEmptyRows }}>
                                                                 <TableCell colSpan={6} />
                                                             </TableRow>
                                                         )}
+
                                                     </TableBody>
 
-                                                    {newReferralIsNotFound && (
+                                                    {tab === filteredNewReferralOrders && newReferralIsNotFound && (
                                                         <TableBody>
                                                             <TableRow>
                                                                 <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -473,9 +477,10 @@ export default function OrderPage() {
                                                                 </TableCell>
                                                             </TableRow>
                                                         </TableBody>
-                                                    )}
-                                                    {filteredNewReferralOrders.length === 0 && !newReferralIsNotFound &&
-                                                        (
+                                                    )
+                                                    }
+                                                    {
+                                                        tab === filteredCancelledOrders && cancelledOrderIsNotFound && (
                                                             <TableBody>
                                                                 <TableRow>
                                                                     <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -485,27 +490,431 @@ export default function OrderPage() {
                                                                             }}
                                                                         >
                                                                             <Typography component={'span'} variant="h6" paragraph>
-                                                                                No New Referral order has been added
+                                                                                Not found
                                                                             </Typography>
 
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
                                                                         </Paper>
                                                                     </TableCell>
                                                                 </TableRow>
                                                             </TableBody>
-                                                        )}
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredEvaluationOrder && evaluationOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredEvaluationCompletedOrder && evaluationCompletedOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredPaperWorkOrder && paperWorkOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredPriorAuthOrder && priorAuthOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredPriorAuthReceiveOrder && priorAuthReceiveOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredHoldingRtoOrder && holdingRtoOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredRtoOrder && rtoOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredDeliveredOrder && deliveredOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredAuthorizationExpirationOrder && authorizationExpirationOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+                                                    {
+                                                        tab === filteredRequestOrder && requestOrderIsNotFound && (
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                                        <Paper
+                                                                            sx={{
+                                                                                textAlign: 'center',
+                                                                            }}
+                                                                        >
+                                                                            <Typography component={'span'} variant="h6" paragraph>
+                                                                                Not found
+                                                                            </Typography>
+
+                                                                            <Typography variant="body2">
+                                                                                No results found for &nbsp;
+                                                                                <strong>&quot;{filterName}&quot;</strong>.
+                                                                                <br /> Try checking for typos or using complete words.
+                                                                            </Typography>
+                                                                        </Paper>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        )
+                                                    }
+
+
                                                 </Table>
                                             </TableContainer>
                                         </Scrollbar>
 
-                                        <TablePagination
-                                            rowsPerPageOptions={[5, 10, 25]}
-                                            component="div"
-                                            count={newReferralOrder.length}
-                                            rowsPerPage={rowsPerPage}
-                                            page={page}
-                                            onPageChange={handleChangePage}
-                                            onRowsPerPageChange={handleChangeRowsPerPage}
-                                        />
+                                        {tab === filteredNewReferralOrders && (
+                                            <TablePagination
+                                                rowsPerPageOptions={[5, 10, 25]}
+                                                component="div"
+                                                count={newReferralOrders.length}
+                                                rowsPerPage={rowsPerPage}
+                                                page={page}
+                                                onPageChange={handleChangePage}
+                                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                            />
+                                        )
+                                        }
+                                        {
+                                            tab === filteredCancelledOrders && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={cancelledOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredEvaluationOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={evaluationOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredEvaluationCompletedOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={evaluationCompletedOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredPaperWorkOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={paperWorkOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredPriorAuthOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={priorAuthOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredPriorAuthReceiveOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={priorAuthReceiveOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredHoldingRtoOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={holdingRtoOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredRtoOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={rtoOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredDeliveredOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={deliveredOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredAuthorizationExpirationOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={authorizationExpirationOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            tab === filteredRequestOrder && (
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={requestOrders.length}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page}
+                                                    onPageChange={handleChangePage}
+                                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                                />
+                                            )
+                                        }
                                     </Card>
                                 </TabPanel>
                             })

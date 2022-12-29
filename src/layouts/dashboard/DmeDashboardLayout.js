@@ -64,7 +64,7 @@ export default function DmeDashboardLayout() {
   return (
 
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} id={id} />
+      <Header onOpenNav={() => setOpen(true)} id={id} user={user} />
 
       <Nav openNav={open} onCloseNav={() => setOpen(false)}
         user={user}

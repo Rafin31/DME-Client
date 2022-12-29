@@ -27,6 +27,7 @@ import {
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 // components
@@ -107,6 +108,8 @@ export default function PatientNotes() {
     const [loading, setLoading] = useState()
     const [isEdit, setEdit] = useState(false)
     const [editNoteId, setEditNoteId] = useState(false)
+
+    const navigate = useNavigate()
 
     const theme = useTheme();
 
@@ -284,6 +287,15 @@ export default function PatientNotes() {
             </Helmet>
 
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
+
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
                         Notes for <Link

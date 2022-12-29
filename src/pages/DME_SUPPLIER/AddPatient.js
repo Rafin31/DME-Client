@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
 import { Helmet } from 'react-helmet-async';
 import { React, useState } from 'react';
-import { Alert, Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Alert, Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
 import { fDate } from "../../utils/formatTime";
 import { AuthRequest } from "../../services/AuthRequest";
@@ -64,6 +65,14 @@ export default function AddPatient() {
                 <title> Add Patient </title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
                 <Typography variant="h5">Add Patient</Typography>
                 <Grid
                     container

@@ -8,7 +8,7 @@ import { userContext } from '../../../Context/AuthContext';
 import account from '../../../_mock/account';
 
 
-export default function AccountPopover({ id }) {
+export default function AccountPopover({ id, user }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate()
 
@@ -90,10 +90,10 @@ export default function AccountPopover({ id }) {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" nowrap="true">
-            {account.displayName}
+            {user?.fullName}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} nowrap="true">
-            {account.email}
+          <Typography variant="body2" sx={{ color: 'text.secondary', wordBreak: "break-word" }} nowrap="true">
+            {user?.email}
           </Typography>
         </Box>
 

@@ -6,6 +6,7 @@ import React, { useContext, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery } from 'react-query';
 import { LoadingButton } from '@mui/lab';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import { userContext } from '../../Context/AuthContext';
@@ -104,6 +105,16 @@ export default function EditTasks() {
                 <title> Edit Tasks </title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
+
+
                 <Typography variant="h5">Edit Tasks</Typography>
                 <Grid
                     container

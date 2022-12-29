@@ -7,6 +7,7 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
 import { fDateTime } from '../../utils/formatTime';
@@ -116,6 +117,14 @@ export default function UploadPatientDocuments() {
                 <title> Patient Documents </title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h5">Upload Patient Documents for
                         <Link

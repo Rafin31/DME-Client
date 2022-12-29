@@ -1,7 +1,7 @@
 {
   "name": "@dme/dme-app",
   "author": "asif.cc",
-  "proxy": "http://localhost:5000",
+  "proxy": "https://dme-server-production.up.railway.app",
   "licence": "MIT",
   "version": "1.6.0",
   "private": false,

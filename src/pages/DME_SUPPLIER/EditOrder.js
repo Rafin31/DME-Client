@@ -6,6 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate, useNavigation, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
 
@@ -93,6 +94,15 @@ export default function EditOrder() {
                 <title> Edit Order </title>
             </Helmet>
             <Container maxWidth="xl">
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
+
                 <Typography variant="h5">Edit Order</Typography>
                 <Grid
                     container
