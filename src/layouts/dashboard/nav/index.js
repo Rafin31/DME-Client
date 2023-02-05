@@ -7,7 +7,7 @@ import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, CircularProgress } from '@mui/material';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-
+import Iconify from "../../../components/iconify"
 // mock
 import account from '../../../_mock/account';
 // hooks
@@ -41,6 +41,27 @@ Nav.propTypes = {
   onCloseNav: PropTypes.func,
 };
 
+
+const bottomNavConfig = [
+  {
+    title: 'veteran orders',
+    path: '/DME-supplier/dashboard/app',
+    icon: <Iconify icon="fluent-mdl2:activate-orders" />,
+  },
+  {
+    title: 'veterans',
+    path: '/DME-supplier/dashboard/app',
+    icon: <Iconify icon="mdi:user-group" />,
+  },
+  {
+    title: 'VA prosthetics staff',
+    path: '/DME-supplier/dashboard/app',
+    icon: <Iconify icon="icon-park-outline:file-staff" />,
+  },
+
+];
+
+
 export default function Nav({ openNav, onCloseNav, user, loading }) {
 
   const { pathname } = useLocation();
@@ -52,7 +73,6 @@ export default function Nav({ openNav, onCloseNav, user, loading }) {
     if (openNav) {
       onCloseNav();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
 
@@ -98,7 +118,11 @@ export default function Nav({ openNav, onCloseNav, user, loading }) {
       }
 
       <NavSection data={navConfig} />
-      <Box sx={{ flexGrow: 1 }} />
+
+      <Box sx={{ flexGrow: 0.5, borderBottom: 1.5, borderColor: "#ffff" }} />
+
+      <NavSection data={bottomNavConfig} />
+
     </Scrollbar>
   );
 

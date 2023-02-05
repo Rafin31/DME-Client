@@ -31,6 +31,19 @@ import CheckCategory from './services/CheckCategory';
 import EditTasks from './pages/DME_SUPPLIER/EditTask';
 import EditStaffPage from './pages/DME_SUPPLIER/EditStaffPage';
 import AllOrderNotes from './pages/Shared/AllOrderNotes';
+import EquipmentOrder from './pages/DME_SUPPLIER/EquipmentOrder/EquipmentOrder';
+import NewReferral from './pages/DME_SUPPLIER/EquipmentOrder/NewReferral';
+import CancelledOrder from './pages/DME_SUPPLIER/EquipmentOrder/CancelledOrder';
+import Evaluation from './pages/DME_SUPPLIER/EquipmentOrder/Evaluation';
+import EvaluationCompleted from './pages/DME_SUPPLIER/EquipmentOrder/EvaluationCompleted';
+import PaperWork from './pages/DME_SUPPLIER/EquipmentOrder/PaperWork';
+import PriorAuthStatus from './pages/DME_SUPPLIER/EquipmentOrder/PriorAuthStatus';
+import PriorAuthReceived from './pages/DME_SUPPLIER/EquipmentOrder/PriorAuthReceived';
+import HoldingRTO from './pages/DME_SUPPLIER/EquipmentOrder/HoldingRTO';
+import RTO from './pages/DME_SUPPLIER/EquipmentOrder/RTO';
+import Delivered from './pages/DME_SUPPLIER/EquipmentOrder/Delivered';
+import Authorization from './pages/DME_SUPPLIER/EquipmentOrder/Authorization';
+import OrderRequest from './pages/DME_SUPPLIER/EquipmentOrder/OrderRequest';
 
 
 
@@ -66,7 +79,25 @@ export default function Router() {
       }>
         <Route index element={<Navigate to="/DME-supplier/dashboard/app" />} />
         <Route path='app' element={<DmeDashboard />} />
-        <Route path='order' element={<OrderPage />} />
+        {/* <Route path='order' element={<OrderPage />} /> */}
+
+        <Route path='equipment-order' element={<EquipmentOrder />}>
+          <Route index element={<NewReferral />} />
+          <Route path="cancelled-order" element={<CancelledOrder />} />
+          <Route path="evaluation" element={<Evaluation />} />
+          <Route path="evaluation-completed" element={<EvaluationCompleted />} />
+          <Route path="paperWork-in-process" element={<PaperWork />} />
+          <Route path="prior-auth-status" element={<PriorAuthStatus />} />
+          <Route path="prior-auth-received" element={<PriorAuthReceived />} />
+          <Route path="holding-RTO" element={<HoldingRTO />} />
+          <Route path="RTO" element={<RTO />} />
+          <Route path="delivered" element={<Delivered />} />
+          <Route path="authorization-expirations-F/U" element={<Authorization />} />
+          <Route path="order-request" element={<OrderRequest />} />
+        </Route>
+
+
+
         <Route path='add-order' element={<AddOrder />} />
         <Route path='doctor' element={<DoctorPage />} />
         <Route path='therapist' element={<TherapistPage />} />

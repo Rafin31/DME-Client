@@ -1,6 +1,8 @@
 // routes
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
 import Router from './routes';
 // theme
 import ThemeProvider from './theme';
@@ -13,7 +15,7 @@ import ScrollToTop from './components/scroll-to-top';
 export default function App() {
   return (
     <ThemeProvider>
-      <ScrollToTop />
+      {/* <ScrollToTop /> */}
       <ToastContainer
         position="top-center"
         autoClose={2000}
@@ -26,7 +28,6 @@ export default function App() {
         pauseOnHover
         theme="light"
       />
-      {/* <StyledChart /> */}
       <Router />
     </ThemeProvider>
   );

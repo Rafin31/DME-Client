@@ -1,9 +1,4 @@
 // component
-import { MdOutlineBorderColor } from 'react-icons/md'
-import { BiPlusMedical } from 'react-icons/bi'
-import { TbPhysotherapist } from 'react-icons/tb'
-// import { BiPlusMedical } from 'react-icons/bi'
-// import { BiPlusMedical } from 'react-icons/bi'
 import SvgColor from '../../../components/svg-color';
 import Iconify from "../../../components/iconify"
 
@@ -19,8 +14,8 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
-    title: 'order',
-    path: '/DME-supplier/dashboard/order',
+    title: 'Equipment order',
+    path: '/DME-supplier/dashboard/equipment-order',
     icon: <Iconify icon="icon-park-solid:transaction-order" />,
   },
   {
