@@ -4,8 +4,9 @@ import { alpha } from '@mui/material/styles';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { QueryClient, useQueryClient } from 'react-query';
 import { userContext } from '../../../Context/AuthContext';
-import account from '../../../_mock/account';
+
 
 
 export default function AccountPopover({ id, user }) {
@@ -14,6 +15,7 @@ export default function AccountPopover({ id, user }) {
 
   const { signOut } = useContext(userContext)
 
+  const queryClient = useQueryClient()
 
   const MENU_OPTIONS = [
     {
@@ -38,6 +40,7 @@ export default function AccountPopover({ id, user }) {
 
   const handleClose = (path) => {
     if (path === '/logout') {
+      queryClient.removeQueries()
       signOut()
       setOpen(null);
       return

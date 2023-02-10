@@ -6,7 +6,6 @@ import LoginPage from './pages/Authentication/LoginPage';
 import Page404 from './pages/Shared/Page404';
 import DmeDashboard from './pages/DME_SUPPLIER/DmeDashboard';
 import AddOrder from './pages/DME_SUPPLIER/AddOrder';
-import OrderPage from './pages/DME_SUPPLIER/OrderPage';
 import DoctorPage from './pages/DME_SUPPLIER/DoctorPage';
 import AddTasks from './pages/DME_SUPPLIER/AddTasks';
 import PatientPage from './pages/DME_SUPPLIER/PatientPage';
@@ -44,6 +43,27 @@ import RTO from './pages/DME_SUPPLIER/EquipmentOrder/RTO';
 import Delivered from './pages/DME_SUPPLIER/EquipmentOrder/Delivered';
 import Authorization from './pages/DME_SUPPLIER/EquipmentOrder/Authorization';
 import OrderRequest from './pages/DME_SUPPLIER/EquipmentOrder/OrderRequest';
+import RepairOrder from './pages/DME_SUPPLIER/RepairOrder/RepairOrder';
+import PRR from './pages/DME_SUPPLIER/RepairOrder/PRR';
+import Cancelled from './pages/DME_SUPPLIER/RepairOrder/Cancelled';
+import PendingRx from './pages/DME_SUPPLIER/RepairOrder/PendingRx';
+import PendingAssess from './pages/DME_SUPPLIER/RepairOrder/PendingAssess';
+import Workup from './pages/DME_SUPPLIER/RepairOrder/Workup';
+import PaStatus from './pages/DME_SUPPLIER/RepairOrder/PaStatus';
+import RTOStatus from './pages/DME_SUPPLIER/RepairOrder/RTOStatus';
+import PendingParts from './pages/DME_SUPPLIER/RepairOrder/PendingParts';
+import PendingScheduling from './pages/DME_SUPPLIER/RepairOrder/PendingScheduling';
+import Completed from './pages/DME_SUPPLIER/RepairOrder/Completed';
+import VeteranOrder from './pages/DME_SUPPLIER/VeteranOrders/VeteranOrder';
+import Equip from './pages/DME_SUPPLIER/VeteranOrders/Equip';
+import NewRepair from './pages/DME_SUPPLIER/VeteranOrders/NewRepair';
+import RcvdPend from './pages/DME_SUPPLIER/VeteranOrders/RcvdPend';
+import EstimateSent from './pages/DME_SUPPLIER/VeteranOrders/EstimateSent';
+import PoRecieved from './pages/DME_SUPPLIER/VeteranOrders/PoRecieved';
+import PartsOrderedByVAMC from './pages/DME_SUPPLIER/VeteranOrders/PartsOrderedByVAMC';
+import PartsOrderedByGCM from './pages/DME_SUPPLIER/VeteranOrders/PartsOrderedByGCM';
+import VeteranPendingScheduling from './pages/DME_SUPPLIER/VeteranOrders/VeteranPendingScheduling';
+import VeteranCompleted from './pages/DME_SUPPLIER/VeteranOrders/VeteranCompleted';
 
 
 
@@ -79,7 +99,7 @@ export default function Router() {
       }>
         <Route index element={<Navigate to="/DME-supplier/dashboard/app" />} />
         <Route path='app' element={<DmeDashboard />} />
-        {/* <Route path='order' element={<OrderPage />} /> */}
+
 
         <Route path='equipment-order' element={<EquipmentOrder />}>
           <Route index element={<NewReferral />} />
@@ -94,6 +114,33 @@ export default function Router() {
           <Route path="delivered" element={<Delivered />} />
           <Route path="authorization-expirations-F/U" element={<Authorization />} />
           <Route path="order-request" element={<OrderRequest />} />
+        </Route>
+
+
+        <Route path='repair-order' element={<RepairOrder />}>
+          <Route index element={<PRR />} />
+          <Route path="cancelled-order" element={<Cancelled />} />
+          <Route path="pending-rx" element={<PendingRx />} />
+          <Route path="pending-assess" element={<PendingAssess />} />
+          <Route path="workup" element={<Workup />} />
+          <Route path="pa-status" element={<PaStatus />} />
+          <Route path="rto-status" element={<RTOStatus />} />
+          <Route path="pending-parts" element={<PendingParts />} />
+          <Route path="pending-schedule" element={<PendingScheduling />} />
+          <Route path="completed" element={<Completed />} />
+        </Route>
+
+
+        <Route path='veteran-order' element={<VeteranOrder />}>
+          <Route index element={<Equip />} />
+          <Route path="new-repair" element={<NewRepair />} />
+          <Route path="rcvd-pend-schdling" element={<RcvdPend />} />
+          <Route path="estimate-sent" element={<EstimateSent />} />
+          <Route path="po-received" element={<PoRecieved />} />
+          <Route path="parts-ordered-by-vamc" element={<PartsOrderedByVAMC />} />
+          <Route path="parts-ordered-by-gcm" element={<PartsOrderedByGCM />} />
+          <Route path="pending-scheduling" element={<VeteranPendingScheduling />} />
+          <Route path="completed" element={<VeteranCompleted />} />
         </Route>
 
 

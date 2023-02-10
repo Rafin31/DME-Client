@@ -1,4 +1,4 @@
-import { Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 
 import { useForm } from "react-hook-form";
 import React, { useCallback, useEffect, useState } from 'react';
@@ -9,8 +9,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { sentenceCase } from 'change-case';
 import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
+import { fDate } from '../../utils/formatTime';
 
 
 
@@ -21,10 +25,13 @@ export default function AddOrder() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
-    let loggedUser = localStorage.getItem('user');
-    loggedUser = JSON.parse(loggedUser);
 
-    const { id } = loggedUser
+    const { id } = JSON.parse(localStorage.getItem('user'));
+
+
+    const [firstAttempt, setFirstAttempt] = useState(null);
+    const [secondAttempt, setSecondAttempt] = useState(null);
+    const [schedule, setSchedule] = useState(null);
 
     const loadUserInfo = useCallback(() => {
 
@@ -37,32 +44,73 @@ export default function AddOrder() {
             })
     }, [id])
 
+    const { search } = window.location;
+    const params = new URLSearchParams(search);
+    const orderCategory = params.get('orderCategory');
+
     useEffect(() => {
         setLoading(true);
         loadUserInfo()
     }, [loadUserInfo])
 
+
     const { isLoading: patientLoading, data: patients } = useQuery('patient',
         async () => {
+            if (orderCategory === "veteran-order") {
+                return AuthRequest.get(`/api/v1/veteran`).then(data => data.data.data)
+            }
             return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
         }
     )
 
+
+
     const { mutateAsync, isLoading: createOrderLoading } = useMutation((order) => {
 
-        return AuthRequest.post(`/api/v1/order`, order)
-            .then(res => {
-                reset()
-                toast.success("Order Created!", {
-                    toastId: 'success5'
+        if (orderCategory === "equipment-order") {
+            return (AuthRequest.post(`/api/v1/order`, order)
+                .then(res => {
+                    reset()
+                    toast.success("Order Created!", {
+                        toastId: 'success5'
+                    })
+                    navigate(-1)
                 })
-                navigate(-1)
-            })
-            .catch((err) => {
-                toast.error("Something went wrong!", {
-                    toastId: 'error3'
+                .catch((err) => {
+                    toast.error("Something went wrong!", {
+                        toastId: 'error3'
+                    })
+                }))
+        } else if (orderCategory === "repair-order") {
+            return AuthRequest.post(`/api/v1/repair-order`, order)
+                .then(res => {
+                    reset()
+                    toast.success("Order Created!", {
+                        toastId: 'success5'
+                    })
+                    navigate(-1)
                 })
-            })
+                .catch((err) => {
+                    toast.error("Something went wrong!", {
+                        toastId: 'error3'
+                    })
+                })
+        } else if (orderCategory === "veteran-order") {
+            return AuthRequest.post(`/api/v1/veteran-order`, order)
+                .then(res => {
+                    reset()
+                    toast.success("Order Created!", {
+                        toastId: 'success5'
+                    })
+                    navigate(-1)
+                })
+                .catch((err) => {
+                    toast.error("Something went wrong!", {
+                        toastId: 'error3'
+                    })
+                })
+        }
+        return 0
     })
 
 
@@ -79,8 +127,19 @@ export default function AddOrder() {
             patientId,
             description,
             note,
-            status: "New-Referral"
+            status:
+                orderCategory === "equipment-order" ? "New-Referral" :
+                    orderCategory === "repair-order" ? "PRR" :
+                        orderCategory === "veteran-order" && "Equip"
         }
+        if (orderCategory === "veteran-order") delete order.patientId
+        if (orderCategory === "veteran-order") order.veteranId = patientId
+        if (firstAttempt) order.firstAttempt = fDate(firstAttempt)
+        if (secondAttempt) order.secondAttempt = fDate(secondAttempt)
+        if (schedule) order.schedule = fDate(schedule)
+        if (data.partsPO) order.partsPO = data.partsPO
+        if (data.labourPO) order.labourPO = data.labourPO
+
         mutateAsync(order)
         reset()
     };
@@ -101,7 +160,10 @@ export default function AddOrder() {
                     <ArrowBackIcon /> <span>Back</span>
                 </Stack>
 
-                <Typography variant="h5">Add Order</Typography>
+                <Typography variant="h5">
+                    {`Add ${sentenceCase(orderCategory.split("-").join(" "))}`}
+                </Typography>
+
                 <Grid
                     container
                     spacing={0}
@@ -113,8 +175,8 @@ export default function AddOrder() {
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <Grid
                                 container
-                                rowSpacing={1}
-                                columnSpacing={{ xs: 2, sm: 3, md: 5, lg: 5 }}
+                                rowSpacing={2}
+                                columnSpacing={{ xs: 2, sm: 3, md: 2, lg: 2 }}
                             >
                                 <Grid item xs={12}>
                                     <TextField
@@ -134,9 +196,11 @@ export default function AddOrder() {
                                 </Grid>
 
 
-                                <Grid item xs={12} style={{ margin: "10px 0px" }}>
+                                <Grid item xs={12} >
                                     <FormControl fullWidth>
-                                        <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >{"Patient"}</InputLabel>
+                                        <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >
+                                            {orderCategory === "veteran-order" ? "Veteran" : "Patient"}
+                                        </InputLabel>
                                         <Select
                                             variant="outlined"
                                             defaultValue=""
@@ -162,7 +226,68 @@ export default function AddOrder() {
                                         </Select>
                                     </FormControl>
                                 </Grid>
+                                {
+                                    orderCategory === "veteran-order" &&
+                                    <>
+                                        <Grid item xs={6} >
+                                            <TextField
+                                                {...register("partsPO")}
+                                                id="outlined-basic"
+                                                label="Parts PO#"
+                                                error={errors.partsPO && true}
+                                                fullWidth
+                                                helpertext={errors.partsPO?.message}
+                                                variant="outlined" />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                {...register("labourPO")}
+                                                id="outlined-basic"
+                                                label="Labour PO#"
+                                                error={errors.labourPO && true}
+                                                fullWidth
+                                                helpertext={errors.labourPO?.message}
+                                                variant="outlined" />
+                                        </Grid>
 
+                                        <Grid item xs={6} >
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DatePicker
+                                                    label="1st Attempt"
+                                                    value={firstAttempt}
+                                                    onChange={(newValue) => {
+                                                        setFirstAttempt(newValue);
+                                                    }}
+                                                    renderInput={(params) => <TextField {...params} fullWidth />}
+                                                />
+                                            </LocalizationProvider>
+                                        </Grid>
+                                        <Grid item xs={6} >
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DatePicker
+                                                    label="2nd Attempt"
+                                                    value={secondAttempt}
+                                                    onChange={(newValue) => {
+                                                        setSecondAttempt(newValue);
+                                                    }}
+                                                    renderInput={(params) => <TextField {...params} fullWidth />}
+                                                />
+                                            </LocalizationProvider>
+                                        </Grid>
+                                        <Grid item xs={6} >
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DatePicker
+                                                    label="Scheduled/Deliver"
+                                                    value={schedule}
+                                                    onChange={(newValue) => {
+                                                        setSchedule(newValue);
+                                                    }}
+                                                    renderInput={(params) => <TextField {...params} fullWidth />}
+                                                />
+                                            </LocalizationProvider>
+                                        </Grid>
+                                    </>
+                                }
 
                                 <Grid item xs={12} >
                                     <TextField
@@ -188,6 +313,7 @@ export default function AddOrder() {
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>
+
                                 <Grid item xs={12}>
                                     <LoadingButton loading={createOrderLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</LoadingButton>
                                 </Grid>

@@ -1,11 +1,10 @@
-import { Box, Button, Container, Stack, Tab, Tabs, Typography, } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Stack, Tab, Tabs, Typography, } from '@mui/material';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useQuery } from 'react-query';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { DayPicker } from 'react-day-picker';
 import { AuthRequest } from '../../../services/AuthRequest';
 import Iconify from "../../../components/iconify"
-import { fDate } from '../../../utils/formatTime';
 
 
 const EquipmentOrder = () => {
@@ -19,11 +18,10 @@ const EquipmentOrder = () => {
     const [updatedOrder, setUpdatedOrder] = useState([]);
 
     let footer = <p>Select Range of days</p>
-    const loggedUser = JSON.parse(localStorage.getItem('user'));
+    const { id } = JSON.parse(localStorage.getItem('user'));
 
-    const { id } = loggedUser
 
-    const { isLoading: statesLoading, data: orders } = useQuery('orders',
+    const { isLoading: statesLoading, data: orders } = useQuery('equipmentOrders',
         async () => {
             return AuthRequest.get(`/api/v1/order/dme-supplier/${id}`).then(data => data.data.data)
         }
@@ -78,6 +76,13 @@ const EquipmentOrder = () => {
     }, [range.from, range.to])
 
 
+    if (statesLoading) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+
     if (range?.from) {
         footer = (
             <p>
@@ -96,15 +101,17 @@ const EquipmentOrder = () => {
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Box>
                         <Typography component={'span'} variant="h4" gutterBottom>
-                            Orders
+                            Equipment Orders
                         </Typography>
-                        <Box>
-                            <Button startIcon={<Iconify icon="material-symbols:filter-list" />} onClick={handleFilterClick} sx={{ mt: 2 }} variant="contained">{filterOpen ? "Close" : "Filter"}</Button>
-                        </Box>
+                        {
+                            orders !== "No order found!" && <Box>
+                                <Button startIcon={<Iconify icon="material-symbols:filter-list" />} onClick={handleFilterClick} sx={{ mt: 2 }} variant="contained">{filterOpen ? "Close" : "Filter by date"}</Button>
+                            </Box>
+                        }
                     </Box>
 
                     <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}
-                        onClick={() => { navigate('/DME-supplier/dashboard/add-order') }} >
+                        onClick={() => { navigate('/DME-supplier/dashboard/add-order?orderCategory=equipment-order') }} >
                         New Order
                     </Button>
                 </Stack>
@@ -154,14 +161,21 @@ const EquipmentOrder = () => {
 
                     </Tabs>
                 </Box>
-                <main>
-                    {
-                        range?.from && range?.to ?
-                            <Outlet context={[statesLoading, updatedOrder]} />
-                            :
-                            <Outlet context={[statesLoading, orders]} />
-                    }
-                </main>
+                {
+                    !orders || orders === "No order found!" ?
+
+                        <p className='text-center'>No Order Found</p>
+
+                        :
+                        <main>
+                            {
+                                range?.from && range?.to ?
+                                    <Outlet context={[statesLoading, updatedOrder]} />
+                                    :
+                                    <Outlet context={[statesLoading, orders]} />
+                            }
+                        </main>
+                }
             </Container>
         </>
     );

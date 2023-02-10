@@ -45,7 +45,7 @@ Nav.propTypes = {
 const bottomNavConfig = [
   {
     title: 'veteran orders',
-    path: '/DME-supplier/dashboard/app',
+    path: '/DME-supplier/dashboard/veteran-order',
     icon: <Iconify icon="fluent-mdl2:activate-orders" />,
   },
   {

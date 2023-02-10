@@ -32,19 +32,37 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
 
         else if (source === "order-page") {
             if (lebel === "Edit") {
-                navigate(`/DME-supplier/dashboard/edit-order/${id}`)
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
             }
             if (lebel === "Documents") {
-                navigate(`/DME-supplier/dashboard/order-document/${id}`)
+                navigate(`/DME-supplier/dashboard/order-document/${id}?orderCategory=equipment-order`)
             }
             if (lebel === "Add Note") {
-                navigate(`/DME-supplier/dashboard/edit-order/${id}`)
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
             }
             if (lebel === "Note Log") {
-                navigate(`/DME-supplier/dashboard/order-note-log/${id}`)
+                navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=equipment-order`)
             }
             if (lebel === "Status") {
-                navigate(`/DME-supplier/dashboard/edit-order/${id}`)
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
+            }
+        }
+
+        else if (source === "repair-order-page") {
+            if (lebel === "Edit") {
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
+            }
+            if (lebel === "Documents") {
+                navigate(`/DME-supplier/dashboard/order-document/${id}?orderCategory=repair-order`)
+            }
+            if (lebel === "Add Note") {
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
+            }
+            if (lebel === "Note Log") {
+                navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=repair-order`)
+            }
+            if (lebel === "Status") {
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
             }
         }
 

@@ -113,6 +113,7 @@ const NewReferral = () => {
 
 
     if (orders !== "No order found!") {
+        console.log("Inside")
         newReferralOrders = orders?.filter((order) => order.status === "New-Referral")
         newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrders.length) : 0;
         filteredNewReferralOrders = applySortFilter(newReferralOrders, getComparator(order, orderBy), filterName);
@@ -138,6 +139,7 @@ const NewReferral = () => {
 
                 <Scrollbar>
                     <TableContainer sx={{ minWidth: 800 }}>
+
                         <Table size="small">
 
                             <UserListHead
@@ -149,10 +151,11 @@ const NewReferral = () => {
                                 onRequestSort={handleRequestSort}
                             />
 
+
                             <TableBody>
 
                                 {
-                                    row.map((row, index) => {
+                                    row?.map((row, index) => {
                                         const { _id, patientId, status, notes, description } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
@@ -276,13 +279,14 @@ const NewReferral = () => {
                                 )
                             }
                         </Table>
+
                     </TableContainer>
                 </Scrollbar>
 
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={newReferralOrders.length}
+                    count={newReferralOrders?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -290,6 +294,7 @@ const NewReferral = () => {
                 />
 
             </Card>
+
         </>
     );
 };

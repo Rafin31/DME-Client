@@ -1,9 +1,9 @@
-import { Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { LoadingButton } from '@mui/lab';
-import { useNavigate, useNavigation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -17,10 +17,12 @@ export default function EditOrder() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
 
-    let loggedUser = localStorage.getItem('user');
-    loggedUser = JSON.parse(loggedUser);
+    const { search } = window.location;
+    const params = new URLSearchParams(search);
+    const orderCategory = params.get('orderCategory');
 
-    const { id } = loggedUser
+    const { id } = JSON.parse(localStorage.getItem('user'));
+
     const { id: orderId } = useParams()
 
     const loadUserInfo = useCallback(() => {
@@ -33,7 +35,12 @@ export default function EditOrder() {
 
     const { isLoading: orderLoading, data: order } = useQuery('order',
         async () => {
-            return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
+            if (orderCategory === "equipment-order") {
+                return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
+            } else if (orderCategory === "repair-order") {
+                return AuthRequest.get(`/api/v1/repair-order/${orderId}`).then(data => data.data.data)
+            }
+            return 0
         }
     )
 
@@ -45,19 +52,38 @@ export default function EditOrder() {
 
     const { mutateAsync, isLoading: updateOrderLoading } = useMutation((order) => {
 
-        return AuthRequest.patch(`/api/v1/order/${orderId}`, order)
-            .then(res => {
-                reset()
-                toast.success("Order Updated!", res, {
-                    toastId: 'success6'
+        if (orderCategory === "equipment-order") {
+            return AuthRequest.patch(`/api/v1/order/${orderId}`, order)
+                .then(res => {
+                    reset()
+                    toast.success("Order Updated!", res, {
+                        toastId: 'success6'
+                    })
+                    navigate(-1)
                 })
-                navigate(-1)
-            })
-            .catch((err) => {
-                toast.error("Something went wrong!", {
-                    toastId: 'error4'
+                .catch((err) => {
+                    toast.error("Something went wrong!", {
+                        toastId: 'error4'
+                    })
                 })
-            })
+        } else if (orderCategory === "repair-order") {
+            return AuthRequest.patch(`/api/v1/repair-order/${orderId}`, order)
+                .then(res => {
+                    reset()
+                    toast.success("Order Updated!", res, {
+                        toastId: 'success6'
+                    })
+                    navigate(-1)
+                })
+                .catch((err) => {
+                    toast.error("Something went wrong!", {
+                        toastId: 'error4'
+                    })
+                })
+        }
+        return 0
+
+
     })
 
     if (errors) {
@@ -160,60 +186,114 @@ export default function EditOrder() {
                                 <Grid item xs={6} style={{ margin: "10px 0px" }}>
                                     <FormControl fullWidth>
                                         <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Order Status</InputLabel>
-                                        <Select
-                                            variant="outlined"
-                                            size="small"
-                                            error={errors.orderStatus && true}
-                                            rows={2}
-                                            {...register("status",
-                                                { required: "Filed Required" }
-                                            )}
-                                            helpertext={errors.orderStatus?.message}
-                                            defaultValue={order.status}
-                                        >
-                                            {
-                                                order.status === "New-Referral" &&
-                                                <MenuItem value={"Evaluation"}>Evaluation</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Evaluation" &&
-                                                <MenuItem value={"Evaluation-Completed"}>Evaluation Completed</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Evaluation-Completed" &&
-                                                <MenuItem value={"Paper-Work-In-Process"}>Paper-Work-In-Process</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Paper-Work-In-Process" &&
-                                                <MenuItem value={"Prior-Auth-Status"}>Prior Auth Status</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Prior-Auth-Status" &&
-                                                <MenuItem value={"Prior-Auth-Receive"}>Prior Auth Receive</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Prior-Auth-Receive" &&
-                                                <MenuItem value={"Holding-RTO"}>Holding RTO</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Holding-RTO" &&
-                                                <MenuItem value={"RTO"}>RTO</MenuItem>
-                                            }
-                                            {
-                                                order.status === "RTO" &&
-                                                <MenuItem value={"Delivered"}>Delivered</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Delivered" &&
-                                                <MenuItem value={"Authorization-Expiration-F/U"}>Authorization Expiration F/U</MenuItem>
-                                            }
-                                            {
-                                                order.status === "Authorization-Expiration-F/U" &&
-                                                <MenuItem value={"Order-Request"}>Order Request</MenuItem>
-                                            }
-                                            <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
+                                        {
+                                            orderCategory === "equipment-order" &&
+                                            <Select
+                                                variant="outlined"
+                                                size="small"
+                                                error={errors.orderStatus && true}
+                                                rows={2}
+                                                {...register("status",
+                                                    { required: "Filed Required" }
+                                                )}
+                                                helpertext={errors.orderStatus?.message}
+                                                defaultValue={order.status}
+                                            >
+                                                {
+                                                    order.status === "New-Referral" &&
+                                                    <MenuItem value={"Evaluation"}>Evaluation</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Evaluation" &&
+                                                    <MenuItem value={"Evaluation-Completed"}>Evaluation Completed</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Evaluation-Completed" &&
+                                                    <MenuItem value={"Paper-Work-In-Process"}>Paper-Work-In-Process</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Paper-Work-In-Process" &&
+                                                    <MenuItem value={"Prior-Auth-Status"}>Prior Auth Status</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Prior-Auth-Status" &&
+                                                    <MenuItem value={"Prior-Auth-Receive"}>Prior Auth Receive</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Prior-Auth-Receive" &&
+                                                    <MenuItem value={"Holding-RTO"}>Holding RTO</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Holding-RTO" &&
+                                                    <MenuItem value={"RTO"}>RTO</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "RTO" &&
+                                                    <MenuItem value={"Delivered"}>Delivered</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Delivered" &&
+                                                    <MenuItem value={"Authorization-Expiration-F/U"}>Authorization Expiration F/U</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Authorization-Expiration-F/U" &&
+                                                    <MenuItem value={"Order-Request"}>Order Request</MenuItem>
+                                                }
+                                                <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
 
-                                        </Select>
+                                            </Select>
+                                        }
+                                        {
+                                            orderCategory === "repair-order" &&
+                                            <Select
+                                                variant="outlined"
+                                                size="small"
+                                                error={errors.orderStatus && true}
+                                                rows={2}
+                                                {...register("status",
+                                                    { required: "Filed Required" }
+                                                )}
+                                                helpertext={errors.orderStatus?.message}
+                                                defaultValue={order.status}
+                                            >
+                                                {
+                                                    order.status === "PRR" &&
+                                                    <MenuItem value={"Pending-Rx"}>Pending Rx</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Pending-Rx" &&
+                                                    <MenuItem value={"Pending-Assess"}>Pending Assess.</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Pending-Assess" &&
+                                                    <MenuItem value={"Workup"}>Workup</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Workup" &&
+                                                    <MenuItem value={"Pa-Status"}>PA Status</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Pa-Status" &&
+                                                    <MenuItem value={"RTO-Status"}>RTO Status</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "RTO-Status" &&
+                                                    <MenuItem value={"Pending-Parts"}>Pending Parts</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Pending-Parts" &&
+                                                    <MenuItem value={"Pending-Scheduling"}>Pending Scheduling</MenuItem>
+                                                }
+                                                {
+                                                    order.status === "Pending-Scheduling" &&
+                                                    <MenuItem value={"Completed"}>Completed</MenuItem>
+                                                }
+
+                                                <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
+
+                                            </Select>
+                                        }
+
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} >

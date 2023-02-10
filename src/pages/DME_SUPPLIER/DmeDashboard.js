@@ -42,12 +42,23 @@ export default function DmeDashboard() {
   const { isLoading: taskLoading, data: tasks, refetch, isFetching } = useQuery('tasks',
     async () => {
       return AuthRequest.get(`/api/v1/dme/dme-task/${user.id}`).then(data => data.data.data)
-    },
-    {
-      refetchInterval: 2000,
-      refetchIntervalInBackground: true,
     }
   )
+
+  const handleWidgetClick = (dest) => {
+    if (dest === "new-referrals") {
+      navigate('/DME-supplier/dashboard/equipment-order')
+    }
+    else if (dest === "repair") {
+      navigate('/DME-supplier/dashboard/repair-order')
+    }
+    else if (dest === "veteran-order") {
+      navigate('/DME-supplier/dashboard/equipment-order')
+    }
+    else if (dest === "equip-order") {
+      navigate('/DME-supplier/dashboard/equipment-order')
+    }
+  }
 
 
   if (statesLoading || taskLoading) {
@@ -69,20 +80,20 @@ export default function DmeDashboard() {
 
         <Grid container spacing={3}>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="PATIENT" total={+(states?.patient)} icon={'medical-icon:i-outpatient'} />
+          <Grid item xs={12} sm={6} md={3} >
+            <AppWidgetSummary className="cursor-pointer" onClick={() => handleWidgetClick("new-referrals")} title="New Referrals" total={+(states?.equipmentOrderNewReferralCount)} icon={'medical-icon:i-outpatient'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="DOCTORS" total={+(states?.doctors)} color="info" icon={'fontisto:doctor'} />
+            <AppWidgetSummary className="cursor-pointer" onClick={() => handleWidgetClick("repair")} title="Repairs" total={+(states?.repairOrderCount)} color="info" icon={'fontisto:doctor'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="THERAPIST" total={+(states?.therapist)} color="warning" icon={'tabler:physotherapist'} />
+            <AppWidgetSummary className="cursor-pointer" onClick={() => handleWidgetClick("veteran-order")} title="Veteran Orders" total={+(states?.veteranOrderCount)} color="warning" icon={'tabler:physotherapist'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="ORDERS" total={+(states?.orderCount)} color="error" icon={'fluent-mdl2:activate-orders'} />
+            <AppWidgetSummary className="cursor-pointer" onClick={() => handleWidgetClick("equip-order")} title="Equip Orders" total={+(states?.equipmentOrderTotalCount)} color="error" icon={'fluent-mdl2:activate-orders'} />
           </Grid>
 
           <Grid item xs={12} md={12} lg={12}>

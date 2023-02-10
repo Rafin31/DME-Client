@@ -12,6 +12,7 @@ import reportWebVitals from './reportWebVitals';
 import { AuthContext } from './Context/AuthContext';
 
 
+
 const queryClient = new QueryClient()
 axios.defaults.baseURL = process.env.REACT_APP_SERVER;
 

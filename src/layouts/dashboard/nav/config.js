@@ -19,6 +19,11 @@ const navConfig = [
     icon: <Iconify icon="icon-park-solid:transaction-order" />,
   },
   {
+    title: 'Repair order',
+    path: '/DME-supplier/dashboard/repair-order',
+    icon: <Iconify icon="mdi:gear" />,
+  },
+  {
     title: 'doctor',
     path: '/DME-supplier/dashboard/doctor',
     icon: <Iconify icon="fluent:doctor-12-filled" />,

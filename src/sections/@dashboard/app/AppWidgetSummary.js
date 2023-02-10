@@ -42,6 +42,8 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
         ...sx,
       }}
       {...other}
+      className="cursor-pointer"
+
     >
       <StyledIcon
         sx={{
@@ -52,6 +54,7 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
               0.24
             )} 100%)`,
         }}
+
       >
         <Iconify icon={icon} width={24} height={24} />
       </StyledIcon>
