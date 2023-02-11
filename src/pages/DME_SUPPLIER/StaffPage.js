@@ -386,6 +386,7 @@ export default function StaffPage() {
                                                                 </TableCell>
                                                                 <TableCell >
                                                                     <PopOver
+                                                                        key={_id}
                                                                         source={"invited-staff-page"}
                                                                         option={[
                                                                             { label: "Delete" }

@@ -113,7 +113,6 @@ const NewReferral = () => {
 
 
     if (orders !== "No order found!") {
-        console.log("Inside")
         newReferralOrders = orders?.filter((order) => order.status === "New-Referral")
         newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrders.length) : 0;
         filteredNewReferralOrders = applySortFilter(newReferralOrders, getComparator(order, orderBy), filterName);
@@ -165,7 +164,7 @@ const NewReferral = () => {
                                                 <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
-                                                        <Link to={`/DME-supplier/dashboard/patient-profile/${patientId._id}`}
+                                                        <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
                                                             style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             <Tooltip title="Profile">
                                                                 <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">

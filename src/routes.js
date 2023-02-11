@@ -14,7 +14,7 @@ import StaffPage from './pages/DME_SUPPLIER/StaffPage';
 import AuthRoute from './services/AuthRoute';
 import AddPatient from './pages/DME_SUPPLIER/AddPatient';
 import UploadPatientDocuments from './pages/DME_SUPPLIER/UploadPatientDocuments';
-import PatientProfile from './pages/DME_SUPPLIER/PatientProfile';
+import UserProfile from './pages/DME_SUPPLIER/UserProfile';
 import EditPatient from './pages/DME_SUPPLIER/EditPatient';
 import DmeSupplierProfile from './pages/DME_SUPPLIER/DmeSupplierProfile';
 import EditDMESupplier from './pages/DME_SUPPLIER/EditDMESupplier';
@@ -70,9 +70,6 @@ import VeteranCompleted from './pages/DME_SUPPLIER/VeteranOrders/VeteranComplete
 // ----------------------------------------------------------------------
 
 export default function Router() {
-
-  const navigate = useNavigate()
-
 
 
   return (
@@ -156,7 +153,7 @@ export default function Router() {
         <Route path='patient-document/:id' element={<UploadPatientDocuments />} />
         <Route path='order-document/:id' element={<UploadOrderDocuments />} />
         <Route path='edit-tasks/:id' element={<EditTasks />} />
-        <Route path='patient-profile/:id' element={<PatientProfile />} />
+        <Route path='user-profile/:id' element={<UserProfile />} />
         <Route path='edit-patient-profile/:id' element={<EditPatient />} />
         <Route path='DME-supplier-profile/:id' element={<DmeSupplierProfile />} />
         <Route path='edit-dme-supplier-profile/:id' element={<EditDMESupplier />} />

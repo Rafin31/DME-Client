@@ -5,6 +5,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { DayPicker } from 'react-day-picker';
 import { AuthRequest } from '../../../services/AuthRequest';
 import Iconify from "../../../components/iconify"
+import { parseISO } from 'date-fns';
 
 
 const EquipmentOrder = () => {
@@ -119,7 +120,7 @@ const EquipmentOrder = () => {
 
                 <DayPicker
                     mode="range"
-                    selected={range}
+                    selected={parseISO(range)}
                     footer={footer}
                     onSelect={(e) => e.from !== " " && setRange(e)}
                     className={`calender ${filterOpen ? "showCalender" : "hideCalender"}`}

@@ -6,13 +6,16 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
+import { fDate } from '../../utils/formatTime';
 
 
 export default function EditOrder() {
-    const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [user, setUser] = useState()
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
@@ -20,6 +23,10 @@ export default function EditOrder() {
     const { search } = window.location;
     const params = new URLSearchParams(search);
     const orderCategory = params.get('orderCategory');
+
+    const [firstAttempt, setFirstAttempt] = useState(null);
+    const [secondAttempt, setSecondAttempt] = useState(null);
+    const [schedule, setSchedule] = useState(null);
 
     const { id } = JSON.parse(localStorage.getItem('user'));
 
@@ -39,6 +46,8 @@ export default function EditOrder() {
                 return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
             } else if (orderCategory === "repair-order") {
                 return AuthRequest.get(`/api/v1/repair-order/${orderId}`).then(data => data.data.data)
+            } else if (orderCategory === "veteran-order") {
+                return AuthRequest.get(`/api/v1/veteran-order/${orderId}`).then(data => data.data.data)
             }
             return 0
         }
@@ -46,6 +55,9 @@ export default function EditOrder() {
 
     const { isLoading: patientLoading, data: patients } = useQuery('patient',
         async () => {
+            if (orderCategory === "veteran-order") {
+                return AuthRequest.get(`/api/v1/veteran`).then(data => data.data.data)
+            }
             return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
         }
     )
@@ -80,39 +92,66 @@ export default function EditOrder() {
                         toastId: 'error4'
                     })
                 })
+        } else if (orderCategory === "veteran-order") {
+            return AuthRequest.patch(`/api/v1/veteran-order/${orderId}`, order)
+                .then(res => {
+                    reset()
+                    toast.success("Order Updated!", res, {
+                        toastId: 'success6'
+                    })
+                    navigate(-1)
+                })
+                .catch((err) => {
+                    toast.error("Something went wrong!", {
+                        toastId: 'error4'
+                    })
+                })
         }
         return 0
 
 
     })
 
-    if (errors) {
-        console.log(errors);
-    }
     const onSubmit = data => {
         const { patientId, note, description, status } = data
-        const orderData = {
+        const updatedOrder = {
             dmeSupplierId: id,
             patientId,
             note,
             description,
             status
         }
-        mutateAsync(orderData)
-        reset()
+        if (orderCategory === "veteran-order") delete updatedOrder.patientId
+        if (orderCategory === "veteran-order") updatedOrder.veteranId = patientId
+        if (firstAttempt) updatedOrder.firstAttempt = fDate((firstAttempt))
+        if (secondAttempt) updatedOrder.secondAttempt = fDate((secondAttempt))
+        if (schedule) updatedOrder.schedule = fDate((schedule))
+        if (data.partsPo) updatedOrder.partsPo = data.partsPo
+        if (data.labourPo) updatedOrder.labourPo = data.labourPo
+
+
+        mutateAsync(updatedOrder)
     };
 
     useEffect(() => {
         setLoading(true);
         loadUserInfo()
+        return () => {
+            setLoading(false);
+        }
     }, [loadUserInfo])
 
 
-    if (!user || orderLoading || patientLoading) {
+
+
+    if (!user || orderLoading || patientLoading || loading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
     }
+
+
+
 
     return (
         <>
@@ -172,7 +211,10 @@ export default function EditOrder() {
                                             {...register("patientId",
                                                 { required: "Filed Required" })}
                                             helpertext={errors.patient?.message}
-                                            defaultValue={order.patientId._id}
+                                            defaultValue={
+                                                orderCategory === "veteran-order" ? order[0]?.veteranId?._id
+                                                    : order.patientId?._id
+                                            }
 
                                         >
                                             {
@@ -197,7 +239,7 @@ export default function EditOrder() {
                                                     { required: "Filed Required" }
                                                 )}
                                                 helpertext={errors.orderStatus?.message}
-                                                defaultValue={order.status}
+                                                defaultValue={order.status ? order.status : ""}
                                             >
                                                 {
                                                     order.status === "New-Referral" &&
@@ -254,7 +296,7 @@ export default function EditOrder() {
                                                     { required: "Filed Required" }
                                                 )}
                                                 helpertext={errors.orderStatus?.message}
-                                                defaultValue={order.status}
+                                                defaultValue={order.status ? order.status : ""}
                                             >
                                                 {
                                                     order.status === "PRR" &&
@@ -293,9 +335,129 @@ export default function EditOrder() {
 
                                             </Select>
                                         }
+                                        {
+                                            orderCategory === "veteran-order" &&
+                                            <Select
+                                                variant="outlined"
+                                                size="small"
+                                                error={errors.orderStatus && true}
+                                                rows={2}
+                                                {...register("status",
+                                                    { required: "Filed Required" }
+                                                )}
+                                                helpertext={errors.orderStatus?.message}
+                                                defaultValue={order[0]?.status ? order[0].status : ""}
+                                            >
+                                                {
+                                                    order[0].status === "Equip" &&
+                                                    <MenuItem value={"New Repair"}>New Repair</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "New Repair" &&
+                                                    <MenuItem value={"Rcvd-pending-scheduling"}>Rcvd pending scheduling</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "Rcvd-pending-scheduling" &&
+                                                    <MenuItem value={"Estimate-sent-pending-po"}>Estimate sent pending po</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "Estimate-sent-pending-po" &&
+                                                    <MenuItem value={"Po-Received"}>Po Received</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "Po-Received" &&
+                                                    <MenuItem value={"Parts-ordered-by-VAMC"}>Parts ordered by VAMC</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "Parts-ordered-by-VAMC" &&
+                                                    <MenuItem value={"Parts-ordered-by-GCM"}>Parts ordered by GCM</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "Parts-ordered-by-GCM" &&
+                                                    <MenuItem value={"Pending-scheduling"}>Pending Scheduling</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "Pending-scheduling" &&
+                                                    <MenuItem value={"Completed"}>Completed</MenuItem>
+                                                }
+                                                {
+                                                    order[0].status === "Completed" &&
+                                                    <MenuItem value={"Archived"}>Archived</MenuItem>
+                                                }
+
+                                                <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
+
+                                            </Select>
+                                        }
 
                                     </FormControl>
                                 </Grid>
+                                {
+                                    orderCategory === "veteran-order" &&
+                                    <>
+                                        <Grid item xs={6} >
+                                            <TextField
+                                                {...register("partsPo")}
+                                                id="outlined-basic"
+                                                label="Parts PO#"
+                                                error={errors.partsPo && true}
+                                                fullWidth
+                                                helpertext={errors.partsPo?.message}
+                                                defaultValue={order[0]?.partsPo}
+                                                variant="outlined" />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                {...register("labourPo")}
+                                                id="outlined-basic"
+                                                label="Labour PO#"
+                                                error={errors.labourPo && true}
+                                                fullWidth
+                                                helpertext={errors.labourPo?.message}
+                                                defaultValue={order[0]?.labourPo}
+                                                variant="outlined" />
+                                        </Grid>
+
+                                        <Grid item xs={6} >
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DatePicker
+                                                    label="1st Attempt"
+                                                    value={firstAttempt ? firstAttempt : order[0]?.firstAttempt}
+                                                    onChange={(newValue) => {
+                                                        setFirstAttempt(newValue);
+                                                    }}
+                                                    renderInput={(params) => <TextField {...params} fullWidth />}
+                                                />
+                                            </LocalizationProvider>
+                                        </Grid>
+                                        <Grid item xs={6} >
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DatePicker
+                                                    label="2nd Attempt"
+                                                    defaultValue={order[0]?.secondAttempt}
+                                                    value={secondAttempt ? secondAttempt : order[0]?.secondAttempt}
+                                                    onChange={(newValue) => {
+                                                        setSecondAttempt(newValue);
+                                                    }}
+                                                    renderInput={(params) => <TextField {...params} fullWidth />}
+                                                />
+                                            </LocalizationProvider>
+                                        </Grid>
+                                        <Grid item xs={6} >
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DatePicker
+                                                    label="Scheduled/Deliver"
+                                                    defaultValue={order[0]?.schedule}
+                                                    value={schedule ? schedule : order[0]?.schedule}
+                                                    onChange={(newValue) => {
+                                                        setSchedule(newValue);
+                                                    }}
+                                                    renderInput={(params) => <TextField {...params} fullWidth />}
+                                                />
+                                            </LocalizationProvider>
+                                        </Grid>
+                                    </>
+                                }
                                 <Grid item xs={12} >
                                     <TextField
                                         {...register("description")}
@@ -304,7 +466,10 @@ export default function EditOrder() {
                                         error={errors.description && true}
                                         fullWidth
                                         multiline
-                                        defaultValue={order?.description}
+                                        defaultValue={
+                                            orderCategory === "veteran-order" ? order[0]?.description
+                                                : order.description
+                                        }
                                         rows={4}
                                         helpertext={errors.description?.message}
                                         variant="outlined" />
@@ -318,7 +483,10 @@ export default function EditOrder() {
                                         fullWidth
                                         multiline
                                         helpertext={errors.notes?.message}
-                                        defaultValue={order?.notes?.note}
+                                        defaultValue={
+                                            orderCategory === "veteran-order" ? order[0]?.notes?.note
+                                                : order.notes?.note
+                                        }
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>

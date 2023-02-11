@@ -66,6 +66,24 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             }
         }
 
+        else if (source === "veteran-order-page") {
+            if (lebel === "Edit") {
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
+            }
+            if (lebel === "Documents") {
+                navigate(`/DME-supplier/dashboard/order-document/${id}?orderCategory=veteran-order`)
+            }
+            if (lebel === "Add Note") {
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
+            }
+            if (lebel === "Note Log") {
+                navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=veteran-order`)
+            }
+            if (lebel === "Status") {
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
+            }
+        }
+
         else if (source === "patient-notes-page") {
             if (lebel === "Edit") {
                 other.setEdit(true)

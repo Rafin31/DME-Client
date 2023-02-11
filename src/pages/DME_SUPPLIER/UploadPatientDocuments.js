@@ -1,7 +1,7 @@
 
 import { Helmet } from 'react-helmet-async';
 import { React, useRef, useState } from 'react';
-import { Box, Button, Card, CircularProgress, Container, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Backdrop, Box, Button, Card, CircularProgress, Container, Fade, Grid, IconButton, Modal, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
@@ -13,13 +13,27 @@ import { AuthRequest } from '../../services/AuthRequest';
 import { fDateTime } from '../../utils/formatTime';
 
 
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    borderRadius: '5px',
+    p: 2,
+
+};
+
+
 
 export default function UploadPatientDocuments() {
 
     const { id: patientId } = useParams()
     const submitButtonRef = useRef(null)
-    const [user, setUser] = useState()
-    const [loading, setLoading] = useState(false)
+    const [showModal, setModal] = useState(false)
+    const [uploadedFileName, setUploadedFileName] = useState()
 
     const navigate = useNavigate()
 
@@ -27,7 +41,7 @@ export default function UploadPatientDocuments() {
     loggedUser = JSON.parse(loggedUser);
 
 
-    const { isLoading: patient3Loading, refetch, data: patient3 } = useQuery('patient3',
+    const { isLoading: patient3Loading, refetch, data: patient3 } = useQuery(`patient-${patientId}`,
         async () => {
             return AuthRequest.get(`/api/v1/users/${patientId}`).then(data => data.data.data)
         }
@@ -76,18 +90,27 @@ export default function UploadPatientDocuments() {
         submitButtonRef.current.click()
     }
     const handleFormSubmit = (e) => {
+
         e.preventDefault()
         const file = e.target.uploadFile.files[0]
+        const title = e.target.docTitle.value
+        const description = e.target.docDescription.value
         const formData = new FormData()
         formData.append('patient-document', file)
+        formData.append('title', title)
+        formData.append('description', description)
 
         if (!!formData.entries().next().value) {
             formData.append('uploaderId', loggedUser.id)
+            setUploadedFileName("")
+            setModal(!showModal)
             mutateAsync(formData)
 
         } else {
-            toast.warning('Please Upload documents', {
-                toastId: "warning3"
+            setModal(!showModal)
+            setUploadedFileName("")
+            toast.warning('Upload documents', {
+                toastId: "warning1"
             })
         }
     }
@@ -125,26 +148,32 @@ export default function UploadPatientDocuments() {
                 }} >
                     <ArrowBackIcon /> <span>Back</span>
                 </Stack>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+
+                <Stack sx={{
+                    flexDirection: { xs: "column", md: "row" }, alignItems: { xs: "start", md: "center" }
+                }} justifyContent="space-between" mb={5}>
                     <Typography variant="h5">Upload Patient Documents for
                         <Link
-                            to={`/DME-supplier/dashboard/patient-profile/${patient3._id}`}
+                            to={`/DME-supplier/dashboard/user-profile/${patient3._id}`}
                             style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
                             color="inherit" variant="subtitle2" underline="hover" nowrap="true"
                             target="_blank" rel="noopener noreferrer"
                         >{patient3.fullName}
                         </Link>
                     </Typography>
-                    <form onSubmit={(e) => handleFormSubmit(e)}>
-                        <Button variant="contained" component="label" startIcon={<Iconify icon="material-symbols:cloud-upload" />}>
-                            Upload
-                            <input name="uploadFile" hidden type="file" onChange={(e) => handleUploadButtonClick(e)} />
+
+                    {
+                        patient3 &&
+                        <Button variant="contained" onClick={() => { setModal(!showModal) }} startIcon={
+                            <Iconify icon="material-symbols:cloud-upload" />}>
+                            Upload Document
                         </Button>
-                        <input ref={submitButtonRef} hidden type="submit" />
-                    </form>
+                    }
+
+
                 </Stack>
 
-                <Grid
+                {/* <Grid
                     container
                     spacing={1}
                     direction="column"
@@ -160,23 +189,115 @@ export default function UploadPatientDocuments() {
                                     style={{ border: "1px solid #eaeeef", boxShadow: "none" }}
                                     variant="outlined"
                                 >
-                                    <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                    <Stack direction="row" alignItems="center">
+                                        <Tooltip title={data.document.split('__')[1].split('-')[1]}>
+                                            <Stack sx={{ minWidth: "100px" }}>
+                                                <img src={
+
+                                                    data.document.split('.')[1].toLowerCase() === 'jpg' ? `/assets/icons/ic_img.svg`
+                                                        :
+                                                        data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
+                                                            :
+                                                            data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/ic_pdf.svg` ?
+                                                                `/assets/icons/xlsx-file.svg`
+                                                                :
+                                                                data.document.split('.')[1].toLowerCase() === 'pdf' && `/assets/icons/doc-file.svg`
+                                                                : ""
+
+                                                }
+                                                    alt="icon"
+                                                    style={{ marginRight: "10px", width: "100px", height: "100px" }} />
+
+                                                <p style={{ margin: "0", padding: "0", fontSize: "13px", display: "inline", maxWidth: "100px", wordBreak: "break-word" }}>
+                                                    {data.document.split('__')[1].split('-')[1].slice(0, 10) + "..."}
+                                                </p>
+                                            </Stack>
+                                        </Tooltip >
+
+                                        <Stack>
+                                            <Stack>
+                                                <p style={{ fontSize: "small", color: "#afb6bc", margin: "0", padding: "0", display: "inline" }}>
+                                                    {fDateTime(data.createdAt)}
+                                                </p>
+                                            </Stack>
+                                            <Stack>
+                                                <Typography variant='h6'>{data?.title}</Typography>
+                                                <Typography variant='body2'>{data?.description}</Typography>
+                                            </Stack>
+                                        </Stack>
+                                        <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                            <IconButton aria-label="delete" onClick={() => downloadDocument(data.document)}>
+                                                <CloudDownloadIcon color="primary" />
+                                            </IconButton>
+                                            <IconButton aria-label="delete" onClick={() => deleteDocument(data._id)}>
+                                                <DeleteIcon color="error" />
+                                            </IconButton>
+                                        </Stack>
+                                    </Stack>
+                                </Card>
+                            )
+                        })
+                    }
+                </Grid> */}
+
+                <Grid
+                    container
+                    spacing={1}
+                    direction="column"
+                    justify="center"
+                    style={{ minHeight: '100vh', marginTop: '40px' }}
+                >
+                    {
+                        patient3?.details?.document.length !== 0 ? patient3.details.document.map((data, index) => {
+                            return (
+                                <Card
+                                    key={index}
+                                    sx={{ paddingY: 2, paddingX: 2, marginY: 1 }}
+                                    style={{ border: "1px solid #eaeeef", boxShadow: "none" }}
+                                    variant="outlined"
+                                >
+                                    <Stack
+                                        sx={{
+                                            flexDirection: { xs: "column-reverse", md: "row" },
+                                            alignItems: { xs: "start", md: "center" },
+                                        }}
+                                        direction="col" alignItems="center" justifyContent="space-between">
 
                                         <Stack direction="row" alignItems="center">
-                                            <img src={
+                                            <Tooltip title={data.document.split('__')[1].split('-')[1]}>
+                                                <Stack sx={{ minWidth: "100px" }}>
+                                                    <img src={
 
-                                                data.document.split('.')[1].toLowerCase() === 'jpg' ? `/assets/icons/ic_img.svg`
-                                                    :
-                                                    data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
-                                                        :
-                                                        `/assets/icons/doc.png`
+                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ? `/assets/icons/ic_img.svg`
+                                                            :
+                                                            data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
+                                                                :
+                                                                data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/ic_pdf.svg` ?
+                                                                    `/assets/icons/xlsx-file.svg`
+                                                                    :
+                                                                    data.document.split('.')[1].toLowerCase() === 'pdf' && `/assets/icons/doc-file.svg`
+                                                                    : data.document.split('.')[1].toLowerCase() === 'txt' && `/assets/icons/notepad.svg`
 
-                                            } alt="icon"
-                                                style={{ marginRight: "10px", width: "20%" }} />
+                                                    }
+                                                        alt="icon"
+                                                        style={{ marginRight: "10px", width: "100px", height: "100px" }} />
+
+                                                    <p style={{ margin: "0", padding: "0", fontSize: "13px", display: "inline", maxWidth: "100px", wordBreak: "break-word" }}>
+                                                        {data.document.split('__')[1].split('-')[1].slice(0, 10) + "..."}
+                                                    </p>
+                                                </Stack>
+                                            </Tooltip >
+
                                             <Stack>
-                                                <p style={{ margin: "0", padding: "0", fontSize: "15px", fontWeight: "bold" }}>{data.document.split('__')[1].split('-')[1]}</p>
-                                                <p style={{ fontSize: "small", color: "#afb6bc", margin: "0", padding: "0" }}>
-                                                    {fDateTime(data.createdAt)}</p>
+                                                <Stack>
+                                                    <p style={{ fontSize: "small", color: "#afb6bc", margin: "0", padding: "0", display: "inline" }}>
+                                                        {fDateTime(data.createdAt)}
+                                                    </p>
+                                                </Stack>
+                                                <Stack>
+                                                    <Typography variant='h6'>{data?.title}</Typography>
+                                                    <Typography variant='body2'>{data?.description}</Typography>
+                                                </Stack>
                                             </Stack>
                                         </Stack>
 
@@ -192,8 +313,74 @@ export default function UploadPatientDocuments() {
                                 </Card>
                             )
                         })
+                            :
+                            <Typography variant='subtitle' sx={{ textAlign: "center" }}>No Documents Uploaded yet!</Typography>
                     }
                 </Grid>
+
+                {/* -------------------------------------Modal Start------------------------------------ */}
+
+                <Modal
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    open={showModal}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}
+                >
+                    <Fade in={showModal}>
+                        <Box sx={style}>
+                            <p style={{ textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "larger" }}>{"Upload Document"}</p>
+
+                            <form onSubmit={(e) => handleFormSubmit(e)}>
+                                {
+                                    <>
+                                        <TextField
+                                            sx={{ mb: 2 }}
+                                            id="outlined-basic"
+                                            label="Document Title"
+                                            type={'text'}
+                                            fullWidth
+                                            name="docTitle"
+                                            required
+                                            variant="outlined" />
+
+                                        <TextField
+                                            sx={{ mb: 2 }}
+                                            id="outlined-basic"
+                                            label="Description"
+                                            type={'text'}
+                                            fullWidth
+                                            name="docDescription"
+                                            multiline
+                                            rows={3}
+                                            variant="outlined" />
+
+                                        <Stack variant="contained" fullWidth sx={{ mb: 2, border: "2px solid grey", borderStyle: "dashed", py: 2, px: 3, textAlign: "center", cursor: "pointer" }} component="label" startIcon={<Iconify icon="material-symbols:cloud-upload" />}>
+                                            {!uploadedFileName ? "Upload" : uploadedFileName}
+                                            <Typography variant='caption'>DOC/PDF/JPG/PNG/JPEG/XLSX</Typography>
+                                            <input name="uploadFile" hidden type="file" onChange={(e) => handleUploadButtonClick(e)} />
+                                        </Stack>
+                                    </>
+                                }
+                                <Button variant="contained" sx={{ mb: 1 }} color='success' fullWidth type='submit'>
+                                    Upload
+                                </Button>
+                            </form>
+
+                            <Button variant="contained" color='warning' fullWidth onClick={(e) => {
+                                setModal(!showModal); setUploadedFileName("")
+                            }}>
+                                Close
+                            </Button>
+                        </Box>
+                    </Fade>
+                </Modal>
+
+                {/* -------------------------------------Modal End------------------------------------ */}
+
             </Container>
         </>
     );

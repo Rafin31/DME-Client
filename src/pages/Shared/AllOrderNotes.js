@@ -1,38 +1,40 @@
-import { Alert, alpha, Avatar, Box, Button, Card, CircularProgress, Container, Divider, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, CircularProgress, Container, Grid, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import styled from '@emotion/styled';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
 import { fDateTime } from '../../utils/formatTime';
 
-const StyledAccount = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(2, 2.5),
-    borderRadius: Number(theme.shape.borderRadius) * 1.5,
-    backgroundColor: alpha(theme.palette.grey[500], 0.12),
-}));
 
 export default function AllOrderNotes() {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+
     const navigate = useNavigate()
-    const [dbError, setDbError] = useState(false)
     const { id } = useParams()
 
+    const { search } = window.location;
+    const params = new URLSearchParams(search);
+    const orderCategory = params.get('orderCategory');
 
-    const { isLoading: noteLoading, refetch, data: note } = useQuery('note',
+
+    const { isLoading, data: note } = useQuery('note-log',
         async () => {
-            return AuthRequest.get(`/api/v1/order/orderNote/${id}`).then(data => data.data.data)
-        }
+            if (orderCategory === "equipment-order") {
+                return AuthRequest.get(`/api/v1/order/orderNote/${id}`).then(data => data.data.data)
+            } else if (orderCategory === "veteran-order") {
+                return AuthRequest.get(`/api/v1/veteran-order/veteran-order-note/${id}`).then(data => data.data.data)
+            } else if (orderCategory === "repair-order") {
+                return AuthRequest.get(`/api/v1/repair-order/repair-order-note/${id}`).then(data => data.data.data)
+            }
+        }, {
+        cacheTime: 0
+    }
     )
 
-    if (!note) {
+    if (isLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -69,8 +71,8 @@ export default function AllOrderNotes() {
                     style={{ minHeight: '100vh', marginTop: '40px' }}
                 >
                     {
-                        note.length !== 0 ?
-                            note.map((nt, index) => {
+                        note && note.length !== 0 ?
+                            note?.map((nt, index) => {
                                 return (
                                     <Card key={index} sx={{ paddingY: 2, paddingX: 2, marginY: 1 }}>
 

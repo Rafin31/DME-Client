@@ -17,3 +17,12 @@
 .cursor-pointer {
     cursor: pointer !important;
 }
+
+
+::-webkit-file-upload-button {
+    display: none !important;
+}
+
+::file-selector-button {
+    display: none !important;
+}

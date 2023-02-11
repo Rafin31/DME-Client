@@ -53,7 +53,7 @@ export default function DmeDashboard() {
       navigate('/DME-supplier/dashboard/repair-order')
     }
     else if (dest === "veteran-order") {
-      navigate('/DME-supplier/dashboard/equipment-order')
+      navigate('/DME-supplier/dashboard/veteran-order')
     }
     else if (dest === "equip-order") {
       navigate('/DME-supplier/dashboard/equipment-order')

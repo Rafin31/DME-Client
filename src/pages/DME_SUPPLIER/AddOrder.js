@@ -134,11 +134,11 @@ export default function AddOrder() {
         }
         if (orderCategory === "veteran-order") delete order.patientId
         if (orderCategory === "veteran-order") order.veteranId = patientId
-        if (firstAttempt) order.firstAttempt = fDate(firstAttempt)
-        if (secondAttempt) order.secondAttempt = fDate(secondAttempt)
-        if (schedule) order.schedule = fDate(schedule)
-        if (data.partsPO) order.partsPO = data.partsPO
-        if (data.labourPO) order.labourPO = data.labourPO
+        if (firstAttempt) order.firstAttempt = fDate((firstAttempt))
+        if (secondAttempt) order.secondAttempt = fDate((secondAttempt))
+        if (schedule) order.schedule = fDate((schedule))
+        if (data.partsPo) order.partsPo = data.partsPo
+        if (data.labourPo) order.labourPo = data.labourPo
 
         mutateAsync(order)
         reset()
@@ -214,9 +214,10 @@ export default function AddOrder() {
                                                 !patientLoading ?
 
 
-                                                    patients.map((patient, index) => {
-                                                        return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
-                                                    })
+                                                    patients.length !== 0 ?
+                                                        patients.map((patient, index) => {
+                                                            return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
+                                                        }) : <MenuItem disabled>No Veteran Found</MenuItem>
 
                                                     :
                                                     <Box style={{ height: "50px", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -231,22 +232,22 @@ export default function AddOrder() {
                                     <>
                                         <Grid item xs={6} >
                                             <TextField
-                                                {...register("partsPO")}
+                                                {...register("partsPo")}
                                                 id="outlined-basic"
                                                 label="Parts PO#"
-                                                error={errors.partsPO && true}
+                                                error={errors.partsPo && true}
                                                 fullWidth
-                                                helpertext={errors.partsPO?.message}
+                                                helpertext={errors.partsPo?.message}
                                                 variant="outlined" />
                                         </Grid>
                                         <Grid item xs={6}>
                                             <TextField
-                                                {...register("labourPO")}
+                                                {...register("labourPo")}
                                                 id="outlined-basic"
                                                 label="Labour PO#"
-                                                error={errors.labourPO && true}
+                                                error={errors.labourPo && true}
                                                 fullWidth
-                                                helpertext={errors.labourPO?.message}
+                                                helpertext={errors.labourPo?.message}
                                                 variant="outlined" />
                                         </Grid>
 

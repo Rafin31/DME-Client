@@ -1,34 +1,54 @@
 
 import { Helmet } from 'react-helmet-async';
 import { React, useRef, useState } from 'react';
-import { Box, Button, Card, CircularProgress, Container, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Backdrop, Box, Button, Card, CircularProgress, Container, Fade, Grid, IconButton, Modal, Stack, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
 import { fDateTime } from '../../utils/formatTime';
+import { isArray } from 'lodash';
 
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    borderRadius: '5px',
+    p: 2,
+
+};
 
 
 export default function UploadOrderDocuments() {
 
     const { id: orderId } = useParams()
     const submitButtonRef = useRef(null)
-    const [user, setUser] = useState()
-    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const [showModal, setModal] = useState(false)
+    const [uploadedFileName, setUploadedFileName] = useState()
 
-    let loggedUser = localStorage.getItem('user');
-    loggedUser = JSON.parse(loggedUser);
+    const { search } = window.location;
+    const params = new URLSearchParams(search);
+    const orderCategory = params.get('orderCategory');
 
 
-    const { isLoading: orderLoading, refetch, data: order } = useQuery('order',
+    const { isLoading: orderLoading, refetch, data: order } = useQuery(`order-${orderId}`,
         async () => {
-            return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
+            if (orderCategory === "equipment-order") {
+                return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
+            } else if (orderCategory === "repair-order") {
+                return AuthRequest.get(`/api/v1/repair-order/${orderId}`).then(data => data.data.data)
+            } else if (orderCategory === "veteran-order") {
+                return AuthRequest.get(`/api/v1/veteran-order/${orderId}`).then(data => data.data.data)
+            }
         }
     )
 
@@ -74,20 +94,30 @@ export default function UploadOrderDocuments() {
 
     const handleUploadButtonClick = (e) => {
         e.preventDefault()
-        submitButtonRef.current.click()
+        setUploadedFileName(e.target.files[0].name)
+
     }
     const handleFormSubmit = (e) => {
         e.preventDefault()
         const file = e.target.uploadFile.files[0]
+        const title = e.target.docTitle.value
+        const description = e.target.docDescription.value
         const formData = new FormData()
         formData.append('order-document', file)
+        formData.append('title', title)
+        formData.append('description', description)
 
         if (!!formData.entries().next().value) {
-            formData.append('uploaderId', order.patientId._id)
+            if (orderCategory !== "veteran-order") formData.append('uploaderId', order.patientId._id)
+            if (orderCategory === "veteran-order") formData.append('uploaderId', order[0].veteranId._id)
             formData.append('orderId', orderId)
+            formData.append('orderCategory', orderCategory)
+            setUploadedFileName("")
+            setModal(!showModal)
             mutateAsync(formData)
 
         } else {
+            setModal(!showModal)
             toast.warning('Upload documents', {
                 toastId: "warning1"
             })
@@ -112,6 +142,13 @@ export default function UploadOrderDocuments() {
             <CircularProgress />
         </Box>
     }
+    let plainOrder
+
+    if (order && isArray(order)) {
+        plainOrder = order[0]
+    } else {
+        plainOrder = order
+    }
 
     return (
         <>
@@ -128,22 +165,41 @@ export default function UploadOrderDocuments() {
                     <ArrowBackIcon /> <span>Back</span>
                 </Stack>
 
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                <Stack
+                    sx={{
+                        flexDirection: { xs: "column", md: "row" }, alignItems: { xs: "start", md: "center" }
+                    }} justifyContent="space-between" mb={5}>
                     <Typography variant="h5">Upload Order Documents for
-                        <Link
-                            to={`/DME-supplier/dashboard/patient-profile/${order.patientId._id}`}
-                            style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
-                            color="inherit" variant="subtitle2" underline="hover" nowrap="true"
-                            target="_blank" rel="noopener noreferrer"
-                        >{order.patientId.fullName}
-                        </Link>
+                        {
+                            !isArray(order) && orderCategory !== "veteran-order" &&
+                            <Link
+                                to={`/DME-supplier/dashboard/user-profile/${order?.patientId?._id}`}
+                                style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
+                                color="inherit" variant="subtitle2" underline="hover" nowrap="true"
+                                target="_blank" rel="noopener noreferrer"
+                            >{order?.patientId?.fullName}
+                            </Link>
+                        }
+                        {
+                            isArray(order) && orderCategory === "veteran-order" &&
+                            <Link
+                                to={`/DME-supplier/dashboard/user-profile/${order[0]?.veteranId?._id}`}
+                                style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
+                                color="inherit" variant="subtitle2" underline="hover" nowrap="true"
+                                target="_blank" rel="noopener noreferrer"
+                            >{order[0]?.veteranId?.fullName}
+                            </Link>
+                        }
                         Order
                     </Typography>
                     <form onSubmit={(e) => handleFormSubmit(e)}>
-                        <Button variant="contained" component="label" startIcon={<Iconify icon="material-symbols:cloud-upload" />}>
-                            Upload
-                            <input name="uploadFile" hidden type="file" onChange={(e) => handleUploadButtonClick(e)} />
-                        </Button>
+                        {
+                            order &&
+                            <Button variant="contained" onClick={() => { setModal(!showModal) }} startIcon={
+                                <Iconify icon="material-symbols:cloud-upload" />}>
+                                Upload Document
+                            </Button>
+                        }
                         <input ref={submitButtonRef} hidden type="submit" />
                     </form>
                 </Stack>
@@ -156,7 +212,7 @@ export default function UploadOrderDocuments() {
                     style={{ minHeight: '100vh', marginTop: '40px' }}
                 >
                     {
-                        order.document.map((data, index) => {
+                        plainOrder?.document?.length !== 0 ? plainOrder?.document?.map((data, index) => {
                             return (
                                 <Card
                                     key={index}
@@ -164,23 +220,48 @@ export default function UploadOrderDocuments() {
                                     style={{ border: "1px solid #eaeeef", boxShadow: "none" }}
                                     variant="outlined"
                                 >
-                                    <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                    <Stack
+                                        sx={{
+                                            flexDirection: { xs: "column-reverse", md: "row" },
+                                            alignItems: { xs: "start", md: "center" },
+                                        }}
+                                        direction="col" alignItems="center" justifyContent="space-between">
 
                                         <Stack direction="row" alignItems="center">
-                                            <img src={
+                                            <Tooltip title={data.document.split('__')[1].split('-')[1]}>
+                                                <Stack sx={{ minWidth: "100px" }}>
+                                                    <img src={
 
-                                                data.document.split('.')[1].toLowerCase() === 'jpg' ? `/assets/icons/ic_img.svg`
-                                                    :
-                                                    data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
-                                                        :
-                                                        `/assets/icons/doc.png`
+                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ? `/assets/icons/ic_img.svg`
+                                                            :
+                                                            data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
+                                                                :
+                                                                data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/ic_pdf.svg` ?
+                                                                    `/assets/icons/xlsx-file.svg`
+                                                                    :
+                                                                    data.document.split('.')[1].toLowerCase() === 'pdf' && `/assets/icons/doc-file.svg`
+                                                                    : data.document.split('.')[1].toLowerCase() === 'txt' && `/assets/icons/notepad.svg`
 
-                                            } alt="icon"
-                                                style={{ marginRight: "10px", width: "20%" }} />
+                                                    }
+                                                        alt="icon"
+                                                        style={{ marginRight: "10px", width: "100px", height: "100px" }} />
+
+                                                    <p style={{ margin: "0", padding: "0", fontSize: "13px", display: "inline", maxWidth: "100px", wordBreak: "break-word" }}>
+                                                        {data.document.split('__')[1].split('-')[1].slice(0, 10) + "..."}
+                                                    </p>
+                                                </Stack>
+                                            </Tooltip >
+
                                             <Stack>
-                                                <p style={{ margin: "0", padding: "0", fontSize: "15px", fontWeight: "bold" }}>{data.document.split('__')[1].split('-')[1]}</p>
-                                                <p style={{ fontSize: "small", color: "#afb6bc", margin: "0", padding: "0" }}>
-                                                    {fDateTime(data.createdAt)}</p>
+                                                <Stack>
+                                                    <p style={{ fontSize: "small", color: "#afb6bc", margin: "0", padding: "0", display: "inline" }}>
+                                                        {fDateTime(data.createdAt)}
+                                                    </p>
+                                                </Stack>
+                                                <Stack>
+                                                    <Typography variant='h6'>{data?.title}</Typography>
+                                                    <Typography variant='body2'>{data?.description}</Typography>
+                                                </Stack>
                                             </Stack>
                                         </Stack>
 
@@ -196,8 +277,78 @@ export default function UploadOrderDocuments() {
                                 </Card>
                             )
                         })
+                            :
+                            <Typography variant='subtitle' sx={{ textAlign: "center" }}>No Documents Uploaded yet!</Typography>
                     }
                 </Grid>
+
+
+                {/* -------------------------------------Modal Start------------------------------------ */}
+
+                <Modal
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    open={showModal}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}
+                >
+                    <Fade in={showModal}>
+                        <Box sx={style}>
+                            <p style={{ textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "larger" }}>{"Upload Document"}</p>
+
+                            <form onSubmit={(e) => handleFormSubmit(e)}>
+                                {
+                                    <>
+                                        <TextField
+                                            sx={{ mb: 2 }}
+                                            id="outlined-basic"
+                                            label="Document Title"
+                                            type={'text'}
+                                            fullWidth
+                                            name="docTitle"
+                                            required
+                                            variant="outlined" />
+
+                                        <TextField
+                                            sx={{ mb: 2 }}
+                                            id="outlined-basic"
+                                            label="Description"
+                                            type={'text'}
+                                            fullWidth
+                                            name="docDescription"
+                                            multiline
+                                            rows={3}
+                                            variant="outlined" />
+
+                                        <Stack variant="contained" fullWidth sx={{ mb: 2, border: "2px solid grey", borderStyle: "dashed", py: 2, px: 3, textAlign: "center", cursor: "pointer" }} component="label" startIcon={<Iconify icon="material-symbols:cloud-upload" />}>
+                                            {!uploadedFileName ? "Upload" : uploadedFileName}
+                                            <Typography variant='caption'>DOC/PDF/JPG/PNG/JPEG/XLSX</Typography>
+                                            <input name="uploadFile" hidden type="file" onChange={(e) => handleUploadButtonClick(e)} />
+                                        </Stack>
+                                    </>
+                                }
+                                <Button variant="contained" sx={{ mb: 1 }} color='success' fullWidth type='submit'>
+                                    Upload
+                                </Button>
+                            </form>
+
+                            <Button variant="contained" color='warning' fullWidth onClick={(e) => {
+                                setModal(!showModal); setUploadedFileName("")
+                            }}>
+                                Close
+                            </Button>
+                        </Box>
+                    </Fade>
+                </Modal>
+
+                {/* -------------------------------------Modal End------------------------------------ */}
+
+
+
+
             </Container>
         </>
     );

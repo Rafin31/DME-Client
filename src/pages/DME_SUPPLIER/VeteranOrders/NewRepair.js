@@ -160,7 +160,7 @@ const NewRepair = () => {
 
                                 {
                                     row.map((row, index) => {
-                                        const { _id, createdAt, veteranId, firstAttempt, secondAttempt, scheduled, notes, status, labourPo, partsPo } = row;
+                                        const { _id, createdAt, veteranId, firstAttempt, secondAttempt, schedule, notes, status, labourPo, partsPo } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
@@ -172,7 +172,7 @@ const NewRepair = () => {
                                                 <TableCell align="left">{veteranId.lastName}</TableCell>
 
                                                 <TableCell component="th" scope="row" padding="none">
-                                                    <Link to={`/DME-supplier/dashboard/patient-profile/${veteranId._id}`}
+                                                    <Link to={`/DME-supplier/dashboard/user-profile/${veteranId._id}`}
                                                         style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                         <Tooltip title="Profile">
                                                             <Typography component={'span'} style={{ wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
@@ -187,7 +187,7 @@ const NewRepair = () => {
 
                                                 <TableCell align="left">{!firstAttempt ? "Unavailable" : firstAttempt}</TableCell>
                                                 <TableCell align="left">{!secondAttempt ? "Unavailable" : secondAttempt}</TableCell>
-                                                <TableCell align="left">{!scheduled ? "Unavailable" : scheduled}</TableCell>
+                                                <TableCell align="left">{!schedule ? "Unavailable" : schedule}</TableCell>
 
                                                 <TableCell align="left">
                                                     <Label

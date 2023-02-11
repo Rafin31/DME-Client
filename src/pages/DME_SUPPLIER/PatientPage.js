@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 
 
 // @mui
@@ -35,7 +35,6 @@ import Scrollbar from '../../components/scrollbar';
 import PopOver from '../../components/Popover/PopOver';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
-import { fDate } from '../../utils/formatTime';
 import { AuthRequest } from '../../services/AuthRequest';
 
 
@@ -180,15 +179,6 @@ export default function PatientPage() {
         setOrderBy(property);
     };
 
-    const handleSelectAllClick = (event) => {
-        if (event.target.checked) {
-            const newSelecteds = patient.map((n) => n.name);
-            setSelected(newSelecteds);
-            return;
-        }
-        setSelected([]);
-    };
-
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -205,7 +195,7 @@ export default function PatientPage() {
 
     };
 
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - patient.length) : 0;
+    // const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - patient.length) : 0;
 
     const filteredUsers = applySortFilter(patient, getComparator(order, orderBy), filterName);
 
@@ -339,7 +329,7 @@ export default function PatientPage() {
 
                                                 <TableCell align="left">
                                                     <Tooltip title="Profile">
-                                                        <Link to={`/DME-supplier/dashboard/patient-profile/${userId._id}`}
+                                                        <Link to={`/DME-supplier/dashboard/user-profile/${userId._id}`}
                                                             style={{ display: "inline", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             {userId.fullName}
                                                         </Link>
@@ -351,6 +341,7 @@ export default function PatientPage() {
 
                                                 <TableCell >
                                                     <PopOver
+                                                        key={userId._id}
                                                         source="patient-page"
                                                         option={[
                                                             { label: "Edit" },
@@ -363,11 +354,12 @@ export default function PatientPage() {
                                             </TableRow>
                                         );
                                     })}
-                                    {emptyRows > 0 && (
+                                    {/* {emptyRows > 0 && (
                                         <TableRow style={{ height: 53 * emptyRows }}>
+                                          
                                             <TableCell colSpan={6} />
                                         </TableRow>
-                                    )}
+                                    )} */}
                                 </TableBody>
 
                                 {isNotFound && (

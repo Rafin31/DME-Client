@@ -299,7 +299,7 @@ export default function PatientNotes() {
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
                         Notes for <Link
-                            to={`/DME-supplier/dashboard/patient-profile/${65}`}
+                            to={`/DME-supplier/dashboard/user-profile/${65}`}
                             style={{ color: "black", cursor: "pointer", marginLeft: "6px" }}
                             color="inherit" variant="subtitle2" underline="hover" nowrap="true"
                             target="_blank" rel="noopener noreferrer"
@@ -363,6 +363,7 @@ export default function PatientNotes() {
 
                                                 <TableCell >
                                                     <PopOver
+                                                        key={_id}
                                                         source="patient-notes-page"
                                                         option={[
                                                             { label: "Edit" },

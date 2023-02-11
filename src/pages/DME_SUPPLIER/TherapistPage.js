@@ -32,7 +32,6 @@ import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
-import PopOver from '../../components/Popover/PopOver';
 import { AuthRequest } from '../../services/AuthRequest';
 import InviteModal from '../Shared/InviteModal';
 import AddPatientToTherapist from '../Shared/AddPatientToTherapistModal';

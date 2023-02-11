@@ -1,8 +1,6 @@
 // routes
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
 import { ReactQueryDevtools } from "react-query/devtools";
 import Router from './routes';
 // theme

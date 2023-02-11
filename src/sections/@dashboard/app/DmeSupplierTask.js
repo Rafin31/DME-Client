@@ -94,7 +94,7 @@ function NewsItem({ news }) {
           {title}
         </Link>
 
-        <Link to={`/DME-supplier/dashboard/patient-profile/${98}`} style={{ display: "inline", fontSize: "small", cursor: "pointer" }} color="inherit" underline="hover" nowrap="true">
+        <Link to={`/DME-supplier/dashboard/user-profile/${98}`} style={{ display: "inline", fontSize: "small", cursor: "pointer" }} color="inherit" underline="hover" nowrap="true">
           <FaUserAlt style={{ marginRight: "5px" }} /> Patient: {patientName}
         </Link>
 
