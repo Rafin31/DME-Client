@@ -155,7 +155,7 @@ const NewReferral = () => {
 
                                 {
                                     row?.map((row, index) => {
-                                        const { _id, patientId, status, notes, description } = row;
+                                        const { _id, patientId, status, notes, description, progress } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
@@ -219,7 +219,7 @@ const NewReferral = () => {
                                                     </Label>
                                                 </TableCell>
 
-                                                <TableCell align="left">{"Not Mentioned"}</TableCell>
+                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
 
 
 

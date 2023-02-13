@@ -182,12 +182,12 @@ const PoRecieved = () => {
                                                     </Link>
                                                 </TableCell>
 
-                                                <TableCell align="left">{!partsPo ? "Unavailable" : partsPo}</TableCell>
-                                                <TableCell align="left">{!labourPo ? "Unavailable" : labourPo}</TableCell>
+                                                <TableCell align="left">{!partsPo ? "Not Mentioned" : partsPo}</TableCell>
+                                                <TableCell align="left">{!labourPo ? "Not Mentioned" : labourPo}</TableCell>
 
-                                                <TableCell align="left">{!firstAttempt ? "Unavailable" : firstAttempt}</TableCell>
-                                                <TableCell align="left">{!secondAttempt ? "Unavailable" : secondAttempt}</TableCell>
-                                                <TableCell align="left">{!schedule ? "Unavailable" : schedule}</TableCell>
+                                                <TableCell align="left">{!firstAttempt ? "Not Mentioned" : firstAttempt}</TableCell>
+                                                <TableCell align="left">{!secondAttempt ? "Not Mentioned" : secondAttempt}</TableCell>
+                                                <TableCell align="left">{!schedule ? "Not Mentioned" : schedule}</TableCell>
 
                                                 <TableCell align="left">
                                                     <Label

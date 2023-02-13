@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import PropTypes from 'prop-types';
 import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
@@ -10,10 +9,7 @@ import {
     Table,
     Stack,
     Paper,
-    Avatar,
     Button,
-    Popover,
-    Checkbox,
     Box,
     TableRow,
     TableBody,
@@ -100,8 +96,7 @@ function applySortFilterRegisteredStaff(array, comparator, query) {
     return stabilizedThis.map((el) => el[0]);
 }
 
-export default function StaffPage() {
-    const [open, setOpen] = useState(null);
+export default function VAProstheticPage() {
 
     const [inviteOpen, setInviteOpen] = useState(false)
 
@@ -121,16 +116,11 @@ export default function StaffPage() {
 
     const searchFieldRef = useRef(null)
 
-    const navigate = useNavigate()
-
     const [user, setUser] = useState()
     const [loading, setLoading] = useState()
 
 
-    let loggedUser = localStorage.getItem('user');
-    loggedUser = JSON.parse(loggedUser);
-
-    const { id } = loggedUser
+    let { id, email: loggedInUserEmail } = JSON.parse(localStorage.getItem('user'));
 
     const loadUserInfo = useCallback(() => {
         AuthRequest.get(`/api/v1/users/${id}`)
@@ -153,28 +143,29 @@ export default function StaffPage() {
 
 
 
-    const { isLoading: invitedStaff, refetch, data: INVITED_STAFF_LIST } = useQuery('INVITED_STAFF_LIST',
+    const { isLoading: invitedProstheticStaff, refetch, data: INVITED_PROSTHETICS_LIST } = useQuery('INVITED_PROSTHETICS_LIST',
         async () => {
-            return AuthRequest.get(`/api/v1/staff/invited-staff/${id}`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/va-staff/invited-va-staff/${id}`).then(data => data.data.data)
         }
     )
-    const { isLoading: registeredStaff, refetch: refetchRegisteredStaff, data: REGISTERED_STAFF_LIST } = useQuery('REGISTERED_PROSTHETIC_STAFF_LIST',
+    const { isLoading: registeredProstheticStaff, refetch: refetchRegisteredStaff, data: REGISTERED_PROSTHETIC_STAFF_LIST } = useQuery('REGISTERED_PROSTHETIC_STAFF_LIST',
         async () => {
-            return AuthRequest.get(`/api/v1/staff`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/va-staff`).then(data => data.data.data)
         }
     )
 
 
 
-    if (!user || !INVITED_STAFF_LIST || !REGISTERED_STAFF_LIST) {
+    if (!user || !INVITED_PROSTHETICS_LIST || !REGISTERED_PROSTHETIC_STAFF_LIST) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
     }
 
     const handelDeleteInvitedStaff = async (token) => {
+        console.log(token)
 
-        await AuthRequest.delete(`/api/v1/staff/delete-invited-staff/${token}`)
+        await AuthRequest.delete(`/api/v1/va-staff/delete-invited-va-staff/${token}`)
             .then(res => {
                 refetch()
                 toast.success(`Invitation Deleted`, {
@@ -188,7 +179,7 @@ export default function StaffPage() {
 
     const handelDeleteRegisteredStaff = async (id) => {
 
-        await AuthRequest.delete(`/api/v1/staff/delete-registered-staff/${id}`)
+        await AuthRequest.delete(`/api/v1/va-staff/delete-registered-va-staff/${id}`)
             .then(res => {
                 refetchRegisteredStaff()
                 toast.success(`Staff Deleted`, {
@@ -207,9 +198,9 @@ export default function StaffPage() {
     const handelInviteStaff = async (e) => {
         e.preventDefault()
 
-        await AuthRequest.post(`/api/v1/dme/invite-staff`, {
-            dmeSupplierEmail: loggedUser.email,
-            staffEmail: e.target.invitedEmail.value
+        await AuthRequest.post(`/api/v1/dme/invite-va-staff`, {
+            dmeSupplierEmail: loggedInUserEmail,
+            vaProstheticsEmail: e.target.invitedEmail.value
         }).then(res => {
             refetch()
             toast.success(`Invitation sent to ${e.target.invitedEmail.value}`, {
@@ -234,7 +225,7 @@ export default function StaffPage() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = INVITED_STAFF_LIST.map((n) => n.name);
+            const newSelecteds = INVITED_PROSTHETICS_LIST.map((n) => n.name);
             setSelected(newSelecteds);
             return;
         }
@@ -255,10 +246,10 @@ export default function StaffPage() {
         setFilterName(event.target.value);
     };
 
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - INVITED_STAFF_LIST.length) : 0;
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - INVITED_PROSTHETICS_LIST.length) : 0;
 
-    const filteredInvitedStaffs = applySortFilterInvitedStaff(INVITED_STAFF_LIST, getComparator(order, orderBy), filterName);
-    const filteredRegisteredStaffs = applySortFilterRegisteredStaff(REGISTERED_STAFF_LIST, getComparator(order, orderBy), filterName);
+    const filteredInvitedStaffs = applySortFilterInvitedStaff(INVITED_PROSTHETICS_LIST, getComparator(order, orderBy), filterName);
+    const filteredRegisteredStaffs = applySortFilterRegisteredStaff(REGISTERED_PROSTHETIC_STAFF_LIST, getComparator(order, orderBy), filterName);
 
     const isNotFound = !filteredInvitedStaffs.length && !!filterName;
     const isNotFoundRegistered = !filteredRegisteredStaffs.length && !!filterName;
@@ -307,20 +298,20 @@ export default function StaffPage() {
     return (
         <>
             <Helmet>
-                <title> Staffs</title>
+                <title> VA Prosthetic Staffs</title>
             </Helmet>
 
             <Container maxWidth="xl">
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography component={'span'} variant="h4" gutterBottom>
-                        Staffs
+                        VA Prosthetic Staffs
                     </Typography>
                     <Button variant="contained" onClick={() => { setInviteOpen(true) }} startIcon={<Iconify icon="material-symbols:mark-email-read-sharp" />}>
-                        Invite New Staff
+                        Invite VA Prosthetic Staffs
                     </Button>
                 </Stack>
 
-                <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteStaff} title="Invite Staff" />
+                <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteStaff} title="Invite VA Prosthetic Staff" />
                 {/* -------------------------------------------------------------------------
                                    TABS
               --------------------------------------------------------------------------- */}
@@ -332,8 +323,8 @@ export default function StaffPage() {
                         variant="scrollable"
                         scrollButtons="auto"
                         aria-label="basic tabs example">
-                        <Tab label="Invited Staff" {...a11yProps(0)} draggable="true" />
-                        <Tab label="Registered Staff" {...a11yProps(1)} draggable="true" />
+                        <Tab label="Invited VA Prosthetic Staff" {...a11yProps(0)} draggable="true" />
+                        <Tab label="Registered VA Prosthetic Staff" {...a11yProps(1)} draggable="true" />
                     </Tabs>
 
 
@@ -344,7 +335,7 @@ export default function StaffPage() {
 
                     <TabPanel value={value} index={0} >
                         {
-                            INVITED_STAFF_LIST.length !== 0 ?
+                            INVITED_PROSTHETICS_LIST.length !== 0 ?
                                 <Card>
                                     <input type="text"
                                         style={{
@@ -364,7 +355,7 @@ export default function StaffPage() {
                                                     order={order}
                                                     orderBy={orderBy}
                                                     headLabel={INVITED_STAFF_TABLE_HEAD}
-                                                    rowCount={INVITED_STAFF_LIST.length}
+                                                    rowCount={INVITED_PROSTHETICS_LIST.length}
                                                     numSelected={selected.length}
                                                     onRequestSort={handleRequestSort}
                                                     onSelectAllClick={handleSelectAllClick}
@@ -429,7 +420,7 @@ export default function StaffPage() {
                                                         </TableRow>
                                                     </TableBody>
                                                 )}
-                                                {INVITED_STAFF_LIST.length === 0 && (
+                                                {INVITED_PROSTHETICS_LIST.length === 0 && (
                                                     <TableBody>
                                                         <TableRow>
                                                             <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -454,7 +445,7 @@ export default function StaffPage() {
                                     <TablePagination
                                         rowsPerPageOptions={[5, 10, 25]}
                                         component="div"
-                                        count={INVITED_STAFF_LIST.length}
+                                        count={INVITED_PROSTHETICS_LIST.length}
                                         rowsPerPage={rowsPerPage}
                                         page={page}
                                         onPageChange={handleChangePage}
@@ -484,7 +475,7 @@ export default function StaffPage() {
 
                     <TabPanel value={value} index={1} >
                         {
-                            REGISTERED_STAFF_LIST.length !== 0 ?
+                            REGISTERED_PROSTHETIC_STAFF_LIST.length !== 0 ?
                                 <Card>
                                     <input type="text"
                                         style={{
@@ -504,7 +495,7 @@ export default function StaffPage() {
                                                     order={order}
                                                     orderBy={orderBy}
                                                     headLabel={REGISTERED_STAFF_TABLE_HEAD}
-                                                    rowCount={REGISTERED_STAFF_LIST.length}
+                                                    rowCount={REGISTERED_PROSTHETIC_STAFF_LIST.length}
                                                     numSelected={selected.length}
                                                     onRequestSort={handleRequestSort}
                                                     onSelectAllClick={handleSelectAllClick}
@@ -534,7 +525,7 @@ export default function StaffPage() {
 
                                                                 <TableCell >
                                                                     <PopOver
-                                                                        source={"staff-registered-page"}
+                                                                        source={"va-staff-registered-page"}
                                                                         option={[
                                                                             { label: "Edit" },
                                                                             { label: "Delete" }
@@ -583,7 +574,7 @@ export default function StaffPage() {
                                     <TablePagination
                                         rowsPerPageOptions={[5, 10, 25]}
                                         component="div"
-                                        count={INVITED_STAFF_LIST.length}
+                                        count={INVITED_PROSTHETICS_LIST.length}
                                         rowsPerPage={rowsPerPage}
                                         page={page}
                                         onPageChange={handleChangePage}

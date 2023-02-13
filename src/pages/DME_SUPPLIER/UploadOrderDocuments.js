@@ -74,9 +74,9 @@ export default function UploadOrderDocuments() {
             })
     })
 
-    const deleteDocumentRequest = async (docId, orderId) => {
+    const deleteDocumentRequest = async (docId, orderId, orderCategory) => {
 
-        await AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=order-documents`, { data: { orderId } })
+        await AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=order-documents&orderCategory=${orderCategory}`, { data: { orderId } })
             .then(res => {
                 refetch()
                 toast.success("Deleted!", res, {
@@ -107,7 +107,8 @@ export default function UploadOrderDocuments() {
         formData.append('title', title)
         formData.append('description', description)
 
-        if (!!formData.entries().next().value) {
+        if (!!formData.entries().next().value && file) {
+            console.log("first")
             if (orderCategory !== "veteran-order") formData.append('uploaderId', order.patientId._id)
             if (orderCategory === "veteran-order") formData.append('uploaderId', order[0].veteranId._id)
             formData.append('orderId', orderId)
@@ -118,7 +119,7 @@ export default function UploadOrderDocuments() {
 
         } else {
             setModal(!showModal)
-            toast.warning('Upload documents', {
+            toast.warning('Please Upload documents first', {
                 toastId: "warning1"
             })
         }
@@ -133,7 +134,7 @@ export default function UploadOrderDocuments() {
     }
 
     const deleteDocument = async (docId) => {
-        deleteDocumentRequest(docId, orderId)
+        deleteDocumentRequest(docId, orderId, orderCategory)
     }
 
     // 
@@ -232,16 +233,14 @@ export default function UploadOrderDocuments() {
                                                 <Stack sx={{ minWidth: "100px" }}>
                                                     <img src={
 
-                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ? `/assets/icons/ic_img.svg`
+                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ? `/ assets/icons/ic_img.svg`
                                                             :
                                                             data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
                                                                 :
-                                                                data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/ic_pdf.svg` ?
-                                                                    `/assets/icons/xlsx-file.svg`
+                                                                data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/xlsx-file.svg`
                                                                     :
-                                                                    data.document.split('.')[1].toLowerCase() === 'pdf' && `/assets/icons/doc-file.svg`
-                                                                    : data.document.split('.')[1].toLowerCase() === 'txt' && `/assets/icons/notepad.svg`
-
+                                                                    data.document.split('.')[1].toLowerCase() === 'doc' ? `/assets/icons/doc-file.svg` :
+                                                                        data.document.split('.')[1].toLowerCase() === 'txt' ? `/assets/icons/notepad.svg` : data.document.split('.')[1].toLowerCase() === 'docx' && `/assets/icons/doc-file.svg`
                                                     }
                                                         alt="icon"
                                                         style={{ marginRight: "10px", width: "100px", height: "100px" }} />

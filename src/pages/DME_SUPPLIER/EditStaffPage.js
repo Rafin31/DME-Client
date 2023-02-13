@@ -1,20 +1,17 @@
-import { Alert, Avatar, Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery } from 'react-query';
-import { deepOrange } from '@mui/material/colors';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
-import Iconify from '../../components/iconify';
-import { fDate } from '../../utils/formatTime';
 import { AuthRequest } from '../../services/AuthRequest';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 export default function EditStaffPage() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
-    const [dbError, setDbError] = useState(false)
     const navigate = useNavigate()
 
 
@@ -72,6 +69,14 @@ export default function EditStaffPage() {
             </Helmet>
             <Container maxWidth="xl">
                 <Typography variant="h5">Edit - Staff</Typography>
+
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", margin: "15px 0px", }} sx={{
+                    "&:hover": {
+                        color: "#3498db",
+                    },
+                }} >
+                    <ArrowBackIcon /> <span>Back</span>
+                </Stack>
                 <Grid
                     container
                     spacing={0}

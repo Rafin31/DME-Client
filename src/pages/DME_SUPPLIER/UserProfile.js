@@ -59,7 +59,7 @@ export default function UserProfile() {
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Typography variant="h4">User Profile </Typography>
                     <Button variant="contained"
-                        onClick={() => { navigate(`/DME-supplier/dashboard/edit-patient-profile/${id}`) }}
+                        onClick={() => { navigate(`/DME-supplier/dashboard/edit-user-profile/${id}?user=${user.category.toLowerCase()}`) }}
                         startIcon={<Iconify icon="material-symbols:edit-document-rounded" />}>
                         Edit Profile
                     </Button>
@@ -174,6 +174,10 @@ export default function UserProfile() {
                                 <Typography variant='h6'>{user.details.address}</Typography>
                             </Grid>
                         }
+                        <Grid item xs={6} sm={6} md={4}>
+                            <Typography variant='subtitle'>ID#</Typography>
+                            <Typography variant='h6'>{id.substring(id.length - 4, id.length)}</Typography>
+                        </Grid>
                     </Grid>
                 </Box>
             </Container>

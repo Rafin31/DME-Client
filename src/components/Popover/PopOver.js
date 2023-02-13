@@ -22,11 +22,20 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 navigate(`/DME-supplier/dashboard/patient-document/${id}`)
             }
             if (lebel === "Edit") {
-                navigate(`/DME-supplier/dashboard/edit-patient-profile/${id}`)
+                navigate(`/DME-supplier/dashboard/edit-user-profile/${id}?user=patient`)
             }
             if (lebel === "Note") {
                 navigate(`/DME-supplier/dashboard/add-patient-note/${id}`)
 
+            }
+        }
+        if (source === "veteran-page") {
+            if (lebel === "Edit") {
+                navigate(`/DME-supplier/dashboard/edit-user-profile/${id}?user=veteran`)
+            }
+            if (lebel === "Add VA Prosthetics") {
+                other.setAddedVeteran(other.user)
+                other.setAddVaModalOpen(true)
             }
         }
 
@@ -101,7 +110,15 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
         }
         else if (source === "staff-registered-page") {
             if (lebel === "Edit") {
-                navigate(`/DME-supplier/dashboard/edit-staff-profile/${id}`)
+                navigate(`/DME-supplier/dashboard/edit-staff-profile/${id}?staff=staff`)
+            }
+            if (lebel === "Delete") {
+                other.handelDeleteRegisteredStaff(id)
+            }
+        }
+        else if (source === "va-staff-registered-page") {
+            if (lebel === "Edit") {
+                navigate(`/DME-supplier/dashboard/edit-va-prosthetics-staff/${id}`)
             }
             if (lebel === "Delete") {
                 other.handelDeleteRegisteredStaff(id)

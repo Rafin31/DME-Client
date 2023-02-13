@@ -1,7 +1,6 @@
-import { Alert, Avatar, Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { deepOrange } from '@mui/material/colors';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -12,21 +11,27 @@ import Iconify from '../../components/iconify';
 import { fDate } from '../../utils/formatTime';
 import { AuthRequest } from '../../services/AuthRequest';
 
-export default function EditPatient() {
+export default function EditUser() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
-    const { id: patientId } = useParams()
+    const { id: userId } = useParams()
     const navigate = useNavigate()
 
-    const { isLoading: userLoading, refetch, data: user } = useQuery(`user-${patientId}`,
+
+    const { search } = window.location;
+    const params = new URLSearchParams(search);
+    const userCategory = params.get('user');
+
+
+    const { isLoading: userLoading, refetch, data: user } = useQuery(`user-${userId}`,
         async () => {
-            return AuthRequest.get(`/api/v1/users/${patientId}`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/users/${userId}`).then(data => data.data.data)
         }
     )
 
-    const { mutateAsync, isLoading: updatePatientLoading } = useMutation((patient) => {
+    const { mutateAsync, isLoading: updateUserLoading } = useMutation((user) => {
 
-        return AuthRequest.patch(`/api/v1/users/${patientId}`, patient)
+        return AuthRequest.patch(`/api/v1/users/${userId}`, user)
             .then(res => {
                 toast.success("User Updated Successful!", res, {
                     toastId: 'success12'
@@ -50,8 +55,6 @@ export default function EditPatient() {
         </Box>
     }
 
-    // const gender = user.details.gender;
-
     const onSubmit = data => {
         let givenDate
         let presentDate
@@ -59,9 +62,11 @@ export default function EditPatient() {
         if (data?.dob) givenDate = new Date(data?.dob);
         if (data?.dob) presentDate = new Date()
 
-        if (givenDate > presentDate) {
-            setDbError(true)
-            return
+        if (data?.dob) {
+            if (givenDate > presentDate) {
+                setDbError(true)
+                return
+            }
         }
 
         if (data?.dob) data.dob = fDate(data.dob)
@@ -76,7 +81,6 @@ export default function EditPatient() {
         delete data.email
 
         setDbError(false)
-        console.log(data)
         mutateAsync(data)
     };
 
@@ -160,7 +164,7 @@ export default function EditPatient() {
 
 
                                 {
-                                    user.details.gender &&
+                                    userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <FormControl fullWidth>
                                             <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Gender*</InputLabel>
@@ -182,7 +186,7 @@ export default function EditPatient() {
                                 }
 
                                 {
-                                    user.details.dob &&
+                                    userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <TextField
                                             {...register("dob", { required: "Field is required" })}
@@ -202,7 +206,7 @@ export default function EditPatient() {
                                 }
 
                                 {
-                                    user.details.weight &&
+                                    userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <TextField
                                             {...register("weight", { required: "Field is required" })}
@@ -219,80 +223,74 @@ export default function EditPatient() {
                                     </Grid>
                                 }
 
-                                {
-                                    user.details.country &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("country", { required: "Field is required" })}
-                                            error={errors.country && true}
 
-                                            label="Country*"
-                                            fullWidth
-                                            variant="outlined"
-                                            defaultValue={user.details.country}
-                                            helpertext={errors.country?.message}
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("country", { required: "Field is required" })}
+                                        error={errors.country && true}
 
-                                        />
-                                    </Grid>
-                                }
+                                        label="Country*"
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details.country}
+                                        helpertext={errors.country?.message}
 
-                                {
-                                    user.details.city &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("city", { required: "Field is required" })}
-                                            error={errors.city && true}
+                                    />
+                                </Grid>
 
-                                            label="City*"
-                                            fullWidth
-                                            variant="outlined"
-                                            defaultValue={user.details.city}
-                                            helpertext={errors.city?.message}
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("city", { required: "Field is required" })}
+                                        error={errors.city && true}
 
-                                        />
-                                    </Grid>
-                                }
+                                        label="City*"
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details.city}
+                                        helpertext={errors.city?.message}
 
-                                {
-                                    user.details.state &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("state", { required: "Field is required" })}
-                                            error={errors.state && true}
+                                    />
+                                </Grid>
 
-                                            label="State*"
-                                            fullWidth
-                                            variant="outlined"
-                                            defaultValue={user.details.state}
-                                            helpertext={errors.state?.message}
 
-                                        />
-                                    </Grid>
-                                }
-                                {
-                                    user.details?.phoneNumber &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("phoneNumber", {
-                                                required: "Field is required",
-                                                minLength: { value: 6, message: "Phone number should be at last 6 characters" },
-                                            })}
 
-                                            error={errors.phoneNumber && true}
-                                            label="Phone Number*"
-                                            type={"tel"}
-                                            fullWidth
-                                            variant="outlined"
-                                            defaultValue={user.details?.phoneNumber}
-                                            helpertext={errors?.phoneNumber?.message}
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("state", { required: "Field is required" })}
+                                        error={errors.state && true}
 
-                                        />
+                                        label="State*"
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details.state}
+                                        helpertext={errors.state?.message}
 
-                                    </Grid>
-                                }
+                                    />
+                                </Grid>
+
+
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("phoneNumber", {
+                                            required: "Field is required",
+                                            minLength: { value: 6, message: "Phone number should be at last 6 characters" },
+                                        })}
+
+                                        error={errors.phoneNumber && true}
+                                        label="Phone Number*"
+                                        type={"tel"}
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details?.phoneNumber}
+                                        helpertext={errors?.phoneNumber?.message}
+
+                                    />
+
+                                </Grid>
+
 
                                 {
-                                    user.details?.primaryInsurance &&
+                                    userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <TextField
                                             {...register("primaryInsurance", { required: "Field is required" })}
@@ -309,7 +307,7 @@ export default function EditPatient() {
                                 }
 
                                 {
-                                    user.details?.secondaryInsurance &&
+                                    userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <TextField
                                             {...register("secondaryInsurance", { required: "Field is required" })}
@@ -324,25 +322,24 @@ export default function EditPatient() {
                                         />
                                     </Grid>
                                 }
-                                {
-                                    user.details?.address &&
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            {...register("address", { required: "Field is required" })}
-
-                                            label="Address"
-                                            error={errors.address && true}
-                                            fullWidth
-                                            multiline
-                                            helpertext={errors.address?.message}
-                                            defaultValue={user.details?.address}
-                                            rows={4}
-                                            variant="outlined" />
-                                    </Grid>
-                                }
 
                                 <Grid item xs={12}>
-                                    <LoadingButton loading={updatePatientLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Update</LoadingButton>
+                                    <TextField
+                                        {...register("address", { required: "Field is required" })}
+
+                                        label="Address"
+                                        error={errors.address && true}
+                                        fullWidth
+                                        multiline
+                                        helpertext={errors.address?.message}
+                                        defaultValue={user.details?.address}
+                                        rows={4}
+                                        variant="outlined" />
+                                </Grid>
+
+
+                                <Grid item xs={12}>
+                                    <LoadingButton loading={updateUserLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Update</LoadingButton>
                                 </Grid>
                             </Grid>
 

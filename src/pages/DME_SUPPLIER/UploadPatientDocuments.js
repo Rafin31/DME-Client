@@ -268,16 +268,14 @@ export default function UploadPatientDocuments() {
                                                 <Stack sx={{ minWidth: "100px" }}>
                                                     <img src={
 
-                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ? `/assets/icons/ic_img.svg`
+                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ? `/ assets/icons/ic_img.svg`
                                                             :
                                                             data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
                                                                 :
-                                                                data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/ic_pdf.svg` ?
-                                                                    `/assets/icons/xlsx-file.svg`
+                                                                data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/xlsx-file.svg`
                                                                     :
-                                                                    data.document.split('.')[1].toLowerCase() === 'pdf' && `/assets/icons/doc-file.svg`
-                                                                    : data.document.split('.')[1].toLowerCase() === 'txt' && `/assets/icons/notepad.svg`
-
+                                                                    data.document.split('.')[1].toLowerCase() === 'doc' ? `/assets/icons/doc-file.svg` :
+                                                                        data.document.split('.')[1].toLowerCase() === 'txt' ? `/assets/icons/notepad.svg` : data.document.split('.')[1].toLowerCase() === 'docx' && `/assets/icons/doc-file.svg`
                                                     }
                                                         alt="icon"
                                                         style={{ marginRight: "10px", width: "100px", height: "100px" }} />

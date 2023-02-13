@@ -77,6 +77,7 @@ const EquipmentOrder = () => {
     }, [range.from, range.to])
 
 
+
     if (statesLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
@@ -120,7 +121,7 @@ const EquipmentOrder = () => {
 
                 <DayPicker
                     mode="range"
-                    selected={parseISO(range)}
+                    selected={range}
                     footer={footer}
                     onSelect={(e) => e.from !== " " && setRange(e)}
                     className={`calender ${filterOpen ? "showCalender" : "hideCalender"}`}

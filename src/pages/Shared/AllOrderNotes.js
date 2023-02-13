@@ -58,7 +58,7 @@ export default function AllOrderNotes() {
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h5">Order Note Log</Typography>
                     <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}
-                        onClick={() => { navigate(`/DME-supplier/dashboard/edit-order/${id}`) }} >
+                        onClick={() => { navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`) }} >
                         Add Note
                     </Button>
                 </Stack>

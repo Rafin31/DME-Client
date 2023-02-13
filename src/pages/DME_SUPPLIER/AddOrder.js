@@ -208,6 +208,7 @@ export default function AddOrder() {
                                             error={errors.supplier && true}
                                             rows={2}
                                             {...register("patientId", { required: true })}
+                                            helperText={errors.patientId?.message}
 
                                         >
                                             {

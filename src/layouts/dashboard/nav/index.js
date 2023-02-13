@@ -50,12 +50,12 @@ const bottomNavConfig = [
   },
   {
     title: 'veterans',
-    path: '/DME-supplier/dashboard/app',
+    path: '/DME-supplier/dashboard/veteran',
     icon: <Iconify icon="mdi:user-group" />,
   },
   {
     title: 'VA prosthetics staff',
-    path: '/DME-supplier/dashboard/app',
+    path: '/DME-supplier/dashboard/va-prosthetics-staff',
     icon: <Iconify icon="icon-park-outline:file-staff" />,
   },
 

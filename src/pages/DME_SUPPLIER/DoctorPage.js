@@ -243,6 +243,8 @@ export default function DoctorPage() {
 
     })
   };
+
+
   const handelAddPatientToDoctor = async (e) => {
     e.preventDefault()
     const data = {

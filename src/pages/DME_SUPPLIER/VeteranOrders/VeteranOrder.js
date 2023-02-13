@@ -120,7 +120,7 @@ const VeteranOrder = () => {
 
                 <DayPicker
                     mode="range"
-                    selected={parseISO(range)}
+                    selected={(range)}
                     footer={footer}
                     onSelect={(e) => e.from !== " " && setRange(e)}
                     className={`calender ${filterOpen ? "showCalender" : "hideCalender"}`}

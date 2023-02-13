@@ -47,7 +47,12 @@ export default function EditOrder() {
             } else if (orderCategory === "repair-order") {
                 return AuthRequest.get(`/api/v1/repair-order/${orderId}`).then(data => data.data.data)
             } else if (orderCategory === "veteran-order") {
-                return AuthRequest.get(`/api/v1/veteran-order/${orderId}`).then(data => data.data.data)
+                return AuthRequest.get(`/api/v1/veteran-order/${orderId}`).then(data => {
+                    if (data.data.data[0]?.firstAttempt) setFirstAttempt(data.data.data[0]?.firstAttempt)
+                    if (data.data.data[0]?.secondAttempt) setSecondAttempt(data.data.data[0]?.secondAttempt)
+                    if (data.data.data[0]?.schedule) setSchedule(data.data.data[0]?.schedule)
+                    return data.data.data
+                })
             }
             return 0
         }
@@ -56,7 +61,8 @@ export default function EditOrder() {
     const { isLoading: patientLoading, data: patients } = useQuery('patient',
         async () => {
             if (orderCategory === "veteran-order") {
-                return AuthRequest.get(`/api/v1/veteran`).then(data => data.data.data)
+                return AuthRequest.get(`/api/v1/veteran`)
+                    .then(data => data.data.data)
             }
             return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
         }
@@ -128,6 +134,7 @@ export default function EditOrder() {
         if (schedule) updatedOrder.schedule = fDate((schedule))
         if (data.partsPo) updatedOrder.partsPo = data.partsPo
         if (data.labourPo) updatedOrder.labourPo = data.labourPo
+        if (data.progress) updatedOrder.progress = data.progress
 
 
         mutateAsync(updatedOrder)
@@ -149,9 +156,6 @@ export default function EditOrder() {
             <CircularProgress />
         </Box>
     }
-
-
-
 
     return (
         <>
@@ -422,7 +426,7 @@ export default function EditOrder() {
                                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                                 <DatePicker
                                                     label="1st Attempt"
-                                                    value={firstAttempt ? firstAttempt : order[0]?.firstAttempt}
+                                                    value={firstAttempt}
                                                     onChange={(newValue) => {
                                                         setFirstAttempt(newValue);
                                                     }}
@@ -435,7 +439,7 @@ export default function EditOrder() {
                                                 <DatePicker
                                                     label="2nd Attempt"
                                                     defaultValue={order[0]?.secondAttempt}
-                                                    value={secondAttempt ? secondAttempt : order[0]?.secondAttempt}
+                                                    value={secondAttempt}
                                                     onChange={(newValue) => {
                                                         setSecondAttempt(newValue);
                                                     }}
@@ -448,7 +452,7 @@ export default function EditOrder() {
                                                 <DatePicker
                                                     label="Scheduled/Deliver"
                                                     defaultValue={order[0]?.schedule}
-                                                    value={schedule ? schedule : order[0]?.schedule}
+                                                    value={schedule}
                                                     onChange={(newValue) => {
                                                         setSchedule(newValue);
                                                     }}
@@ -490,8 +494,28 @@ export default function EditOrder() {
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>
+
+                                {
+
+                                    orderCategory === "equipment-order" &&
+
+                                    <>
+                                        <Grid item xs={12} >
+                                            <TextField
+                                                {...register("progress")}
+                                                id="outlined-basic"
+                                                label="Order Progress"
+                                                error={errors.progress && true}
+                                                fullWidth
+                                                helpertext={errors.progress?.message}
+                                                defaultValue={order?.progress}
+                                                variant="outlined" />
+                                        </Grid>
+                                    </>
+
+                                }
                                 <Grid item xs={12}>
-                                    <LoadingButton loading={updateOrderLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Update</LoadingButton>
+                                    <LoadingButton loading={updateOrderLoading} type={"submit"} sx={{ width: "200px", margin: "15px 0px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Update</LoadingButton>
                                 </Grid>
                             </Grid>
                         </form>

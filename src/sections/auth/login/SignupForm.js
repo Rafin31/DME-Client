@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox, Grid, FormControl, InputLabel, Select, MenuItem, Alert, Button } from '@mui/material';
+import { IconButton, InputAdornment, TextField, Grid, FormControl, InputLabel, Select, MenuItem, Alert, Box, CircularProgress, } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
-import { AuthRequest } from '../../../services/AuthRequest';
 import { fDate } from '../../../utils/formatTime';
 
 import Iconify from '../../../components/iconify';
+import { useJwt } from 'react-jwt';
 
 
 
@@ -30,6 +30,9 @@ export default function SignupForm() {
 
     const queryParams = new URLSearchParams(window.location.search)
     const invitationToken = queryParams.get("invitationToken")
+    const { decodedToken } = useJwt(invitationToken)
+
+    console.log(decodedToken)
 
     const createUser = async (data) => {
         setLoading(true)
@@ -79,15 +82,26 @@ export default function SignupForm() {
         setDbError(false)
         const { userCategory, ...rest } = data
 
-        if (invitationToken) {
+        if (invitationToken && decodedToken.invitationFor === "Staff") {
             finalData = {
                 ...rest,
                 fullName: data.firstName + " " + data.lastName,
                 status: "63861954b3b3ded1ee267309",
                 country: "USA",
-                userCategory: "638f7714a7f2be8abe01d2d2",
+                userCategory: "638f7714a7f2be8abe01d2d2", //staff
                 inviteToken: invitationToken
             }
+        } else if (invitationToken && decodedToken.invitationFor === "va-prosthetics") {
+
+            finalData = {
+                ...rest,
+                fullName: data.firstName + " " + data.lastName,
+                status: "63861954b3b3ded1ee267309",
+                country: "USA",
+                userCategory: "63caa0428ceb169589e611ca", //va-prosthetics
+                inviteToken: invitationToken
+            }
+
         } else {
             finalData = {
                 ...rest,
@@ -101,6 +115,15 @@ export default function SignupForm() {
 
         createUser(finalData)
     };
+
+
+    if (invitationToken) {
+        if (!decodedToken) {
+            return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <CircularProgress />
+            </Box>
+        }
+    }
 
 
 
@@ -135,59 +158,85 @@ export default function SignupForm() {
                             helperText={errors.Lname?.message}
                         />
                     </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            {...register("email", { required: "Field is required" })}
-                            name="email"
-                            label="Email address"
-                            error={errors.email && true}
-                            type="email"
-                            fullWidth
-                            variant="outlined"
-                            helperText={errors.email?.message}
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            {...register("city", { required: "Field is required" })}
-                            error={errors.city && true}
+                    {
+                        !invitationToken ?
+                            <Grid item xs={6}>
+                                <TextField
+                                    {...register("email", { required: "Field is required" })}
+                                    name="email"
+                                    label="Email address"
+                                    error={errors.email && true}
+                                    type="email"
+                                    fullWidth
+                                    variant="outlined"
+                                    helperText={errors.email?.message}
+                                />
+                            </Grid>
 
-                            label="City*"
-                            fullWidth
-                            variant="outlined"
-                            helperText={errors.city?.message}
+                            :
+                            <Grid item xs={6}>
+                                <TextField
+                                    {...register("email", {
+                                        required: "Field is required",
+                                        value: decodedToken?.invitedEmail
+                                    })}
+                                    name="email"
+                                    label="Email address"
+                                    error={errors.email && true}
+                                    type="email"
+                                    fullWidth
+                                    disabled
+                                    variant="outlined"
+                                    helperText={errors.email?.message}
+                                />
+                            </Grid>
+                    }
+                    {
+                        (!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor === "Staff")) &&
+                        <>
+                            <Grid item xs={6}>
+                                <TextField
+                                    {...register("city", { required: "Field is required" })}
+                                    error={errors.city && true}
 
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            {...register("state", { required: "Field is required" })}
-                            error={errors.state && true}
+                                    label="City*"
+                                    fullWidth
+                                    variant="outlined"
+                                    helperText={errors.city?.message}
 
-                            label="State*"
-                            fullWidth
-                            variant="outlined"
-                            helperText={errors.state?.message}
+                                />
+                            </Grid>
 
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            {...register("zip", {
-                                required: "Field is required",
-                                minLength: { value: 3, message: "Phone number should be at last 3 characters" },
-                            })}
+                            <Grid item xs={6}>
+                                <TextField
+                                    {...register("state", { required: "Field is required" })}
+                                    error={errors.state && true}
 
-                            error={errors.zipNumber && true}
-                            label="Zip code*"
-                            type={"number"}
-                            fullWidth
-                            variant="outlined"
-                            helperText={errors?.zip?.message}
-                        />
-                    </Grid>
+                                    label="State*"
+                                    fullWidth
+                                    variant="outlined"
+                                    helperText={errors.state?.message}
 
-                    <Grid item xs={12}>
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    {...register("zip", {
+                                        required: "Field is required",
+                                        minLength: { value: 3, message: "Phone number should be at last 3 characters" },
+                                    })}
+
+                                    error={errors.zipNumber && true}
+                                    label="Zip code*"
+                                    type={"number"}
+                                    fullWidth
+                                    variant="outlined"
+                                    helperText={errors?.zip?.message}
+                                />
+                            </Grid>
+                        </>
+                    }
+                    <Grid item xs={(!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor === "Staff")) ? 12 : 6}>
                         <TextField
                             {...register("phoneNumber", {
                                 required: "Field is required",
@@ -203,18 +252,21 @@ export default function SignupForm() {
 
                         />
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            {...register("address", { required: "Field is required" })}
+                    {
+                        (!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor === "Staff")) &&
+                        <Grid item xs={12}>
+                            <TextField
+                                {...register("address", { required: "Field is required" })}
 
-                            label="Address"
-                            error={errors.address && true}
-                            fullWidth
-                            multiline
-                            helperText={errors.address?.message}
-                            rows={4}
-                            variant="outlined" />
-                    </Grid>
+                                label="Address"
+                                error={errors.address && true}
+                                fullWidth
+                                multiline
+                                helperText={errors.address?.message}
+                                rows={4}
+                                variant="outlined" />
+                        </Grid>
+                    }
                     {
                         !invitationToken ?
                             <Grid item xs={12}>
@@ -238,23 +290,41 @@ export default function SignupForm() {
                                 </FormControl>
                             </Grid>
                             :
-                            <Grid item xs={12}>
-                                <TextField
-                                    {...register("userCategory", { required: "Field is required", value: "staff" })}
+                            invitationToken && decodedToken.invitationFor === "Staff" ?
+                                <Grid item xs={12}>
+                                    <TextField
+                                        {...register("userCategory", { required: "Field is required", value: "Staff" })}
 
-                                    label="User Category"
-                                    error={errors.userCategory && true}
-                                    fullWidth
-                                    multiline
-                                    defaultValue={"Staff"}
-                                    disabled
-                                    helperText={errors.userCategory?.message}
-                                    variant="outlined" />
-                            </Grid>
+                                        label="Sign up as"
+                                        error={errors.userCategory && true}
+                                        fullWidth
+                                        multiline
+                                        defaultValue={"Staff"}
+                                        disabled
+                                        helperText={errors.userCategory?.message}
+                                        variant="outlined" />
+                                </Grid>
+                                :
+                                invitationToken && decodedToken.invitationFor === "va-prosthetics" &&
+                                <Grid item xs={12}>
+                                    <TextField
+                                        {...register("userCategory", { required: "Field is required", value: "VA Prosthetics Staff" })}
+
+                                        label="Sign up as"
+                                        error={errors.userCategory && true}
+                                        fullWidth
+                                        multiline
+                                        defaultValue={"VA Prosthetic Staff"}
+                                        disabled
+                                        helperText={errors.userCategory?.message}
+                                        variant="outlined" />
+                                </Grid>
                     }
 
 
-                    {(showField === "other" || invitationToken) &&
+                    {(
+                        (showField !== "patient" || showField === "other") &&
+                        (!invitationToken || (invitationToken && decodedToken?.invitationFor !== "va-prosthetics"))) &&
                         <>
                             <Grid item xs={6}>
                                 <TextField
