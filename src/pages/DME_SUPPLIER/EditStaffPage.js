@@ -67,7 +67,7 @@ export default function EditStaffPage() {
             <Helmet>
                 <title> Edit - Staff </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
                 <Typography variant="h5">Edit - Staff</Typography>
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", margin: "15px 0px", }} sx={{
@@ -100,7 +100,7 @@ export default function EditStaffPage() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.companyName?.message}
+                                        helperText={errors.companyName?.message}
                                         defaultValue={user.details.companyName}
 
                                     />
@@ -117,7 +117,7 @@ export default function EditStaffPage() {
                                         type={"number"}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.npiNumber?.message}
+                                        helperText={errors.npiNumber?.message}
                                         defaultValue={user.details.npiNumber}
                                     />
                                 </Grid>
@@ -133,7 +133,7 @@ export default function EditStaffPage() {
                                         type={"text"}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.phoneNumber?.message}
+                                        helperText={errors.phoneNumber?.message}
                                         defaultValue={user.details.phoneNumber}
                                     />
                                 </Grid>
@@ -146,7 +146,7 @@ export default function EditStaffPage() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.firstName?.message}
+                                        helperText={errors.firstName?.message}
                                         defaultValue={user.firstName}
 
                                     />
@@ -160,7 +160,7 @@ export default function EditStaffPage() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.lastName?.message}
+                                        helperText={errors.lastName?.message}
                                         defaultValue={user.lastName}
 
                                     />
@@ -176,7 +176,7 @@ export default function EditStaffPage() {
                                         type={'email'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.email?.message}
+                                        helperText={errors.email?.message}
                                         InputProps={{
                                             readOnly: true,
                                         }}
@@ -191,7 +191,7 @@ export default function EditStaffPage() {
                                         label="Country*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.country?.message}
+                                        helperText={errors.country?.message}
                                         defaultValue={user.details.country}
 
                                     />
@@ -204,7 +204,7 @@ export default function EditStaffPage() {
                                         label="City*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.city?.message}
+                                        helperText={errors.city?.message}
                                         defaultValue={user.details.city}
 
                                     />
@@ -217,7 +217,7 @@ export default function EditStaffPage() {
                                         label="State*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.state?.message}
+                                        helperText={errors.state?.message}
                                         defaultValue={user.details.state}
 
                                     />
@@ -234,7 +234,7 @@ export default function EditStaffPage() {
                                         type={"number"}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors?.zip?.message}
+                                        helperText={errors?.zip?.message}
                                         defaultValue={user.details.zip}
 
                                     />
@@ -248,7 +248,7 @@ export default function EditStaffPage() {
                                         error={errors.address && true}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.address?.message}
+                                        helperText={errors.address?.message}
                                         rows={4}
                                         defaultValue={user.details.address}
                                         variant="outlined" />

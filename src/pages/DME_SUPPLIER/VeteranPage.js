@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 
 // @mui
@@ -13,9 +13,7 @@ import {
     Stack,
     Paper,
     Button,
-    Popover,
     TableRow,
-    MenuItem,
     TableBody,
     TableCell,
     Container,
@@ -36,16 +34,17 @@ import PopOver from '../../components/Popover/PopOver';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
 import { AuthRequest } from '../../services/AuthRequest';
-import InviteModal from '../Shared/InviteModal';
 import AddVAProstheticsToVeteran from '../Shared/AddVAProstheticsToVeteran';
 
 
 const TABLE_HEAD = [
     { id: 'id', label: 'ID#', alignRight: false },
     { id: 'Fname', label: 'Full  Name', alignRight: false },
+    { id: 'lastFour', label: 'Last  Four#', alignRight: false },
     { id: 'email', label: 'Email', alignRight: false },
     { id: 'phone', label: 'Phone#', alignRight: false },
     { id: 'city', label: 'City', alignRight: false },
+    { id: 'assignedVA', label: 'Assigned VA', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
     // { id: '' },
 ];
@@ -98,12 +97,13 @@ export default function VeteranPage() {
 
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
+    const [invitedVeteran, setVeteranId] = useState()
+
     const navigate = useNavigate()
 
 
-
-
-    const { isLoading: veteranLoading, refetch, data: veteran } = useQuery('veteran',
+    const { isLoading: veteranLoading, refetch: veteranRefetch, data: veteran } = useQuery(
+        ["veteran", addedVeteran !== null && addedVeteran],
         async () => {
             return AuthRequest.get(`/api/v1/veteran/`).then(data => data.data.data)
         }
@@ -115,7 +115,23 @@ export default function VeteranPage() {
         }
     )
 
-    if (!veteran || veteranLoading) {
+    const { mutateAsync: addVaToVeteran, isLoading: addVALoading } = useMutation((data) => {
+        return AuthRequest.post(`/api/v1/dme/add-va-to-veteran`, data)
+            .then(res => {
+                veteranRefetch()
+                toast.success('VA successfully assigned to the Veteran', {
+                    toastId: "success100"
+                })
+            })
+            .catch(err => {
+                veteranRefetch()
+                toast.error(err.response.data.data, {
+                    toastId: "error109"
+                })
+            })
+    })
+
+    if (!veteran || veteranLoading || addVALoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -123,8 +139,20 @@ export default function VeteranPage() {
 
     const handelAddVaProsthetics = async (e) => {
         e.preventDefault()
+
+        if (!e.target.veteran.value || !e.target.addVAtoVeteran.value) {
+            return toast.error("All fields are required!", {
+                toastId: "error1099"
+            })
+        }
+
+        const data = {
+            veteranId: invitedVeteran,
+            vaProstheticId: e.target.addVAtoVeteran.value
+        }
         setInviteOpen(!inviteOpen)
-        console.log(e.target.veteran.value, e.target.addVAtoVeteran.value)
+        addVaToVeteran(data)
+
     };
 
     const handleRequestSort = (event, property) => {
@@ -187,7 +215,7 @@ export default function VeteranPage() {
                 <title> Veterans</title>
             </Helmet>
 
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
                 <Stack sx={{ flexDirection: { xs: "column", md: "row" } }} alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
                         Veterans
@@ -205,7 +233,7 @@ export default function VeteranPage() {
                     </Stack>
                 </Stack>
 
-                <AddVAProstheticsToVeteran open={inviteOpen} setOpen={setInviteOpen} handelFormSubmit={handelAddVaProsthetics} vaProsthetics={vaProsthetics} veteran={addedVeteran} title="Add VA Prosthetics" />
+                <AddVAProstheticsToVeteran open={inviteOpen} setOpen={setInviteOpen} handelFormSubmit={handelAddVaProsthetics} vaProsthetics={vaProsthetics} veteran={addedVeteran} title="Add VA Prosthetics" setVeteranId={setVeteranId} />
 
                 <Card className='new-referal'>
 
@@ -232,7 +260,7 @@ export default function VeteranPage() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const { userId, phoneNumber, city } = row;
+                                        const { userId, phoneNumber, city, assignedVaProsthetic, lastFour } = row;
                                         const selectedUser = selected.indexOf(userId.fullName) !== -1;
 
                                         return (
@@ -255,9 +283,18 @@ export default function VeteranPage() {
                                                     </Tooltip>
                                                 </TableCell>
 
+                                                <TableCell align="left">{lastFour ? lastFour : "Not given!"}</TableCell>
                                                 <TableCell align="left">{userId.email}</TableCell>
                                                 <TableCell align="left">{phoneNumber}</TableCell>
                                                 <TableCell align="left">{city}</TableCell>
+
+                                                <TableCell align="left">
+                                                    {
+                                                        !assignedVaProsthetic || assignedVaProsthetic.length !== 0 ?
+                                                            assignedVaProsthetic[assignedVaProsthetic.length - 1].fullName
+                                                            : "No one is Assigned!"
+                                                    }
+                                                </TableCell>
 
                                                 <TableCell >
                                                     <PopOver
@@ -266,6 +303,7 @@ export default function VeteranPage() {
                                                         option={[
                                                             { label: "Edit" },
                                                             { label: "Add VA Prosthetics" },
+                                                            { label: "Order History" },
                                                         ]}
                                                         id={userId._id}
                                                         setAddVaModalOpen={setInviteOpen}

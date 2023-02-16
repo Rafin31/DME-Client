@@ -12,6 +12,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
 import { fDate } from '../../utils/formatTime';
+import { render } from 'react-dom';
 
 
 export default function EditOrder() {
@@ -74,7 +75,7 @@ export default function EditOrder() {
             return AuthRequest.patch(`/api/v1/order/${orderId}`, order)
                 .then(res => {
                     reset()
-                    toast.success("Order Updated!", res, {
+                    toast.success("Order Updated!", {
                         toastId: 'success6'
                     })
                     navigate(-1)
@@ -88,7 +89,7 @@ export default function EditOrder() {
             return AuthRequest.patch(`/api/v1/repair-order/${orderId}`, order)
                 .then(res => {
                     reset()
-                    toast.success("Order Updated!", res, {
+                    toast.success("Order Updated!", {
                         toastId: 'success6'
                     })
                     navigate(-1)
@@ -102,7 +103,7 @@ export default function EditOrder() {
             return AuthRequest.patch(`/api/v1/veteran-order/${orderId}`, order)
                 .then(res => {
                     reset()
-                    toast.success("Order Updated!", res, {
+                    toast.success("Order Updated!", {
                         toastId: 'success6'
                     })
                     navigate(-1)
@@ -120,6 +121,7 @@ export default function EditOrder() {
 
     const onSubmit = data => {
         const { patientId, note, description, status } = data
+
         const updatedOrder = {
             dmeSupplierId: id,
             patientId,
@@ -135,6 +137,7 @@ export default function EditOrder() {
         if (data.partsPo) updatedOrder.partsPo = data.partsPo
         if (data.labourPo) updatedOrder.labourPo = data.labourPo
         if (data.progress) updatedOrder.progress = data.progress
+        if (status === "Delivered" || status === "Completed") updatedOrder.dateCompleted = new Date()
 
 
         mutateAsync(updatedOrder)
@@ -162,7 +165,7 @@ export default function EditOrder() {
             <Helmet>
                 <title> Edit Order </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -196,7 +199,7 @@ export default function EditOrder() {
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user?.fullName}
-                                        helpertext={errors.supplier?.message}
+                                        helperText={errors.supplier?.message}
                                         InputProps={{
                                             readOnly: true,
                                         }}
@@ -214,7 +217,7 @@ export default function EditOrder() {
                                             rows={2}
                                             {...register("patientId",
                                                 { required: "Filed Required" })}
-                                            helpertext={errors.patient?.message}
+                                            helperText={errors.patient?.message}
                                             defaultValue={
                                                 orderCategory === "veteran-order" ? order[0]?.veteranId?._id
                                                     : order.patientId?._id
@@ -242,7 +245,7 @@ export default function EditOrder() {
                                                 {...register("status",
                                                     { required: "Filed Required" }
                                                 )}
-                                                helpertext={errors.orderStatus?.message}
+                                                helperText={errors.orderStatus?.message}
                                                 defaultValue={order.status ? order.status : ""}
                                             >
                                                 {
@@ -279,11 +282,16 @@ export default function EditOrder() {
                                                 }
                                                 {
                                                     order.status === "Delivered" &&
+
                                                     <MenuItem value={"Authorization-Expiration-F/U"}>Authorization Expiration F/U</MenuItem>
                                                 }
                                                 {
                                                     order.status === "Authorization-Expiration-F/U" &&
                                                     <MenuItem value={"Order-Request"}>Order Request</MenuItem>
+                                                }
+                                                {
+                                                    (order.status === "Delivered" || order.status === "Authorization-Expiration-F/U" || order.status === "Cancelled") &&
+                                                    <MenuItem value={"Archived"}>Archived</MenuItem>
                                                 }
                                                 <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
 
@@ -299,7 +307,7 @@ export default function EditOrder() {
                                                 {...register("status",
                                                     { required: "Filed Required" }
                                                 )}
-                                                helpertext={errors.orderStatus?.message}
+                                                helperText={errors.orderStatus?.message}
                                                 defaultValue={order.status ? order.status : ""}
                                             >
                                                 {
@@ -334,6 +342,11 @@ export default function EditOrder() {
                                                     order.status === "Pending-Scheduling" &&
                                                     <MenuItem value={"Completed"}>Completed</MenuItem>
                                                 }
+                                                {
+                                                    (order.status === "Completed" || order.status === "Cancelled") &&
+                                                    <MenuItem value={"Archived"}>Archived</MenuItem>
+
+                                                }
 
                                                 <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
 
@@ -349,7 +362,7 @@ export default function EditOrder() {
                                                 {...register("status",
                                                     { required: "Filed Required" }
                                                 )}
-                                                helpertext={errors.orderStatus?.message}
+                                                helperText={errors.orderStatus?.message}
                                                 defaultValue={order[0]?.status ? order[0].status : ""}
                                             >
                                                 {
@@ -389,7 +402,7 @@ export default function EditOrder() {
                                                     <MenuItem value={"Archived"}>Archived</MenuItem>
                                                 }
 
-                                                <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
+                                                {/* <MenuItem value={"Cancelled"}>Cancelled</MenuItem> */}
 
                                             </Select>
                                         }
@@ -406,7 +419,7 @@ export default function EditOrder() {
                                                 label="Parts PO#"
                                                 error={errors.partsPo && true}
                                                 fullWidth
-                                                helpertext={errors.partsPo?.message}
+                                                helperText={errors.partsPo?.message}
                                                 defaultValue={order[0]?.partsPo}
                                                 variant="outlined" />
                                         </Grid>
@@ -417,7 +430,7 @@ export default function EditOrder() {
                                                 label="Labour PO#"
                                                 error={errors.labourPo && true}
                                                 fullWidth
-                                                helpertext={errors.labourPo?.message}
+                                                helperText={errors.labourPo?.message}
                                                 defaultValue={order[0]?.labourPo}
                                                 variant="outlined" />
                                         </Grid>
@@ -475,7 +488,7 @@ export default function EditOrder() {
                                                 : order.description
                                         }
                                         rows={4}
-                                        helpertext={errors.description?.message}
+                                        helperText={errors.description?.message}
                                         variant="outlined" />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -486,7 +499,7 @@ export default function EditOrder() {
                                         error={errors.notes && true}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.notes?.message}
+                                        helperText={errors.notes?.message}
                                         defaultValue={
                                             orderCategory === "veteran-order" ? order[0]?.notes?.note
                                                 : order.notes?.note
@@ -507,7 +520,7 @@ export default function EditOrder() {
                                                 label="Order Progress"
                                                 error={errors.progress && true}
                                                 fullWidth
-                                                helpertext={errors.progress?.message}
+                                                helperText={errors.progress?.message}
                                                 defaultValue={order?.progress}
                                                 variant="outlined" />
                                         </Grid>

@@ -14,6 +14,11 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
+    title: 'private messages',
+    path: '/DME-supplier/dashboard/private-message',
+    icon: <Iconify icon="uil:comment-alt-message" />,
+  },
+  {
     title: 'Equipment order',
     path: '/DME-supplier/dashboard/equipment-order',
     icon: <Iconify icon="icon-park-solid:transaction-order" />,

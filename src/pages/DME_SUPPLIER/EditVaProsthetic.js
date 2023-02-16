@@ -67,7 +67,7 @@ export default function EditVaProstheticPage() {
             <Helmet>
                 <title> Edit - VA Prosthetics </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
                 <Typography variant="h5">Edit - VA Prosthetics</Typography>
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", margin: "15px 0px", }} sx={{
@@ -100,7 +100,7 @@ export default function EditVaProstheticPage() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.firstName?.message}
+                                        helperText={errors.firstName?.message}
                                         defaultValue={user.firstName}
 
                                     />
@@ -114,7 +114,7 @@ export default function EditVaProstheticPage() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.lastName?.message}
+                                        helperText={errors.lastName?.message}
                                         defaultValue={user.lastName}
 
                                     />
@@ -130,7 +130,7 @@ export default function EditVaProstheticPage() {
                                         type={'email'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.email?.message}
+                                        helperText={errors.email?.message}
                                         InputProps={{
                                             readOnly: true,
                                         }}
@@ -149,7 +149,7 @@ export default function EditVaProstheticPage() {
                                         type={"text"}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.phoneNumber?.message}
+                                        helperText={errors.phoneNumber?.message}
                                         defaultValue={user.details.phoneNumber}
                                     />
                                 </Grid>

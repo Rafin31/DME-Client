@@ -136,6 +136,7 @@ export default function PatientPage() {
         e.preventDefault()
         importButtonRef.current.click()
     }
+
     const handleImportFormSubmit = (e) => {
         e.preventDefault()
         const file = e.target.importFile.files[0]
@@ -237,7 +238,7 @@ export default function PatientPage() {
                 <title> Patients</title>
             </Helmet>
 
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
                 <Stack sx={{ flexDirection: { xs: "column", md: "row" } }} alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
                         Patients
@@ -347,6 +348,7 @@ export default function PatientPage() {
                                                             { label: "Edit" },
                                                             { label: "Note" },
                                                             { label: "Documents" },
+                                                            { label: "Order History" },
                                                         ]}
                                                         id={userId._id}
                                                     />
@@ -354,12 +356,6 @@ export default function PatientPage() {
                                             </TableRow>
                                         );
                                     })}
-                                    {/* {emptyRows > 0 && (
-                                        <TableRow style={{ height: 53 * emptyRows }}>
-                                          
-                                            <TableCell colSpan={6} />
-                                        </TableRow>
-                                    )} */}
                                 </TableBody>
 
                                 {isNotFound && (

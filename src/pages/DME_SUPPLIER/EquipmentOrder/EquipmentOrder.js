@@ -5,7 +5,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { DayPicker } from 'react-day-picker';
 import { AuthRequest } from '../../../services/AuthRequest';
 import Iconify from "../../../components/iconify"
-import { parseISO } from 'date-fns';
+
 
 
 const EquipmentOrder = () => {
@@ -98,7 +98,7 @@ const EquipmentOrder = () => {
 
     return (
         <>
-            <Container maxWidth="xl" style={{ minHeight: "120vh" }}>
+            <Container maxWidth="1350px" style={{ minHeight: "120vh" }}>
 
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Box>

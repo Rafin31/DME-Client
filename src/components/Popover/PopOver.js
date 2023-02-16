@@ -26,7 +26,9 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             }
             if (lebel === "Note") {
                 navigate(`/DME-supplier/dashboard/add-patient-note/${id}`)
-
+            }
+            if (lebel === "Order History") {
+                navigate(`/DME-supplier/dashboard/order-history/${id}`)
             }
         }
         if (source === "veteran-page") {
@@ -36,6 +38,9 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Add VA Prosthetics") {
                 other.setAddedVeteran(other.user)
                 other.setAddVaModalOpen(true)
+            }
+            if (lebel === "Order History") {
+                navigate(`/DME-supplier/dashboard/order-history/${id}`)
             }
         }
 
@@ -50,7 +55,13 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
             }
             if (lebel === "Note Log") {
-                navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=equipment-order`)
+                if (other?.orderStatus === "archived") {
+                    navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=equipment-order&orderStatus=archived`)
+                } else {
+                    navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=equipment-order`)
+                }
+
+
             }
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
@@ -68,7 +79,11 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
             }
             if (lebel === "Note Log") {
-                navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=repair-order`)
+                if (other?.orderStatus === "archived") {
+                    navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=repair-order&orderStatus=archived`)
+                } else {
+                    navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=repair-order`)
+                }
             }
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
@@ -86,7 +101,12 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
             }
             if (lebel === "Note Log") {
-                navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=veteran-order`)
+                if (other?.orderStatus === "archived") {
+                    navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=veteran-order&orderStatus=archived`)
+                } else {
+                    navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=veteran-order`)
+                }
+
             }
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
@@ -103,11 +123,13 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 other.deleteFunction(id)
             }
         }
+
         else if (source === "invited-staff-page") {
             if (lebel === "Delete") {
                 other.handelDeleteInvitedStaff(id)
             }
         }
+
         else if (source === "staff-registered-page") {
             if (lebel === "Edit") {
                 navigate(`/DME-supplier/dashboard/edit-staff-profile/${id}?staff=staff`)
@@ -116,6 +138,7 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 other.handelDeleteRegisteredStaff(id)
             }
         }
+
         else if (source === "va-staff-registered-page") {
             if (lebel === "Edit") {
                 navigate(`/DME-supplier/dashboard/edit-va-prosthetics-staff/${id}`)

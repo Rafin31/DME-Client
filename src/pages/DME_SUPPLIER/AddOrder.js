@@ -58,8 +58,10 @@ export default function AddOrder() {
         async () => {
             if (orderCategory === "veteran-order") {
                 return AuthRequest.get(`/api/v1/veteran`).then(data => data.data.data)
+            } else {
+                return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
             }
-            return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+
         }
     )
 
@@ -150,7 +152,7 @@ export default function AddOrder() {
             <Helmet>
                 <title> Add Order </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -187,7 +189,7 @@ export default function AddOrder() {
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user?.fullName}
-                                        helpertext={errors.supplier?.message}
+                                        helperText={errors.supplier?.message}
                                         InputProps={{
                                             readOnly: true,
                                         }}
@@ -238,7 +240,7 @@ export default function AddOrder() {
                                                 label="Parts PO#"
                                                 error={errors.partsPo && true}
                                                 fullWidth
-                                                helpertext={errors.partsPo?.message}
+                                                helperText={errors.partsPo?.message}
                                                 variant="outlined" />
                                         </Grid>
                                         <Grid item xs={6}>
@@ -248,7 +250,7 @@ export default function AddOrder() {
                                                 label="Labour PO#"
                                                 error={errors.labourPo && true}
                                                 fullWidth
-                                                helpertext={errors.labourPo?.message}
+                                                helperText={errors.labourPo?.message}
                                                 variant="outlined" />
                                         </Grid>
 
@@ -300,7 +302,7 @@ export default function AddOrder() {
                                         fullWidth
                                         multiline
                                         rows={4}
-                                        helpertext={errors.description?.message}
+                                        helperText={errors.description?.message}
                                         variant="outlined" />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -311,7 +313,7 @@ export default function AddOrder() {
                                         error={errors.notes && true}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.notes?.message}
+                                        helperText={errors.notes?.message}
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>

@@ -41,7 +41,7 @@ export default function DmeSupplierProfile() {
             <Helmet>
                 <title>  DME Supplier - Profile </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {

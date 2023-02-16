@@ -163,7 +163,6 @@ export default function VAProstheticPage() {
     }
 
     const handelDeleteInvitedStaff = async (token) => {
-        console.log(token)
 
         await AuthRequest.delete(`/api/v1/va-staff/delete-invited-va-staff/${token}`)
             .then(res => {
@@ -301,7 +300,7 @@ export default function VAProstheticPage() {
                 <title> VA Prosthetic Staffs</title>
             </Helmet>
 
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography component={'span'} variant="h4" gutterBottom>
                         VA Prosthetic Staffs

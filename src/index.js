@@ -13,7 +13,13 @@ import { AuthContext } from './Context/AuthContext';
 
 
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 3000,
+    },
+  },
+})
 axios.defaults.baseURL = process.env.REACT_APP_SERVER;
 
 

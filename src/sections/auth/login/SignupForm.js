@@ -32,8 +32,6 @@ export default function SignupForm() {
     const invitationToken = queryParams.get("invitationToken")
     const { decodedToken } = useJwt(invitationToken)
 
-    console.log(decodedToken)
-
     const createUser = async (data) => {
         setLoading(true)
         await axios.post('/api/v1/users', data)

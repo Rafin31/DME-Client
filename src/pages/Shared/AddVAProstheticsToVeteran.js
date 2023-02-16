@@ -15,7 +15,10 @@ const style = {
 
 };
 
-export default function AddVAProstheticsToVeteran({ open, setOpen, handelFormSubmit, vaProsthetics, veteran = "", title }) {
+export default function AddVAProstheticsToVeteran({ open, setOpen, handelFormSubmit, vaProsthetics, veteran = "", title, setVeteranId }) {
+
+    veteran && setVeteranId(veteran._id)
+
     return (
         <div>
             <Modal
@@ -31,7 +34,10 @@ export default function AddVAProstheticsToVeteran({ open, setOpen, handelFormSub
                 <Fade in={open}>
                     <Box sx={style}>
                         <p style={{ textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "larger" }}>{title}</p>
-                        <form onSubmit={(e) => { handelFormSubmit(e) }}>
+                        <form onSubmit={(e) => {
+                            handelFormSubmit(e)
+                            setVeteranId(veteran?._id)
+                        }}>
                             <TextField
                                 sx={{ mb: 2 }}
                                 id="outlined-basic"
@@ -56,8 +62,8 @@ export default function AddVAProstheticsToVeteran({ open, setOpen, handelFormSub
                                     name='addVAtoVeteran'
                                 >
                                     {
-                                        vaProsthetics.length !== 0 ? vaProsthetics.map((va, index) => {
-                                            return <MenuItem key={index} value={va._id}>{va.userId.fullName}</MenuItem>
+                                        vaProsthetics?.length !== 0 ? vaProsthetics?.map((va, index) => {
+                                            return <MenuItem key={index} value={va?.userId._id}>{va.userId.fullName}</MenuItem>
                                         })
                                             :
                                             <MenuItem disabled>No VA Prosthetics Found!</MenuItem>

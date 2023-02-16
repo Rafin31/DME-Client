@@ -22,7 +22,7 @@ const TABLE_HEAD = [
     { id: 'dateCreated', label: 'Date Created', alignRight: false },
     { id: 'Fname', label: 'First Name', alignRight: false },
     { id: 'Lname', label: 'Last Name', alignRight: false },
-    { id: 'Fullname', label: 'Full Name', alignRight: false },
+    { id: 'lastFOur', label: 'Last Four#', alignRight: false },
     { id: 'partsPo', label: 'Parts PO#', alignRight: false },
     { id: 'labourPo', label: 'Labour PO#', alignRight: false },
     { id: 'firstAttempt', label: '1st Attempt', alignRight: false },
@@ -32,7 +32,6 @@ const TABLE_HEAD = [
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'action', label: '', alignRight: false },
 ];
-
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
         return -1;
@@ -175,8 +174,8 @@ const PoRecieved = () => {
                                                     <Link to={`/DME-supplier/dashboard/user-profile/${veteranId._id}`}
                                                         style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                         <Tooltip title="Profile">
-                                                            <Typography component={'span'} style={{ wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
-                                                                {veteranId.fullName}
+                                                            <Typography variant="subtitle2" sx={{ textAlign: "center" }}>
+                                                                {veteranId.lastFour}
                                                             </Typography>
                                                         </Tooltip>
                                                     </Link>

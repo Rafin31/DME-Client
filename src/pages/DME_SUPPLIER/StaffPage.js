@@ -310,7 +310,7 @@ export default function StaffPage() {
                 <title> Staffs</title>
             </Helmet>
 
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography component={'span'} variant="h4" gutterBottom>
                         Staffs

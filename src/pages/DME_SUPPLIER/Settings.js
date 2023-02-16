@@ -58,7 +58,7 @@ export default function Settings() {
             <Helmet>
                 <title> Settings </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -99,7 +99,7 @@ export default function Settings() {
                                         type="file"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.companyBanner?.message}
+                                        helperText={errors.companyBanner?.message}
 
                                     />
                                 </Grid>

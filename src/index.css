@@ -26,3 +26,100 @@
 ::file-selector-button {
     display: none !important;
 }
+
+.leftMessageContainer {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    padding: 20px 20px;
+    margin: 10px 0px;
+    background: white;
+    cursor: pointer;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.leftMessageContainer p {
+    padding: 0;
+    margin: 0;
+}
+
+.leftMessageContainer span {
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.leftMessageContainer hr {
+    opacity: 0.2;
+}
+
+.leftMessageContainer .notification {
+    position: absolute;
+    top: 20px;
+    left: 90%;
+}
+
+.leftMessageContainer .timeStamp {
+    font-size: small;
+}
+
+
+
+.chatWidget {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    padding: 20px 20px;
+    margin: 10px 0px;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.chatWidget p {
+    padding: 0;
+    margin: 0;
+}
+
+.chatWidget span {
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.chatWidget hr {
+    opacity: 0.2;
+}
+
+.chatWidget .notification {
+    position: absolute;
+    top: 20px;
+    left: 90%;
+}
+
+.chatWidget .timeStamp {
+    font-size: small;
+}
+
+
+
+
+
+
+.chatInputBox {
+    background: #F9FAFB;
+    width: 100%;
+}
+
+.chat {
+    max-height: 75vh;
+    overflow-y: scroll;
+    margin-bottom: 50px;
+}
+
+
+.ChatContainer .chatInputBox {
+    position: fixed;
+    bottom: 0px;
+
+}

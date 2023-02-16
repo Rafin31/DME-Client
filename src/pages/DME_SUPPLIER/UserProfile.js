@@ -6,7 +6,6 @@ import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
-import { fDate } from '../../utils/formatTime';
 import { AuthRequest } from '../../services/AuthRequest';
 
 export default function UserProfile() {
@@ -45,7 +44,7 @@ export default function UserProfile() {
             <Helmet>
                 <title> User Profile </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -178,6 +177,13 @@ export default function UserProfile() {
                             <Typography variant='subtitle'>ID#</Typography>
                             <Typography variant='h6'>{id.substring(id.length - 4, id.length)}</Typography>
                         </Grid>
+                        {
+                            user.details.lastFour &&
+                            <Grid item xs={6} sm={6} md={4}>
+                                <Typography variant='subtitle'>Last Four#</Typography>
+                                <Typography variant='h6'>{user.details.lastFour}</Typography>
+                            </Grid>
+                        }
                     </Grid>
                 </Box>
             </Container>

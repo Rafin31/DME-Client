@@ -139,7 +139,7 @@ export default function UploadPatientDocuments() {
             <Helmet>
                 <title> Patient Documents </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -268,14 +268,18 @@ export default function UploadPatientDocuments() {
                                                 <Stack sx={{ minWidth: "100px" }}>
                                                     <img src={
 
-                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ? `/ assets/icons/ic_img.svg`
+                                                        data.document.split('.')[1].toLowerCase() === 'jpg' ||
+                                                            data.document.split('.')[1].toLowerCase() === 'jpeg' ||
+                                                            data.document.split('.')[1].toLowerCase() === 'png'
+                                                            ? `/assets/icons/ic_img.svg`
                                                             :
                                                             data.document.split('.')[1].toLowerCase() === 'pdf' ? `/assets/icons/ic_pdf.svg`
                                                                 :
                                                                 data.document.split('.')[1].toLowerCase() === 'xlsx' ? `/assets/icons/xlsx-file.svg`
                                                                     :
                                                                     data.document.split('.')[1].toLowerCase() === 'doc' ? `/assets/icons/doc-file.svg` :
-                                                                        data.document.split('.')[1].toLowerCase() === 'txt' ? `/assets/icons/notepad.svg` : data.document.split('.')[1].toLowerCase() === 'docx' && `/assets/icons/doc-file.svg`
+                                                                        data.document.split('.')[1].toLowerCase() === 'txt' ? `/assets/icons/notepad.svg` : data.document.split('.')[1].toLowerCase() === 'docx' ? `/assets/icons/doc-file.svg`
+                                                                            : `/assets/icons/icons8-file.svg`
                                                     }
                                                         alt="icon"
                                                         style={{ marginRight: "10px", width: "100px", height: "100px" }} />

@@ -7,7 +7,7 @@ import { useQuery } from 'react-query';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthRequest } from '../../services/AuthRequest';
 import Iconify from '../../components/iconify';
-import { fDateTime } from '../../utils/formatTime';
+import { fDate, fDateTime } from '../../utils/formatTime';
 
 
 export default function AllOrderNotes() {
@@ -18,7 +18,7 @@ export default function AllOrderNotes() {
     const { search } = window.location;
     const params = new URLSearchParams(search);
     const orderCategory = params.get('orderCategory');
-
+    const orderStatus = params.get('orderStatus');
 
     const { isLoading, data: note } = useQuery('note-log',
         async () => {
@@ -45,7 +45,7 @@ export default function AllOrderNotes() {
             <Helmet>
                 <title> Order Note Log </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -57,10 +57,13 @@ export default function AllOrderNotes() {
 
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h5">Order Note Log</Typography>
-                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}
-                        onClick={() => { navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`) }} >
-                        Add Note
-                    </Button>
+                    {
+                        orderStatus !== "archived" &&
+                        <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}
+                            onClick={() => { navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`) }} >
+                            Add Note
+                        </Button>
+                    }
                 </Stack>
 
                 <Grid
@@ -80,15 +83,13 @@ export default function AllOrderNotes() {
 
                                             <Box sx={{ ml: 2 }}>
                                                 <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                                                    {nt?.writerId?.fullName}
+                                                    {nt?.writerId?.fullName} |  {nt?.writerId?.userCategory?.category}
                                                 </Typography>
 
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                    {nt?.writerId?.userCategory?.category}
+                                                <Typography variant="caption" sx={{ color: 'text.primary' }}>
+                                                    {fDateTime(nt?.createdAt)}
                                                 </Typography>
-                                                <Typography variant="body2" sx={{ color: 'text.primary' }}>
-                                                    {fDateTime(nt.writerId.createdAt)}
-                                                </Typography>
+
                                             </Box>
                                         </Stack>
 

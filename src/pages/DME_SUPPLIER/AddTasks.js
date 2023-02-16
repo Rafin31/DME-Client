@@ -84,7 +84,7 @@ export default function AddTasks() {
             <Helmet>
                 <title> Add Task </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
 
 
@@ -152,7 +152,7 @@ export default function AddTasks() {
                                         error={errors.title && true}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.title?.message}
+                                        helperText={errors.title?.message}
                                         variant="outlined" />
                                 </Grid>
 
@@ -165,7 +165,7 @@ export default function AddTasks() {
                                         fullWidth
                                         multiline
                                         rows={4}
-                                        helpertext={errors.description?.message}
+                                        helperText={errors.description?.message}
                                         variant="outlined" />
                                 </Grid>
 

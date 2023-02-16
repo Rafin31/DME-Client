@@ -53,7 +53,7 @@ export default function AddVeteran() {
             <Helmet>
                 <title> Add Veteran </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -80,25 +80,25 @@ export default function AddVeteran() {
                                 <Grid item xs={6}>
                                     <TextField
                                         {...register("firstName", { required: "Field is required" })}
-                                        error={errors.Fname && true}
+                                        error={errors.firstName && true}
                                         label="First Name*"
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.Fname?.message}
+                                        helperText={errors.firstName?.message}
 
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
                                         {...register("lastName", { required: "Field is required" })}
-                                        error={errors.Lname && true}
+                                        error={errors.lastName && true}
 
                                         label="Last Name*"
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.Lname?.message}
+                                        helperText={errors.lastName?.message}
 
                                     />
                                 </Grid>
@@ -112,7 +112,7 @@ export default function AddVeteran() {
                                         type={'email'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.email?.message}
+                                        helperText={errors.email?.message}
 
                                     />
                                 </Grid>
@@ -131,7 +131,7 @@ export default function AddVeteran() {
                                         type={'password'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.password?.message}
+                                        helperText={errors.password?.message}
 
                                     />
                                 </Grid>
@@ -143,13 +143,26 @@ export default function AddVeteran() {
                                             }
 
                                         )}
-                                        error={errors.password && true}
+                                        error={errors.confirmPassword && true}
 
                                         label="Confirm Password*"
                                         type={'password'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.confirmPassword?.message}
+                                        helperText={errors.confirmPassword?.message}
+
+                                    />
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("lastFour", { required: "Field is required" })}
+                                        error={errors.lastFour && true}
+
+                                        label="Last Four*"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.lastFour?.message}
 
                                     />
                                 </Grid>
@@ -162,7 +175,7 @@ export default function AddVeteran() {
                                         label="Country*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.country?.message}
+                                        helperText={errors.country?.message}
 
                                     />
                                 </Grid>
@@ -174,7 +187,7 @@ export default function AddVeteran() {
                                         label="City*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.city?.message}
+                                        helperText={errors.city?.message}
 
                                     />
                                 </Grid>
@@ -186,11 +199,11 @@ export default function AddVeteran() {
                                         label="State*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.state?.message}
+                                        helperText={errors.state?.message}
 
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={6}>
                                     <TextField
                                         {...register("phoneNumber", {
                                             required: "Field is required",
@@ -202,7 +215,7 @@ export default function AddVeteran() {
                                         type={"tel"}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors?.phoneNumber?.message}
+                                        helperText={errors?.phoneNumber?.message}
 
                                     />
 
@@ -216,7 +229,7 @@ export default function AddVeteran() {
                                         error={errors.address && true}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.address?.message}
+                                        helperText={errors.address?.message}
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>

@@ -235,7 +235,7 @@ export default function TherapistPage() {
                 <title> Therapists</title>
             </Helmet>
 
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
                         Therapists

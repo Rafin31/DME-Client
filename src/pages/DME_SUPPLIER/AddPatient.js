@@ -64,7 +64,7 @@ export default function AddPatient() {
             <Helmet>
                 <title> Add Patient </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -96,7 +96,7 @@ export default function AddPatient() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.Fname?.message}
+                                        helperText={errors.Fname?.message}
 
                                     />
                                 </Grid>
@@ -109,7 +109,7 @@ export default function AddPatient() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.Lname?.message}
+                                        helperText={errors.Lname?.message}
 
                                     />
                                 </Grid>
@@ -123,7 +123,7 @@ export default function AddPatient() {
                                         type={'email'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.email?.message}
+                                        helperText={errors.email?.message}
 
                                     />
                                 </Grid>
@@ -142,7 +142,7 @@ export default function AddPatient() {
                                         type={'password'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.password?.message}
+                                        helperText={errors.password?.message}
 
                                     />
                                 </Grid>
@@ -160,7 +160,7 @@ export default function AddPatient() {
                                         type={'password'}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.confirmPassword?.message}
+                                        helperText={errors.confirmPassword?.message}
 
                                     />
                                 </Grid>
@@ -171,7 +171,7 @@ export default function AddPatient() {
                                             variant="outlined"
                                             size="small"
                                             error={errors.gender && true}
-                                            helpertext={errors.gender?.message}
+                                            helperText={errors.gender?.message}
                                             rows={2}
                                             defaultValue=""
                                             {...register("gender", { required: "Field is required" })}
@@ -193,7 +193,7 @@ export default function AddPatient() {
                                         type="text"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.dob?.message}
+                                        helperText={errors.dob?.message}
                                     />
                                     {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
                                 </Grid>
@@ -206,7 +206,7 @@ export default function AddPatient() {
                                         label="Weight (lbs)*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.weight?.message}
+                                        helperText={errors.weight?.message}
 
                                     />
                                 </Grid>
@@ -218,7 +218,7 @@ export default function AddPatient() {
                                         label="Country*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.country?.message}
+                                        helperText={errors.country?.message}
 
                                     />
                                 </Grid>
@@ -230,7 +230,7 @@ export default function AddPatient() {
                                         label="City*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.city?.message}
+                                        helperText={errors.city?.message}
 
                                     />
                                 </Grid>
@@ -242,7 +242,7 @@ export default function AddPatient() {
                                         label="State*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.state?.message}
+                                        helperText={errors.state?.message}
 
                                     />
                                 </Grid>
@@ -258,7 +258,7 @@ export default function AddPatient() {
                                         type={"tel"}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors?.phoneNumber?.message}
+                                        helperText={errors?.phoneNumber?.message}
 
                                     />
 
@@ -272,7 +272,7 @@ export default function AddPatient() {
                                         label="Primary Insurance*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.primaryInsurance?.message}
+                                        helperText={errors.primaryInsurance?.message}
 
                                     />
                                 </Grid>
@@ -284,7 +284,7 @@ export default function AddPatient() {
                                         label="Secondary Insurance*"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.secondaryInsurance?.message}
+                                        helperText={errors.secondaryInsurance?.message}
 
                                     />
                                 </Grid>
@@ -296,7 +296,7 @@ export default function AddPatient() {
                                         error={errors.address && true}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.address?.message}
+                                        helperText={errors.address?.message}
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>

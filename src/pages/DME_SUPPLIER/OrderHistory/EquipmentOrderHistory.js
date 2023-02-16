@@ -17,20 +17,16 @@ import { fDate } from '../../../utils/formatTime';
 
 
 
-
 const TABLE_HEAD = [
-    { id: 'dateCreated', label: 'Date Created', alignRight: false },
-    { id: 'Fname', label: 'First Name', alignRight: false },
-    { id: 'Lname', label: 'Last Name', alignRight: false },
-    { id: 'lastFOur', label: 'Last Four#', alignRight: false },
-    { id: 'partsPo', label: 'Parts PO#', alignRight: false },
-    { id: 'labourPo', label: 'Labour PO#', alignRight: false },
-    { id: 'firstAttempt', label: '1st Attempt', alignRight: false },
-    { id: 'secondAttempt', label: '2nd Attempt', alignRight: false },
-    { id: 'schedule', label: 'Schedule', alignRight: false },
-    { id: 'status', label: 'status', alignRight: false },
+    { id: 'create', label: 'Date Created', alignRight: false },
+    { id: 'dateCompleted', label: 'Date Completed', alignRight: false },
+    { id: 'PatientName', label: 'Patient Name', alignRight: false },
+    { id: 'email', label: 'Patient Email', alignRight: false },
+    { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
-    { id: 'action', label: '', alignRight: false },
+    { id: 'status', label: 'Status', alignRight: false },
+    { id: 'Progress', label: 'Progress', alignRight: false },
+    { id: 'action', label: 'Action', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -58,7 +54,7 @@ function applySortFilter(array, comparator, query) {
             return a[1] - b[1];
         });
         if (query) {
-            return filter(array, (_user) => _user.veteranId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+            return filter(array, (_user) => _user.patientId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
         }
         return stabilizedThis?.map((el) => el[0]);
     }
@@ -66,7 +62,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const RcvdPend = () => {
+const EquipmentOrderHistory = ({ orders }) => {
 
     const [page, setPage] = useState(0);
 
@@ -82,10 +78,10 @@ const RcvdPend = () => {
 
     const searchFieldRef = useRef(null)
 
-    let cancelledOrders
-    let cancelledEmptyRows
-    let filteredCancelledOrders
-    let cancelledIsNotFound
+    let newReferralOrders
+    let newReferralEmptyRows
+    let filteredNewReferralOrders
+    let newReferralIsNotFound
     let row
 
 
@@ -110,21 +106,21 @@ const RcvdPend = () => {
     };
 
 
-    const [statesLoading, orders] = useOutletContext();
+    // const [statesLoading, orders] = useOutletContext();
 
-    if (statesLoading) {
-        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <CircularProgress />
-        </Box>
-    }
+    // if (statesLoading) {
+    //     return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+    //         <CircularProgress />
+    //     </Box>
+    // }
 
 
     if (orders !== "No order found!") {
-        cancelledOrders = orders?.filter((order) => order.status === "Rcvd-pending-scheduling")
-        cancelledEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cancelledOrders.length) : 0;
-        filteredCancelledOrders = applySortFilter(cancelledOrders, getComparator(order, orderBy), filterName);
-        cancelledIsNotFound = !filteredCancelledOrders.length && !!filterName;
-        row = filteredCancelledOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        newReferralOrders = orders
+        newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrders.length) : 0;
+        filteredNewReferralOrders = applySortFilter(newReferralOrders, getComparator(order, orderBy), filterName);
+        newReferralIsNotFound = !filteredNewReferralOrders.length && !!filterName;
+        row = filteredNewReferralOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     }
 
 
@@ -136,7 +132,7 @@ const RcvdPend = () => {
                     style={{
                         margin: "20px 15px",
                         padding: "10px 5px",
-                        width: "220px",
+                        width: "220px"
                     }}
                     ref={searchFieldRef}
                     placeholder="Search Orders by Patient Name"
@@ -145,50 +141,80 @@ const RcvdPend = () => {
 
                 <Scrollbar>
                     <TableContainer sx={{ minWidth: 800 }}>
+
                         <Table size="small">
 
                             <UserListHead
                                 order={order}
                                 orderBy={orderBy}
                                 headLabel={TABLE_HEAD}
-                                rowCount={cancelledOrders.length}
+                                rowCount={newReferralOrders.length}
                                 numSelected={selected.length}
                                 onRequestSort={handleRequestSort}
                             />
 
+
                             <TableBody>
 
                                 {
-                                    row.map((row, index) => {
-                                        const { _id, createdAt, veteranId, firstAttempt, secondAttempt, schedule, notes, status, labourPo, partsPo } = row;
+                                    row?.map((row, index) => {
+                                        const { _id, createdAt, dateCompleted, patientId, status, notes, description, progress } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
 
-
-
                                                 <TableCell align="left">{fDate(createdAt)}</TableCell>
-                                                <TableCell align="left">{veteranId.firstName}</TableCell>
-                                                <TableCell align="left">{veteranId.lastName}</TableCell>
+                                                <TableCell align="left">{dateCompleted ? fDate(dateCompleted) : "Not Mentioned"}</TableCell>
 
                                                 <TableCell component="th" scope="row" padding="none">
-                                                    <Link to={`/DME-supplier/dashboard/user-profile/${veteranId._id}`}
-                                                        style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
-                                                        <Tooltip title="Profile">
-                                                            <Typography variant="subtitle2" sx={{ textAlign: "center" }}>
-                                                                {veteranId.lastFour}
-                                                            </Typography>
-                                                        </Tooltip>
-                                                    </Link>
+                                                    <Stack direction="row" alignItems="center" spacing={10}>
+                                                        {/* <Avatar alt={name} src={avatarUrl} /> */}
+                                                        <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
+                                                            style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
+                                                            <Tooltip title="Profile">
+                                                                <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                                    {patientId.fullName}
+                                                                </Typography>
+                                                            </Tooltip>
+                                                        </Link>
+
+                                                    </Stack>
                                                 </TableCell>
 
-                                                <TableCell align="left">{!partsPo ? "Not Mentioned" : partsPo}</TableCell>
-                                                <TableCell align="left">{!labourPo ? "Not Mentioned" : labourPo}</TableCell>
+                                                <TableCell align="left">{patientId.email}</TableCell>
 
-                                                <TableCell align="left">{!firstAttempt ? "Not Mentioned" : firstAttempt}</TableCell>
-                                                <TableCell align="left">{!secondAttempt ? "Not Mentioned" : secondAttempt}</TableCell>
-                                                <TableCell align="left">{!schedule ? "Not Mentioned" : schedule}</TableCell>
+                                                {
+                                                    description ?
+                                                        <TableCell align="left">{description}</TableCell>
+                                                        :
+                                                        <TableCell align="left">No Description Available</TableCell>
+                                                }
 
+                                                {notes && notes?.length !== 0 ?
+                                                    <TableCell width="30%" align="left">
+                                                        <ReactShowMoreText
+                                                            lines={1}
+                                                            more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                            less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                            anchorClass=""
+                                                            expanded={false}
+                                                        >
+                                                            {notes?.note}
+                                                        </ReactShowMoreText >
+                                                    </TableCell>
+                                                    :
+                                                    <TableCell width="30%" align="left">
+                                                        <ReactShowMoreText
+                                                            lines={1}
+                                                            more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                            less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                            anchorClass=""
+                                                            expanded={false}
+                                                        >
+                                                            {"No Notes available"}
+                                                        </ReactShowMoreText >
+                                                    </TableCell>
+                                                }
                                                 <TableCell align="left">
                                                     <Label
                                                         color={
@@ -198,42 +224,17 @@ const RcvdPend = () => {
                                                     </Label>
                                                 </TableCell>
 
-                                                {
-                                                    notes && notes?.length !== 0 ?
-                                                        <TableCell sx={{ maxWidth: "200px", wordWrap: "break-word" }} align="left">
-                                                            <ReactShowMoreText
-                                                                lines={1}
-                                                                more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                anchorClass=""
-                                                                expanded={false}
-                                                            >
-                                                                {notes?.note}
-                                                            </ReactShowMoreText >
-                                                        </TableCell>
-                                                        :
-                                                        <TableCell width="auto" align="left">
-                                                            <ReactShowMoreText
-                                                                lines={1}
-                                                                more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                                anchorClass=""
-                                                                expanded={false}
-                                                            >
-                                                                {"No Notes available"}
-                                                            </ReactShowMoreText >
-                                                        </TableCell>
-                                                }
+                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
+
+
 
                                                 <TableCell >
                                                     <PopOver
                                                         key={index}
-                                                        source='veteran-order-page'
+                                                        source='order-page'
+                                                        orderStatus="archived"
                                                         option={[
-                                                            { label: "Edit" },
-                                                            { label: "Add Note" },
                                                             { label: "Note Log" },
-                                                            { label: "Status" },
                                                             { label: "Documents" },
                                                         ]}
                                                         id={row._id}
@@ -246,8 +247,8 @@ const RcvdPend = () => {
                                 }
 
 
-                                {cancelledEmptyRows > 0 || (
-                                    <TableRow style={{ height: 53 * cancelledEmptyRows }}>
+                                {newReferralEmptyRows > 0 || (
+                                    <TableRow style={{ height: 53 * newReferralEmptyRows }}>
                                         <TableCell colSpan={6} />
                                     </TableRow>
                                 )}
@@ -255,10 +256,10 @@ const RcvdPend = () => {
                             </TableBody>
 
                             {
-                                cancelledIsNotFound && (
+                                newReferralIsNotFound && (
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
+                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
                                                 <Paper
                                                     sx={{
                                                         textAlign: 'center',
@@ -280,13 +281,14 @@ const RcvdPend = () => {
                                 )
                             }
                         </Table>
+
                     </TableContainer>
                 </Scrollbar>
 
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={cancelledOrders.length}
+                    count={newReferralOrders?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -294,8 +296,9 @@ const RcvdPend = () => {
                 />
 
             </Card>
+
         </>
     );
 };
 
-export default RcvdPend;
+export default EquipmentOrderHistory;

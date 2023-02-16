@@ -20,14 +20,10 @@ import { fDate } from '../../../utils/formatTime';
 
 const TABLE_HEAD = [
     { id: 'dateCreated', label: 'Date Created', alignRight: false },
-    { id: 'Fname', label: 'First Name', alignRight: false },
-    { id: 'Lname', label: 'Last Name', alignRight: false },
-    { id: 'lastFOur', label: 'Last Four#', alignRight: false },
+    { id: 'dateCompleted', label: 'Date Completed', alignRight: false },
+    { id: 'Fullname', label: 'Full Name', alignRight: false },
     { id: 'partsPo', label: 'Parts PO#', alignRight: false },
     { id: 'labourPo', label: 'Labour PO#', alignRight: false },
-    { id: 'firstAttempt', label: '1st Attempt', alignRight: false },
-    { id: 'secondAttempt', label: '2nd Attempt', alignRight: false },
-    { id: 'schedule', label: 'Schedule', alignRight: false },
     { id: 'status', label: 'status', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'action', label: '', alignRight: false },
@@ -66,7 +62,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const RcvdPend = () => {
+const VeteranOrderHistory = ({ orders }) => {
 
     const [page, setPage] = useState(0);
 
@@ -110,17 +106,17 @@ const RcvdPend = () => {
     };
 
 
-    const [statesLoading, orders] = useOutletContext();
+    // const [statesLoading, orders] = useOutletContext();
 
-    if (statesLoading) {
-        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <CircularProgress />
-        </Box>
-    }
+    // if (statesLoading) {
+    //     return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+    //         <CircularProgress />
+    //     </Box>
+    // }
 
 
     if (orders !== "No order found!") {
-        cancelledOrders = orders?.filter((order) => order.status === "Rcvd-pending-scheduling")
+        cancelledOrders = orders
         cancelledEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cancelledOrders.length) : 0;
         filteredCancelledOrders = applySortFilter(cancelledOrders, getComparator(order, orderBy), filterName);
         cancelledIsNotFound = !filteredCancelledOrders.length && !!filterName;
@@ -160,7 +156,7 @@ const RcvdPend = () => {
 
                                 {
                                     row.map((row, index) => {
-                                        const { _id, createdAt, veteranId, firstAttempt, secondAttempt, schedule, notes, status, labourPo, partsPo } = row;
+                                        const { _id, createdAt, dateCompleted, veteranId, firstAttempt, secondAttempt, schedule, notes, status, labourPo, partsPo } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
@@ -168,15 +164,14 @@ const RcvdPend = () => {
 
 
                                                 <TableCell align="left">{fDate(createdAt)}</TableCell>
-                                                <TableCell align="left">{veteranId.firstName}</TableCell>
-                                                <TableCell align="left">{veteranId.lastName}</TableCell>
+                                                <TableCell align="left">{dateCompleted ? fDate(dateCompleted) : "Not Mentioned"}</TableCell>
 
                                                 <TableCell component="th" scope="row" padding="none">
                                                     <Link to={`/DME-supplier/dashboard/user-profile/${veteranId._id}`}
                                                         style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                         <Tooltip title="Profile">
-                                                            <Typography variant="subtitle2" sx={{ textAlign: "center" }}>
-                                                                {veteranId.lastFour}
+                                                            <Typography component={'span'} style={{ wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                                {veteranId.fullName}
                                                             </Typography>
                                                         </Tooltip>
                                                     </Link>
@@ -184,10 +179,6 @@ const RcvdPend = () => {
 
                                                 <TableCell align="left">{!partsPo ? "Not Mentioned" : partsPo}</TableCell>
                                                 <TableCell align="left">{!labourPo ? "Not Mentioned" : labourPo}</TableCell>
-
-                                                <TableCell align="left">{!firstAttempt ? "Not Mentioned" : firstAttempt}</TableCell>
-                                                <TableCell align="left">{!secondAttempt ? "Not Mentioned" : secondAttempt}</TableCell>
-                                                <TableCell align="left">{!schedule ? "Not Mentioned" : schedule}</TableCell>
 
                                                 <TableCell align="left">
                                                     <Label
@@ -229,11 +220,9 @@ const RcvdPend = () => {
                                                     <PopOver
                                                         key={index}
                                                         source='veteran-order-page'
+                                                        orderStatus="archived"
                                                         option={[
-                                                            { label: "Edit" },
-                                                            { label: "Add Note" },
                                                             { label: "Note Log" },
-                                                            { label: "Status" },
                                                             { label: "Documents" },
                                                         ]}
                                                         id={row._id}
@@ -298,4 +287,4 @@ const RcvdPend = () => {
     );
 };
 
-export default RcvdPend;
+export default VeteranOrderHistory;

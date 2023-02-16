@@ -104,7 +104,7 @@ export default function EditTasks() {
             <Helmet>
                 <title> Edit Tasks </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -169,7 +169,7 @@ export default function EditTasks() {
                                         defaultValue={task[0].title}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.title?.message}
+                                        helperText={errors.title?.message}
                                         variant="outlined" />
                                 </Grid>
 
@@ -183,7 +183,7 @@ export default function EditTasks() {
                                         multiline
                                         defaultValue={task[0].description}
                                         rows={4}
-                                        helpertext={errors.description?.message}
+                                        helperText={errors.description?.message}
                                         variant="outlined" />
                                 </Grid>
 

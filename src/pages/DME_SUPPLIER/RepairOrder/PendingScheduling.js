@@ -22,7 +22,6 @@ const TABLE_HEAD = [
     { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'status', label: 'Status', alignRight: false },
-    { id: 'Progress', label: 'Progress', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
 
@@ -216,10 +215,6 @@ const PendingScheduling = () => {
                                                         {sentenceCase(status)}
                                                     </Label>
                                                 </TableCell>
-
-                                                <TableCell align="left">{"Not Mentioned"}</TableCell>
-
-
 
                                                 <TableCell >
                                                     <PopOver

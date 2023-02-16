@@ -90,7 +90,7 @@ export default function EditUser() {
             <Helmet>
                 <title> Edit - User Profile </title>
             </Helmet>
-            <Container maxWidth="xl">
+            <Container maxWidth="1350px">
 
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
                     "&:hover": {
@@ -124,7 +124,7 @@ export default function EditUser() {
                                         fullWidth
                                         defaultValue={user.firstName}
                                         variant="outlined"
-                                        helpertext={errors.Fname?.message}
+                                        helperText={errors.Fname?.message}
 
                                     />
                                 </Grid>
@@ -138,7 +138,7 @@ export default function EditUser() {
                                         fullWidth
                                         defaultValue={user.lastName}
                                         variant="outlined"
-                                        helpertext={errors.Lname?.message}
+                                        helperText={errors.Lname?.message}
 
                                     />
                                 </Grid>
@@ -153,7 +153,7 @@ export default function EditUser() {
                                         defaultValue={user.email}
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.email?.message}
+                                        helperText={errors.email?.message}
                                         InputProps={{
                                             readOnly: true,
                                         }}
@@ -161,6 +161,22 @@ export default function EditUser() {
 
                                     />
                                 </Grid>
+
+                                {
+                                    userCategory === "veteran" &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("lastFour", { required: "Field is required" })}
+                                            error={errors.lastFour && true}
+
+                                            label="Last Four*"
+                                            fullWidth
+                                            variant="outlined"
+                                            helperText={errors.lastFour?.message}
+
+                                        />
+                                    </Grid>
+                                }
 
 
                                 {
@@ -172,7 +188,7 @@ export default function EditUser() {
                                                 variant="outlined"
                                                 size="small"
                                                 error={errors.gender && true}
-                                                helpertext={errors.gender?.message}
+                                                helperText={errors.gender?.message}
                                                 rows={2}
                                                 defaultValue={user.details.gender.toLowerCase()}
                                                 {...register("gender", { required: "Field is required" })}
@@ -199,7 +215,7 @@ export default function EditUser() {
                                             fullWidth
                                             variant="outlined"
                                             defaultValue={user.details.dob}
-                                            helpertext={errors.dob?.message}
+                                            helperText={errors.dob?.message}
                                         />
                                         {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
                                     </Grid>
@@ -217,7 +233,7 @@ export default function EditUser() {
                                             fullWidth
                                             variant="outlined"
                                             defaultValue={user.details.weight}
-                                            helpertext={errors.weight?.message}
+                                            helperText={errors.weight?.message}
 
                                         />
                                     </Grid>
@@ -233,7 +249,7 @@ export default function EditUser() {
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user.details.country}
-                                        helpertext={errors.country?.message}
+                                        helperText={errors.country?.message}
 
                                     />
                                 </Grid>
@@ -247,7 +263,7 @@ export default function EditUser() {
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user.details.city}
-                                        helpertext={errors.city?.message}
+                                        helperText={errors.city?.message}
 
                                     />
                                 </Grid>
@@ -263,7 +279,7 @@ export default function EditUser() {
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user.details.state}
-                                        helpertext={errors.state?.message}
+                                        helperText={errors.state?.message}
 
                                     />
                                 </Grid>
@@ -282,7 +298,7 @@ export default function EditUser() {
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user.details?.phoneNumber}
-                                        helpertext={errors?.phoneNumber?.message}
+                                        helperText={errors?.phoneNumber?.message}
 
                                     />
 
@@ -300,7 +316,7 @@ export default function EditUser() {
                                             fullWidth
                                             defaultValue={user.details?.primaryInsurance}
                                             variant="outlined"
-                                            helpertext={errors.primaryInsurance?.message}
+                                            helperText={errors.primaryInsurance?.message}
 
                                         />
                                     </Grid>
@@ -317,7 +333,7 @@ export default function EditUser() {
                                             fullWidth
                                             defaultValue={user.details?.secondaryInsurance}
                                             variant="outlined"
-                                            helpertext={errors.secondaryInsurance?.message}
+                                            helperText={errors.secondaryInsurance?.message}
 
                                         />
                                     </Grid>
@@ -331,7 +347,7 @@ export default function EditUser() {
                                         error={errors.address && true}
                                         fullWidth
                                         multiline
-                                        helpertext={errors.address?.message}
+                                        helperText={errors.address?.message}
                                         defaultValue={user.details?.address}
                                         rows={4}
                                         variant="outlined" />

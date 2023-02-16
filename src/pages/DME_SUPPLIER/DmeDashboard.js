@@ -73,7 +73,7 @@ export default function DmeDashboard() {
         <title> Dashboard | DME Supplier </title>
       </Helmet>
 
-      <Container maxWidth="xl">
+      <Container maxWidth="1350px">
         <Typography variant="h4" sx={{ mb: 5 }}>
           Hi, Welcome back
         </Typography>

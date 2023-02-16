@@ -68,6 +68,10 @@ import VeteranPage from './pages/DME_SUPPLIER/VeteranPage';
 import AddVeteran from './pages/DME_SUPPLIER/AddVeteran';
 import VAProstheticPage from './pages/DME_SUPPLIER/VAProstheticPage';
 import EditVaProstheticPage from './pages/DME_SUPPLIER/EditVaProsthetic';
+import OrderHistory from './pages/DME_SUPPLIER/OrderHistory/OrderHistory';
+import PrivateMessagePage from './pages/Shared/PrivateMessage/PrivateMessagePage';
+import { PrivateMessageContext } from './Context/PrivateMessageContext';
+import Chat from './pages/Shared/PrivateMessage/Chat';
 
 
 
@@ -160,8 +164,21 @@ export default function Router() {
         <Route path='va-prosthetics-staff' element={<VAProstheticPage />} />
 
 
+        <Route path='private-message' element={
+          <PrivateMessageContext>
+            <PrivateMessagePage />
+          </PrivateMessageContext>
+        } />
+        <Route path='private-message/chat/:id' element={
+          <PrivateMessageContext>
+            <Chat />
+          </PrivateMessageContext>
+        } />
+
+
 
         <Route path='patient-document/:id' element={<UploadPatientDocuments />} />
+        <Route path='order-history/:id' element={<OrderHistory />} />
         <Route path='order-document/:id' element={<UploadOrderDocuments />} />
         <Route path='edit-tasks/:id' element={<EditTasks />} />
         <Route path='user-profile/:id' element={<UserProfile />} />

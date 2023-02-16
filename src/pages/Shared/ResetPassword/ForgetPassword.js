@@ -114,7 +114,7 @@ export default function ForgetPassword() {
                                         type="email"
                                         fullWidth
                                         variant="outlined"
-                                        helpertext={errors.email?.message}
+                                        helperText={errors.email?.message}
 
                                     />
                                 </Grid>
