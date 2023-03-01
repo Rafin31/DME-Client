@@ -342,14 +342,14 @@ export default function VeteranPage() {
                                 {veteran.length === 0 && (
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                            <TableCell align="center" colSpan={8} sx={{ py: 3 }}>
                                                 <Paper
                                                     sx={{
                                                         textAlign: 'center',
                                                     }}
                                                 >
                                                     <Typography variant="body2">
-                                                        No Veteran found  &nbsp;
+                                                        No Veterans found  &nbsp;
                                                     </Typography>
 
                                                 </Paper>

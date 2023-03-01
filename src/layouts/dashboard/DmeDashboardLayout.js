@@ -39,8 +39,8 @@ export default function DmeDashboardLayout() {
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(false)
 
-  let loggedInUser = localStorage.getItem('user');
-  loggedInUser = JSON.parse(loggedInUser);
+  let loggedInUser = JSON.parse(localStorage.getItem('user'));
+
 
   const { id } = loggedInUser
 

@@ -336,6 +336,24 @@ export default function TherapistPage() {
                                         </TableRow>
                                     </TableBody>
                                 )}
+                                {therapist.length === 0 && (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                <Paper
+                                                    sx={{
+                                                        textAlign: 'center',
+                                                    }}
+                                                >
+                                                    <Typography variant="body2">
+                                                        No Therapist found  &nbsp;
+                                                    </Typography>
+
+                                                </Paper>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                )}
                             </Table>
                         </TableContainer>
                     </Scrollbar>

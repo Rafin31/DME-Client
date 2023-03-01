@@ -1,4 +1,7 @@
+import { CircularProgress } from '@mui/material';
+import { Box } from '@mui/system';
 import React, { createContext, useState } from 'react';
+import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { AuthRequest } from '../services/AuthRequest'
 
@@ -10,7 +13,7 @@ const AuthContext = ({ children }) => {
 
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
-
+    let user = JSON.parse(localStorage.getItem('user'));
 
     const signOut = () => {
         localStorage.clear('accessToken')
@@ -50,12 +53,8 @@ const AuthContext = ({ children }) => {
     }
 
     const loggedInUser = () => {
-        let user = localStorage.getItem('user');
-        user = JSON.parse(user);
         return user
-
     }
-
 
     return (
         <userContext.Provider value={{ signOut, signIn, isLogin, loading, loggedInUser }} >
@@ -63,5 +62,7 @@ const AuthContext = ({ children }) => {
         </userContext.Provider>
     );
 };
+
+
 
 export { AuthContext, userContext };

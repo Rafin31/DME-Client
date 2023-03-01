@@ -414,6 +414,25 @@ export default function DoctorPage() {
                     </TableRow>
                   </TableBody>
                 )}
+
+                {doctors.length === 0 && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper
+                          sx={{
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Typography variant="body2">
+                            No Doctors found  &nbsp;
+                          </Typography>
+
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
           </Scrollbar>

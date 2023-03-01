@@ -29,6 +29,7 @@ const Chat = () => {
 
     const { GetChat } = useContext(MessageContext)
 
+
     const { chatLoading, chat, fetchChat } = GetChat(receiverId, senderId)
 
     const { sentMessage } = useContext(MessageContext)
@@ -91,7 +92,7 @@ const Chat = () => {
                 </Stack>
 
                 <Typography variant="h4" gutterBottom>
-                    {chat[0]?.receiverId.fullName}
+                    {chat[0]?.receiverId.email !== user.email ? chat[0]?.receiverId.fullName : chat[0]?.senderId.fullName}
                 </Typography>
 
                 <Stack>

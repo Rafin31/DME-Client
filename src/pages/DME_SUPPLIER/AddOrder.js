@@ -34,9 +34,6 @@ export default function AddOrder() {
     const [schedule, setSchedule] = useState(null);
 
     const loadUserInfo = useCallback(() => {
-
-
-
         AuthRequest.get(`/api/v1/users/${id}`)
             .then(res => {
                 setUser(res.data.data)
