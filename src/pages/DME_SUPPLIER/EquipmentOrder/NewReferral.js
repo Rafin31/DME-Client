@@ -194,7 +194,7 @@ const NewReferral = () => {
                                                             anchorClass=""
                                                             expanded={false}
                                                         >
-                                                            {notes?.note}
+                                                            {notes}
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                     :

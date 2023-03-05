@@ -208,7 +208,7 @@ const RcvdPend = () => {
                                                                 anchorClass=""
                                                                 expanded={false}
                                                             >
-                                                                {notes?.note}
+                                                                {notes}
                                                             </ReactShowMoreText >
                                                         </TableCell>
                                                         :

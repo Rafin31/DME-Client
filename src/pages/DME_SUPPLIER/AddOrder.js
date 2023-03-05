@@ -120,12 +120,12 @@ export default function AddOrder() {
     }
 
     const onSubmit = data => {
-        const { patientId, description, note } = data
+        const { patientId, description, notes } = data
         const order = {
             dmeSupplierId: id,
             patientId,
             description,
-            note,
+            notes,
             status:
                 orderCategory === "equipment-order" ? "New-Referral" :
                     orderCategory === "repair-order" ? "PRR" :
@@ -304,7 +304,7 @@ export default function AddOrder() {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("note")}
+                                        {...register("notes")}
                                         id="outlined-basic"
                                         label="Notes"
                                         error={errors.notes && true}

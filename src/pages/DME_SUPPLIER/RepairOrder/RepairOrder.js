@@ -51,7 +51,7 @@ const RepairOrder = () => {
         if (path === "/DME-supplier/dashboard/repair-order/rto-status") return setValue(6)
         if (path === "/DME-supplier/dashboard/repair-order/pending-parts") return setValue(7)
         if (path === "/DME-supplier/dashboard/repair-order/pending-schedule") return setValue(8)
-        if (path === "/DME-supplier/dashboard/repair-order/Completed") return setValue(9)
+        if (path === "/DME-supplier/dashboard/repair-order/completed") return setValue(9)
 
         return () => {
             setValue(0)

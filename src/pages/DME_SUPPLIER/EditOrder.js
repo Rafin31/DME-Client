@@ -120,12 +120,12 @@ export default function EditOrder() {
     })
 
     const onSubmit = data => {
-        const { patientId, note, description, status } = data
+        const { patientId, notes, description, status } = data
 
         const updatedOrder = {
             dmeSupplierId: id,
             patientId,
-            note,
+            notes,
             description,
             status
         }
@@ -290,7 +290,7 @@ export default function EditOrder() {
                                                     <MenuItem value={"Order-Request"}>Order Request</MenuItem>
                                                 }
                                                 {
-                                                    (order.status === "Delivered" || order.status === "Authorization-Expiration-F/U" || order.status === "Cancelled") &&
+                                                    (order.status === "Delivered" || order.status === "Authorization-Expiration-F/U" || order.status === "Order-Request" || order.status === "Cancelled") &&
                                                     <MenuItem value={"Archived"}>Archived</MenuItem>
                                                 }
                                                 <MenuItem value={"Cancelled"}>Cancelled</MenuItem>
@@ -493,7 +493,7 @@ export default function EditOrder() {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("note")}
+                                        {...register("notes")}
                                         id="outlined-basic"
                                         label="Notes"
                                         error={errors.notes && true}
@@ -501,8 +501,8 @@ export default function EditOrder() {
                                         multiline
                                         helperText={errors.notes?.message}
                                         defaultValue={
-                                            orderCategory === "veteran-order" ? order[0]?.notes?.note
-                                                : order.notes?.note
+                                            orderCategory === "veteran-order" ? order[0]?.notes
+                                                : order.notes
                                         }
                                         rows={4}
                                         variant="outlined" />

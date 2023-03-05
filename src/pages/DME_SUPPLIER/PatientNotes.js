@@ -114,8 +114,7 @@ export default function PatientNotes() {
     const theme = useTheme();
 
 
-    let loggedUser = localStorage.getItem('user');
-    loggedUser = JSON.parse(loggedUser);
+    let loggedUser = JSON.parse(localStorage.getItem('user'));
 
     const { id: writerId } = loggedUser
     const { id: patientId } = useParams()
@@ -123,8 +122,6 @@ export default function PatientNotes() {
 
 
     const loadUserInfo = useCallback(() => {
-
-
 
         AuthRequest.get(`/api/v1/users/${writerId}`)
             .then(res => {

@@ -193,7 +193,7 @@ const CancelledOrder = () => {
                                                             anchorClass=""
                                                             expanded={false}
                                                         >
-                                                            {notes?.note}
+                                                            {notes}
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                     :

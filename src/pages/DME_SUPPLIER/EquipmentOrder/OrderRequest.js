@@ -114,7 +114,7 @@ const OrderRequest = () => {
 
 
     if (orders !== "No order found!") {
-        OrderRequestOrders = orders?.filter((order) => order.status === "Holding-RTO")
+        OrderRequestOrders = orders?.filter((order) => order.status === "Order-Request")
         orderRequestEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - OrderRequestOrders.length) : 0;
         filteredOrderRequestOrders = applySortFilter(OrderRequestOrders, getComparator(order, orderBy), filterName);
         OrderRequestIsNotFound = !filteredOrderRequestOrders.length && !!filterName;
@@ -193,7 +193,7 @@ const OrderRequest = () => {
                                                             anchorClass=""
                                                             expanded={false}
                                                         >
-                                                            {notes?.note}
+                                                            {notes}
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                     :

@@ -199,7 +199,7 @@ const EquipmentOrderHistory = ({ orders }) => {
                                                             anchorClass=""
                                                             expanded={false}
                                                         >
-                                                            {notes?.note}
+                                                            {notes}
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                     :
@@ -249,7 +249,7 @@ const EquipmentOrderHistory = ({ orders }) => {
 
                                 {newReferralEmptyRows > 0 || (
                                     <TableRow style={{ height: 53 * newReferralEmptyRows }}>
-                                        <TableCell colSpan={6} />
+                                        <TableCell colSpan={9} />
                                     </TableRow>
                                 )}
 
@@ -259,7 +259,7 @@ const EquipmentOrderHistory = ({ orders }) => {
                                 newReferralIsNotFound && (
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                            <TableCell align="center" colSpan={9} sx={{ py: 3 }}>
                                                 <Paper
                                                     sx={{
                                                         textAlign: 'center',

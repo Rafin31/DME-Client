@@ -193,7 +193,7 @@ const PaperWork = () => {
                                                             anchorClass=""
                                                             expanded={false}
                                                         >
-                                                            {notes?.note}
+                                                            {notes}
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                     :

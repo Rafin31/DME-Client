@@ -208,7 +208,7 @@ const VeteranPendingScheduling = () => {
                                                                 anchorClass=""
                                                                 expanded={false}
                                                             >
-                                                                {notes?.note}
+                                                                {notes}
                                                             </ReactShowMoreText >
                                                         </TableCell>
                                                         :
