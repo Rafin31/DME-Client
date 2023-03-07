@@ -18,7 +18,7 @@ import Scrollbar from '../../../components/scrollbar';
 
 const TABLE_HEAD = [
     { id: 'PatientName', label: 'Patient Name', alignRight: false },
-    { id: 'email', label: 'Patient Email', alignRight: false },
+    { id: 'dob', label: 'Date of Birth', alignRight: false },
     { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'status', label: 'Status', alignRight: false },
@@ -173,7 +173,7 @@ const Cancelled = () => {
                                                     </Stack>
                                                 </TableCell>
 
-                                                <TableCell align="left">{patientId.email}</TableCell>
+                                                <TableCell align="left">{patientId.patientDob}</TableCell>
 
                                                 {
                                                     description ?

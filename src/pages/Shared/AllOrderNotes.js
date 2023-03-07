@@ -24,7 +24,6 @@ const TABLE_HEAD = [
     { id: 'designation', label: 'Designation', alignRight: false },
     { id: 'note', label: 'Note', alignRight: false },
     // { id: 'action', label: 'Action', alignRight: false },
-    // { id: '' },
 ];
 
 

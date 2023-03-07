@@ -75,8 +75,6 @@ export default function EditUser() {
             ...data,
             fullName: data.firstName + " " + data.lastName,
         }
-        if (data.secondaryInsurance) data.secondaryInsurance = (+data.secondaryInsurance)
-        if (data.primaryInsurance) data.primaryInsurance = (+data.primaryInsurance)
 
         delete data.email
 
@@ -225,7 +223,7 @@ export default function EditUser() {
                                     userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <TextField
-                                            {...register("weight", { required: "Field is required" })}
+                                            {...register("weight")}
                                             error={errors.weight && true}
 
                                             type={'number'}
@@ -242,7 +240,7 @@ export default function EditUser() {
 
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("country", { required: "Field is required" })}
+                                        {...register("country")}
                                         error={errors.country && true}
 
                                         label="Country*"
@@ -256,7 +254,7 @@ export default function EditUser() {
 
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("city", { required: "Field is required" })}
+                                        {...register("city")}
                                         error={errors.city && true}
 
                                         label="City*"
@@ -272,7 +270,7 @@ export default function EditUser() {
 
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("state", { required: "Field is required" })}
+                                        {...register("state")}
                                         error={errors.state && true}
 
                                         label="State*"
@@ -288,7 +286,6 @@ export default function EditUser() {
                                 <Grid item xs={6}>
                                     <TextField
                                         {...register("phoneNumber", {
-                                            required: "Field is required",
                                             minLength: { value: 6, message: "Phone number should be at last 6 characters" },
                                         })}
 
@@ -309,9 +306,9 @@ export default function EditUser() {
                                     userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <TextField
-                                            {...register("primaryInsurance", { required: "Field is required" })}
+                                            {...register("primaryInsurance")}
                                             error={errors.primaryInsurance && true}
-                                            type="number"
+                                            type="text"
                                             label="Primary Insurance*"
                                             fullWidth
                                             defaultValue={user.details?.primaryInsurance}
@@ -326,9 +323,9 @@ export default function EditUser() {
                                     userCategory === "patient" &&
                                     <Grid item xs={6}>
                                         <TextField
-                                            {...register("secondaryInsurance", { required: "Field is required" })}
+                                            {...register("secondaryInsurance")}
                                             error={errors.secondaryInsurance && true}
-                                            type="number"
+                                            type="text"
                                             label="Secondary Insurance*"
                                             fullWidth
                                             defaultValue={user.details?.secondaryInsurance}
@@ -341,7 +338,7 @@ export default function EditUser() {
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("address", { required: "Field is required" })}
+                                        {...register("address")}
 
                                         label="Address"
                                         error={errors.address && true}

@@ -39,19 +39,21 @@ export default function AddPatient() {
 
 
     const onSubmit = data => {
-        const givenDate = new Date(data?.dob);
-        const presentDate = new Date()
-        if (givenDate > presentDate) {
-            setDbError(true)
-            return
+        if (data?.dob !== "") {
+            const givenDate = new Date(data?.dob);
+            const presentDate = new Date()
+            if (givenDate > presentDate) {
+                setDbError(true)
+                return
+            }
+            data.dob = fDate(data?.dob)
         }
-        data.dob = fDate(data.dob)
         setDbError(false)
         data = {
             ...data,
-            fullName: data.firstName + " " + data.lastName,
-            secondaryInsurance: (+data.secondaryInsurance),
-            primaryInsurance: (+data.primaryInsurance),
+            fullName: data?.firstName + " " + data?.lastName,
+            secondaryInsurance: data?.secondaryInsurance,
+            primaryInsurance: data?.primaryInsurance,
             userCategory: "63861b794e45673948bb7c9f",
             status: "63861954b3b3ded1ee267309",
         }
@@ -199,7 +201,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("weight", { required: "Field is required" })}
+                                        {...register("weight")}
                                         error={errors.weight && true}
 
                                         type={'number'}
@@ -212,7 +214,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("country", { required: "Field is required" })}
+                                        {...register("country")}
                                         error={errors.country && true}
 
                                         label="Country*"
@@ -224,7 +226,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("city", { required: "Field is required" })}
+                                        {...register("city")}
                                         error={errors.city && true}
 
                                         label="City*"
@@ -236,7 +238,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("state", { required: "Field is required" })}
+                                        {...register("state")}
                                         error={errors.state && true}
 
                                         label="State*"
@@ -249,7 +251,6 @@ export default function AddPatient() {
                                 <Grid item xs={12}>
                                     <TextField
                                         {...register("phoneNumber", {
-                                            required: "Field is required",
                                             minLength: { value: 6, message: "Phone number should be at last 6 characters" },
                                         })}
 
@@ -266,9 +267,9 @@ export default function AddPatient() {
 
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("primaryInsurance", { required: "Field is required" })}
+                                        {...register("primaryInsurance")}
                                         error={errors.primaryInsurance && true}
-                                        type="number"
+                                        type="text"
                                         label="Primary Insurance*"
                                         fullWidth
                                         variant="outlined"
@@ -278,9 +279,9 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("secondaryInsurance", { required: "Field is required" })}
+                                        {...register("secondaryInsurance")}
                                         error={errors.secondaryInsurance && true}
-                                        type="number"
+                                        type="text"
                                         label="Secondary Insurance*"
                                         fullWidth
                                         variant="outlined"
@@ -290,7 +291,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("address", { required: "Field is required" })}
+                                        {...register("address")}
 
                                         label="Address"
                                         error={errors.address && true}
