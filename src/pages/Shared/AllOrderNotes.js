@@ -1,14 +1,61 @@
-import { Box, Button, Card, CircularProgress, Container, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, CircularProgress, Container, Paper, Stack, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AuthRequest } from '../../services/AuthRequest';
+import { UserListHead } from '../../sections/@dashboard/user';
+import Scrollbar from '../../components/scrollbar';
 import Iconify from '../../components/iconify';
 import { fDateTime } from '../../utils/formatTime';
+import { filter } from 'lodash';
 import AddOrderNoteLogModal from './AddOrderNoteLogModal';
 import { toast } from 'react-toastify';
+import ReactShowMoreText from 'react-show-more-text';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+
+
+const TABLE_HEAD = [
+    { id: 'TimeStamp', label: 'Created At', alignRight: false },
+    { id: 'name', label: 'Name', alignRight: false },
+    { id: 'designation', label: 'Designation', alignRight: false },
+    { id: 'note', label: 'Note', alignRight: false },
+    // { id: 'action', label: 'Action', alignRight: false },
+    // { id: '' },
+];
+
+
+function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
+}
+
+function getComparator(order, orderBy) {
+    return order === 'desc'
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function applySortFilter(array, comparator, query) {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+        const order = comparator(a[0], b[0]);
+        if (order !== 0) return order;
+        return a[1] - b[1];
+    });
+    if (query) {
+        return filter(array, (_user) => _user.notes.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.writerId?.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.writerId?.userCategory?.category.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    }
+    return stabilizedThis.map((el) => el[0]);
+}
 
 
 export default function AllOrderNotes() {
@@ -24,6 +71,13 @@ export default function AllOrderNotes() {
     const [user, setUser] = useState()
     const [addNotesOpen, setAddNotesOpen] = useState(false)
     const [loading, setLoading] = useState()
+
+    const [page, setPage] = useState(0);
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('name');
+    const [filterName, setFilterName] = useState('');
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+
 
 
     let loggedUser = JSON.parse(localStorage.getItem('user'));
@@ -120,11 +174,40 @@ export default function AllOrderNotes() {
     };
 
 
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setPage(0);
+        setRowsPerPage(parseInt(event.target.value, 10));
+    };
+
+    const handleFilterByName = (event) => {
+        setPage(0);
+        setFilterName(event.target.value);
+
+    };
+
+    const handleRequestSort = (event, property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+
     if (isLoading || loading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
     }
+
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - note.length) : 0;
+
+    const filteredUsers = applySortFilter(note, getComparator(order, orderBy), filterName);
+
+    const isNotFound = !filteredUsers.length && !!filterName;
+
 
     return (
         <>
@@ -154,51 +237,117 @@ export default function AllOrderNotes() {
 
                 <AddOrderNoteLogModal open={addNotesOpen} setOpen={setAddNotesOpen} handelFormSubmit={handelAddOrderNotes} data={{ notes: "" }} title="Add Note" user={user} addOrderNoteLog={addOrderNoteLog} />
 
-                <Grid
-                    container
-                    spacing={0}
-                    direction="column"
-                    justify="center"
-                    style={{ minHeight: '100vh', marginTop: '40px' }}
-                >
-                    {
-                        note && note.length !== 0 ?
-                            note?.map((nt, index) => {
-                                return (
-                                    <Card key={index} sx={{ paddingY: 2, paddingX: 2, marginY: 1 }}>
 
-                                        <Stack direction="row" alignItems="start" mb={2}>
+                <Card className='new-referal'>
+                    <input type="text"
+                        style={{
+                            margin: "20px 15px",
+                            padding: "10px 5px",
+                            width: "220px"
+                        }}
+                        placeholder="Search by Name,Designation,Note"
+                        value={filterName}
+                        onChange={handleFilterByName} />
 
-                                            <Box sx={{ ml: 2 }}>
-                                                <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                                                    {nt?.writerId?.fullName} |  {nt?.writerId?.userCategory?.category}
-                                                </Typography>
+                    <Scrollbar>
+                        <TableContainer sx={{ minWidth: 800 }}>
+                            <Table size="small">
+                                <UserListHead
+                                    order={order}
+                                    orderBy={orderBy}
+                                    headLabel={TABLE_HEAD}
+                                    rowCount={note.length}
+                                    onRequestSort={handleRequestSort}
+                                />
+                                <TableBody>
+                                    {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                                        const { _id, writerId, notes, createdAt } = row;
 
-                                                <Typography variant="caption" sx={{ color: 'text.primary' }}>
-                                                    {fDateTime(nt?.createdAt)}
-                                                </Typography>
+                                        return (
+                                            <TableRow hover key={_id} tabIndex={-1}>
+                                                <TableCell align="left">{fDateTime(createdAt)}</TableCell>
+                                                <TableCell align="left">{writerId?.fullName}</TableCell>
+                                                <TableCell align="left">{writerId?.userCategory?.category}</TableCell>
+                                                <TableCell sx={{ width: "50%" }} component="th" scope="row" padding="none">
+                                                    <Stack direction="row" alignItems="center" spacing={0}>
+                                                        <Typography style={{ paddingLeft: "20px" }} variant="subtitle2" wrap="true">
+                                                            <ReactShowMoreText
+                                                                lines={0}
+                                                                more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                anchorClass=""
+                                                                expanded={false}
+                                                            >
+                                                                {notes}
+                                                            </ReactShowMoreText>
+                                                        </Typography>
+                                                    </Stack>
+                                                </TableCell>
 
-                                            </Box>
-                                        </Stack>
+                                                {/* <TableCell >
+                                                    <PopOver
+                                                        key={_id}
+                                                        source="patient-notes-page"
+                                                        option={[
+                                                            { label: "Edit" },
+                                                            { label: "Delete" }
+                                                        ]}
+                                                        id={_id}
+                                                        deleteFunction={handleDelete}
+                                                        setEdit={setEdit}
+                                                        setEditNoteId={setEditNoteId}
+                                                        setOpen={setAddNotesOpen}
+                                                    />
+                                                </TableCell> */}
+                                            </TableRow>
+                                        );
+                                    })}
+                                    {emptyRows > 0 && (
+                                        <TableRow style={{ height: 53 * emptyRows }}>
+                                            <TableCell colSpan={6} />
+                                        </TableRow>
+                                    )}
+                                </TableBody>
 
-                                        <Typography variant="subtitle2" sx={{ color: 'text.primary', paddingLeft: 2 }}>
-                                            {nt.notes}
-                                        </Typography>
+                                {isNotFound && (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                                <Paper
+                                                    sx={{
+                                                        textAlign: 'center',
+                                                    }}
+                                                >
+                                                    <Typography variant="h6" paragraph>
+                                                        Not found
+                                                    </Typography>
 
-                                    </Card>
-                                )
-                            })
+                                                    <Typography variant="body2">
+                                                        No results found for &nbsp;
+                                                        <strong>&quot;{filterName}&quot;</strong>.
+                                                        <br /> Try checking for typos or using complete words.
+                                                    </Typography>
+                                                </Paper>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                )}
+                            </Table>
+                        </TableContainer>
+                    </Scrollbar>
 
-                            :
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={note.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </Card>
 
-                            <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                                No Notes Found!
-                            </Typography>
 
-                    }
-
-
-                </Grid>
             </Container>
         </>
     );
