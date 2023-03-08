@@ -1,17 +1,21 @@
-import { Avatar, Box, Button, CircularProgress, Container, Grid, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, CircularProgress, Container, Divider, Grid, Stack, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { deepOrange } from '@mui/material/colors';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
+import { useLoginUser } from '../../services/CheckCategory';
+import { toast } from 'react-toastify';
 
 export default function UserProfile() {
 
     const navigate = useNavigate()
     const { id } = useParams()
+
+    const { loggedUser } = useLoginUser()
 
     const { isLoading: userLoading, refetch, data: user } = useQuery(`user-profile-${id}`,
         async () => {
@@ -19,23 +23,74 @@ export default function UserProfile() {
         }
     )
 
+    const { mutateAsync: removeDoctor, isLoading: removeDoctorLoading } = useMutation((data) => {
+
+        return AuthRequest.post(`/api/v1/dme/remove-doctor-from-patient`, data)
+            .then(res => {
+                refetch()
+                toast.success("Doctor Removed!", res, {
+                    toastId: 'success699'
+                })
+
+            })
+            .catch((err) => {
+                refetch()
+                toast.error(err.response.data.message, {
+                    toastId: 'error4'
+                })
+            })
+    })
+    const { mutateAsync: removeTherapist, isLoading: removeTherapistLoading } = useMutation((data) => {
+
+        return AuthRequest.post(`/api/v1/dme/remove-therapist-from-patient`, data)
+            .then(res => {
+                refetch()
+                toast.success("Therapist Removed!", res, {
+                    toastId: 'success6899'
+                })
+
+            })
+            .catch((err) => {
+                refetch()
+                toast.error(err.response.data.message, {
+                    toastId: 'error94'
+                })
+            })
+    })
 
     useEffect(() => {
         refetch()
     }, [id])
 
 
-
-    if (!user || userLoading) {
+    if (!user || userLoading || !loggedUser || removeDoctorLoading || removeTherapistLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
     }
 
-
-
     const name = user.fullName.match(/\b(\w)/g); // ['J','S','O','N']
     const firstLetterName = name.join('').toUpperCase(); // JSON
+
+    const handleChipClick = (id) => {
+        navigate(`/DME-supplier/dashboard/user-profile/${id}`)
+    }
+
+    const handleDeleteDoctorClick = async (doctorUserId) => {
+        const data = {
+            patientUserId: id,
+            doctorUserId: doctorUserId
+        }
+        removeDoctor(data)
+    };
+
+    const handleTherapistDelete = (therapistUserId) => {
+        const data = {
+            patientUserId: id,
+            therapistUserId: therapistUserId
+        }
+        removeTherapist(data)
+    };
 
 
 
@@ -79,6 +134,70 @@ export default function UserProfile() {
                         </Stack>
                     </Stack>
 
+                    <Stack
+                        direction="row"
+                        alignItems="start"
+                        spacing={2}
+                        sx={{ my: 5, py: 2 }}
+                    >
+                        {
+                            user.details.doctor &&
+                            <Grid item xs={6} sm={6} md={4}>
+                                <Typography variant='subtitle'>Assigned Doctors</Typography>
+                                <br />
+                                {
+                                    user.details.doctor.length !== 0 ? user.details?.doctor?.map((doc, index) => {
+                                        return (
+                                            <Chip
+                                                key={index}
+                                                label={doc?.fullName}
+                                                sx={{ fontWeight: 800, mr: 1, my: 1 }}
+                                                onClick={() => handleChipClick(doc._id)}
+                                                onDelete={
+                                                    loggedUser?.category === "DME-Supplier" ?
+                                                        () => { handleDeleteDoctorClick(doc._id) }
+                                                        :
+                                                        false
+                                                }
+                                            />
+                                        )
+                                    })
+                                        :
+                                        <p style={{ maxWidth: "220px", fontSize: "12px" }}>No doctors has been assigned yet!</p>
+                                }
+                            </Grid>
+                        }
+                        {
+                            user.details.therapist &&
+                            <Grid item xs={6} sm={6} md={4}>
+                                <Typography variant='subtitle'>Assigned Therapist</Typography>
+                                <br />
+                                {
+                                    user.details.therapist.length !== 0 ? user.details.therapist.map((therapist, index) => {
+                                        return (
+                                            <Chip
+                                                key={index}
+                                                label={therapist?.fullName}
+                                                sx={{ fontWeight: 800, mr: 1, my: 1 }}
+                                                onClick={() => handleChipClick(therapist._id)}
+                                                onDelete={loggedUser?.category === "DME-Supplier" ?
+                                                    () => handleTherapistDelete(therapist._id)
+                                                    :
+                                                    false
+                                                }
+                                            />
+                                        )
+                                    })
+                                        :
+                                        <p style={{ maxWidth: "220px", fontSize: "12px" }}>No Therapist has been assigned yet!</p>
+                                }
+
+                            </Grid>
+                        }
+                    </Stack>
+
+                    <Divider variant="middle" />
+
                     <Grid
                         sx={{ marginY: 2, paddingX: 3 }}
                         container
@@ -110,6 +229,7 @@ export default function UserProfile() {
                                 <Typography variant='h6'>{user.details.dob}</Typography>
                             </Grid>
                         }
+
                         {
                             user.details.gender &&
                             <Grid item xs={6} sm={6} md={4}>

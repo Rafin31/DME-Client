@@ -26,7 +26,7 @@ import UploadOrderDocuments from './pages/DME_SUPPLIER/UploadOrderDocuments';
 import SignupPage from './pages/Authentication/SignupPage';
 import ForgetPassword from './pages/Shared/ResetPassword/ForgetPassword';
 import ResetPassword from './pages/Shared/ResetPassword/ResetPassword';
-import CheckCategory from './services/CheckCategory';
+import { CheckCategory } from './services/CheckCategory';
 import EditTasks from './pages/DME_SUPPLIER/EditTask';
 import EditStaffPage from './pages/DME_SUPPLIER/EditStaffPage';
 import AllOrderNotes from './pages/Shared/AllOrderNotes';
