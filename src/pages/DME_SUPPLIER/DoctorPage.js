@@ -19,6 +19,7 @@ import {
   TablePagination,
   Box,
   CircularProgress,
+  Tooltip,
 } from '@mui/material';
 // components
 
@@ -31,6 +32,7 @@ import { AuthRequest } from '../../services/AuthRequest';
 import { UserListHead } from '../../sections/@dashboard/user';
 import InviteModal from '../Shared/InviteModal';
 import AddPatienttToDoctor from '../Shared/AddPatientToDoctorModal';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 
@@ -182,6 +184,8 @@ export default function DoctorPage() {
 
   const [invitedDoctorId, setInvitedDoctor] = useState()
 
+  const navigate = useNavigate()
+
 
   const { isLoading: doctorLoading, data: doctors } = useQuery('doctorsTemp',
     async () => {
@@ -314,10 +318,18 @@ export default function DoctorPage() {
           <Typography variant="h4" gutterBottom>
             Doctor
           </Typography>
-          <Button variant="contained" onClick={() => { setInviteOpen(true) }} startIcon={
-            <Iconify icon="material-symbols:mark-email-read-sharp" />}>
-            Invite New Doctor
-          </Button>
+
+          <Box>
+            <Button sx={{ mx: 2 }} variant="outlined" startIcon={<Iconify icon="material-symbols:add" />}
+              onClick={() => { navigate('/DME-supplier/dashboard/add-doctor') }}>
+              New Doctor
+            </Button>
+            <Button variant="contained" onClick={() => { setInviteOpen(true) }} startIcon={
+              <Iconify icon="material-symbols:mark-email-read-sharp" />}>
+              Invite New Doctor
+            </Button>
+          </Box>
+
         </Stack>
 
         <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteDoctor} title="Invite Doctors" />
@@ -367,7 +379,14 @@ export default function DoctorPage() {
                         </TableCell>
 
                         <TableCell align="left">{userId.lastName}</TableCell>
-                        <TableCell align="left">{userId.fullName}</TableCell>
+                        <TableCell align="left">
+                          <Tooltip title="Profile">
+                            <Link to={`/DME-supplier/dashboard/user-profile/${userId._id}`}
+                              style={{ display: "inline", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
+                              {userId.fullName}
+                            </Link>
+                          </Tooltip>
+                        </TableCell>
 
                         <TableCell align="left">{userId.email}</TableCell>
 

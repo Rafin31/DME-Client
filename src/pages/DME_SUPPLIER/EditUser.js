@@ -283,7 +283,7 @@ export default function EditUser() {
                                 </Grid>
 
 
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <TextField
                                         {...register("phoneNumber", {
                                             minLength: { value: 6, message: "Phone number should be at last 6 characters" },
@@ -331,6 +331,39 @@ export default function EditUser() {
                                             defaultValue={user.details?.secondaryInsurance}
                                             variant="outlined"
                                             helperText={errors.secondaryInsurance?.message}
+
+                                        />
+                                    </Grid>
+                                }
+
+                                {
+                                    userCategory === "doctor" &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("npiNumber", { required: "Field is required" })}
+                                            error={errors.lastFour && true}
+
+                                            label="NPI Number*"
+                                            fullWidth
+                                            variant="outlined"
+                                            defaultValue={user.details?.npiNumber}
+                                            helperText={errors.npiNumber?.message}
+
+                                        />
+                                    </Grid>
+                                }
+                                {
+                                    userCategory === "doctor" &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("companyName", { required: "Field is required" })}
+                                            error={errors.lastFour && true}
+
+                                            label="Company Name*"
+                                            fullWidth
+                                            variant="outlined"
+                                            defaultValue={user.details?.companyName}
+                                            helperText={errors.companyName?.message}
 
                                         />
                                     </Grid>

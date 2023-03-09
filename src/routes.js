@@ -72,6 +72,8 @@ import OrderHistory from './pages/DME_SUPPLIER/OrderHistory/OrderHistory';
 import PrivateMessagePage from './pages/Shared/PrivateMessage/PrivateMessagePage';
 import { PrivateMessageContext } from './Context/PrivateMessageContext';
 import Chat from './pages/Shared/PrivateMessage/Chat';
+import AddDoctor from './pages/DME_SUPPLIER/AddDoctor';
+import AddTherapist from './pages/DME_SUPPLIER/AddTherapist';
 
 
 
@@ -152,7 +154,9 @@ export default function Router() {
 
         <Route path='add-order' element={<AddOrder />} />
         <Route path='doctor' element={<DoctorPage />} />
+        <Route path="add-doctor" element={<AddDoctor />} />
         <Route path='therapist' element={<TherapistPage />} />
+        <Route path='add-therapist' element={<AddTherapist />} />
         <Route path='patient' element={<PatientPage />} />
         <Route path='add-patient' element={<AddPatient />} />
         <Route path='staff' element={<StaffPage />} />

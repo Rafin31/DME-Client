@@ -134,69 +134,74 @@ export default function UserProfile() {
                         </Stack>
                     </Stack>
 
-                    <Stack
-                        direction="row"
-                        alignItems="start"
-                        spacing={2}
-                        sx={{ my: 5, py: 2 }}
-                    >
-                        {
-                            user.details.doctor &&
-                            <Grid item xs={6} sm={6} md={4}>
-                                <Typography variant='subtitle'>Assigned Doctors</Typography>
-                                <br />
-                                {
-                                    user.details.doctor.length !== 0 ? user.details?.doctor?.map((doc, index) => {
-                                        return (
-                                            <Chip
-                                                key={index}
-                                                label={doc?.fullName}
-                                                sx={{ fontWeight: 800, mr: 1, my: 1 }}
-                                                onClick={() => handleChipClick(doc._id)}
-                                                onDelete={
-                                                    loggedUser?.category === "DME-Supplier" ?
-                                                        () => { handleDeleteDoctorClick(doc._id) }
+                    {
+                        user.category === "Patient" &&
+                        <Stack
+                            direction="row"
+                            alignItems="start"
+                            spacing={2}
+                            sx={{ my: 5, py: 2 }}
+                        >
+                            {
+                                user.details.doctor &&
+                                <Grid item xs={6} sm={6} md={4}>
+                                    <Typography variant='subtitle'>Assigned Doctors</Typography>
+                                    <br />
+                                    {
+                                        user.details.doctor.length !== 0 ? user.details?.doctor?.map((doc, index) => {
+                                            return (
+                                                <Chip
+                                                    key={index}
+                                                    label={doc?.fullName}
+                                                    sx={{ fontWeight: 800, mr: 1, my: 1 }}
+                                                    onClick={() => handleChipClick(doc._id)}
+                                                    onDelete={
+                                                        loggedUser?.category === "DME-Supplier" ?
+                                                            () => { handleDeleteDoctorClick(doc._id) }
+                                                            :
+                                                            false
+                                                    }
+                                                />
+                                            )
+                                        })
+                                            :
+                                            <p style={{ maxWidth: "220px", fontSize: "12px" }}>No doctors has been assigned yet!</p>
+                                    }
+                                </Grid>
+                            }
+                            {
+                                user.details.therapist &&
+                                <Grid item xs={6} sm={6} md={4}>
+                                    <Typography variant='subtitle'>Assigned Therapist</Typography>
+                                    <br />
+                                    {
+                                        user.details.therapist.length !== 0 ? user.details.therapist.map((therapist, index) => {
+                                            return (
+                                                <Chip
+                                                    key={index}
+                                                    label={therapist?.fullName}
+                                                    sx={{ fontWeight: 800, mr: 1, my: 1 }}
+                                                    onClick={() => handleChipClick(therapist._id)}
+                                                    onDelete={loggedUser?.category === "DME-Supplier" ?
+                                                        () => handleTherapistDelete(therapist._id)
                                                         :
                                                         false
-                                                }
-                                            />
-                                        )
-                                    })
-                                        :
-                                        <p style={{ maxWidth: "220px", fontSize: "12px" }}>No doctors has been assigned yet!</p>
-                                }
-                            </Grid>
-                        }
-                        {
-                            user.details.therapist &&
-                            <Grid item xs={6} sm={6} md={4}>
-                                <Typography variant='subtitle'>Assigned Therapist</Typography>
-                                <br />
-                                {
-                                    user.details.therapist.length !== 0 ? user.details.therapist.map((therapist, index) => {
-                                        return (
-                                            <Chip
-                                                key={index}
-                                                label={therapist?.fullName}
-                                                sx={{ fontWeight: 800, mr: 1, my: 1 }}
-                                                onClick={() => handleChipClick(therapist._id)}
-                                                onDelete={loggedUser?.category === "DME-Supplier" ?
-                                                    () => handleTherapistDelete(therapist._id)
-                                                    :
-                                                    false
-                                                }
-                                            />
-                                        )
-                                    })
-                                        :
-                                        <p style={{ maxWidth: "220px", fontSize: "12px" }}>No Therapist has been assigned yet!</p>
-                                }
+                                                    }
+                                                />
+                                            )
+                                        })
+                                            :
+                                            <p style={{ maxWidth: "220px", fontSize: "12px" }}>No Therapist has been assigned yet!</p>
+                                    }
 
-                            </Grid>
-                        }
-                    </Stack>
+                                </Grid>
+                            }
+                            <Divider variant="middle" />
+                        </Stack>
 
-                    <Divider variant="middle" />
+                    }
+
+
 
                     <Grid
                         sx={{ marginY: 2, paddingX: 3 }}
@@ -302,6 +307,20 @@ export default function UserProfile() {
                             <Grid item xs={6} sm={6} md={4}>
                                 <Typography variant='subtitle'>Last Four#</Typography>
                                 <Typography variant='h6'>{user.details.lastFour}</Typography>
+                            </Grid>
+                        }
+                        {
+                            user.details.companyName &&
+                            <Grid item xs={6} sm={6} md={4}>
+                                <Typography variant='subtitle'>Company Name</Typography>
+                                <Typography variant='h6'>{user.details.companyName}</Typography>
+                            </Grid>
+                        }
+                        {
+                            user.details.npiNumber &&
+                            <Grid item xs={6} sm={6} md={4}>
+                                <Typography variant='subtitle'>NPI#</Typography>
+                                <Typography variant='h6'>{user.details.npiNumber}</Typography>
                             </Grid>
                         }
                     </Grid>
