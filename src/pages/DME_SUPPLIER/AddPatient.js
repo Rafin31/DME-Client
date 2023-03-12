@@ -131,7 +131,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("password",
+                                        {...register("password*",
                                             {
                                                 required: "Field is required",
                                                 minLength: { value: 8, message: "Password must be at last 8 characters" },
@@ -205,7 +205,7 @@ export default function AddPatient() {
                                         error={errors.weight && true}
 
                                         type={'number'}
-                                        label="Weight (lbs)*"
+                                        label="Weight (lbs)"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.weight?.message}
@@ -217,7 +217,7 @@ export default function AddPatient() {
                                         {...register("country")}
                                         error={errors.country && true}
 
-                                        label="Country*"
+                                        label="Country"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.country?.message}
@@ -229,7 +229,7 @@ export default function AddPatient() {
                                         {...register("city")}
                                         error={errors.city && true}
 
-                                        label="City*"
+                                        label="City"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.city?.message}
@@ -241,7 +241,7 @@ export default function AddPatient() {
                                         {...register("state")}
                                         error={errors.state && true}
 
-                                        label="State*"
+                                        label="State"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.state?.message}
@@ -255,7 +255,7 @@ export default function AddPatient() {
                                         })}
 
                                         error={errors.phoneNumber && true}
-                                        label="Phone Number*"
+                                        label="Phone Number"
                                         type={"tel"}
                                         fullWidth
                                         variant="outlined"
@@ -270,7 +270,7 @@ export default function AddPatient() {
                                         {...register("primaryInsurance")}
                                         error={errors.primaryInsurance && true}
                                         type="text"
-                                        label="Primary Insurance*"
+                                        label="Primary Insurance"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.primaryInsurance?.message}
@@ -282,7 +282,7 @@ export default function AddPatient() {
                                         {...register("secondaryInsurance")}
                                         error={errors.secondaryInsurance && true}
                                         type="text"
-                                        label="Secondary Insurance*"
+                                        label="Secondary Insurance"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.secondaryInsurance?.message}

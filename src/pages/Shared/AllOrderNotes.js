@@ -20,6 +20,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 const TABLE_HEAD = [
     { id: 'TimeStamp', label: 'Created At', alignRight: false },
+    { id: 'companyName', label: 'Company Name', alignRight: false },
     { id: 'name', label: 'Name', alignRight: false },
     { id: 'designation', label: 'Designation', alignRight: false },
     { id: 'note', label: 'Note', alignRight: false },
@@ -51,7 +52,7 @@ function applySortFilter(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.notes.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.writerId?.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.writerId?.userCategory?.category.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.notes.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.writerId?.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.writerId?.userCategory?.category.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.writerId?.companyName?.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
@@ -244,7 +245,7 @@ export default function AllOrderNotes() {
                             padding: "10px 5px",
                             width: "220px"
                         }}
-                        placeholder="Search by Name,Designation,Note"
+                        placeholder="Search by Name,Company Name,Designation,Note"
                         value={filterName}
                         onChange={handleFilterByName} />
 
@@ -265,6 +266,7 @@ export default function AllOrderNotes() {
                                         return (
                                             <TableRow hover key={_id} tabIndex={-1}>
                                                 <TableCell align="left">{fDateTime(createdAt)}</TableCell>
+                                                <TableCell align="left">{writerId?.companyName ? writerId.companyName : "Not given"}</TableCell>
                                                 <TableCell align="left">{writerId?.fullName}</TableCell>
                                                 <TableCell align="left">{writerId?.userCategory?.category}</TableCell>
                                                 <TableCell sx={{ width: "50%" }} component="th" scope="row" padding="none">
