@@ -140,6 +140,21 @@ export default function EditUser() {
 
                                     />
                                 </Grid>
+                                {
+                                    (userCategory === "doctor" || userCategory === "therapist") &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("title")}
+                                            error={errors.title && true}
+                                            defaultValue={user.details?.title}
+                                            label="Title"
+                                            fullWidth
+                                            variant="outlined"
+                                            helperText={errors.title?.message}
+
+                                        />
+                                    </Grid>
+                                }
                                 <Grid item xs={6}>
                                     <TextField
                                         {...register("email", { required: "Field is required" })}
@@ -283,7 +298,7 @@ export default function EditUser() {
                                 </Grid>
 
 
-                                <Grid item xs={12}>
+                                <Grid item xs={6}>
                                     <TextField
                                         {...register("phoneNumber", {
                                             minLength: { value: 6, message: "Phone number should be at last 6 characters" },
@@ -337,12 +352,11 @@ export default function EditUser() {
                                 }
 
                                 {
-                                    userCategory === "doctor" &&
+                                    (userCategory === "doctor" || userCategory === "therapist") &&
                                     <Grid item xs={6}>
                                         <TextField
                                             {...register("npiNumber", { required: "Field is required" })}
                                             error={errors.lastFour && true}
-
                                             label="NPI Number*"
                                             fullWidth
                                             variant="outlined"
@@ -353,7 +367,7 @@ export default function EditUser() {
                                     </Grid>
                                 }
                                 {
-                                    userCategory === "doctor" &&
+                                    (userCategory === "doctor" || userCategory === "therapist") &&
                                     <Grid item xs={6}>
                                         <TextField
                                             {...register("companyName", { required: "Field is required" })}

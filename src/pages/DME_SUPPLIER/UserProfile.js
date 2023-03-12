@@ -226,6 +226,13 @@ export default function UserProfile() {
                             <Typography variant='subtitle'>Last Name</Typography>
                             <Typography variant='h6'>{user.lastName}</Typography>
                         </Grid>
+                        {
+                            user.details.title &&
+                            <Grid item xs={6} sm={6} md={4}>
+                                <Typography variant='subtitle'>Title</Typography>
+                                <Typography variant='h6'>{user.details.title}</Typography>
+                            </Grid>
+                        }
 
                         {
                             user.details.dob &&

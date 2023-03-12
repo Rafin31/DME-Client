@@ -104,6 +104,17 @@ export default function AddDoctor() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
+                                        {...register("title")}
+                                        error={errors.title && true}
+                                        label="Title"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.title?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
                                         {...register("email", { required: "Field is required" })}
                                         error={errors.email && true}
 
@@ -153,7 +164,6 @@ export default function AddDoctor() {
 
                                     />
                                 </Grid>
-
                                 <Grid item xs={6}>
                                     <TextField
                                         {...register("country")}
@@ -187,7 +197,7 @@ export default function AddDoctor() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={6}>
                                     <TextField
                                         {...register("phoneNumber", {
                                             minLength: { value: 6, message: "Phone number should be at last 6 characters" },
