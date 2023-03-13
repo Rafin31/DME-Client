@@ -131,7 +131,7 @@ export default function AddPatient() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("password*",
+                                        {...register("password",
                                             {
                                                 required: "Field is required",
                                                 minLength: { value: 8, message: "Password must be at last 8 characters" },
