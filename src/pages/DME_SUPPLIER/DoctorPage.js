@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // @mui
 import {
@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 // components
 
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
@@ -186,8 +186,10 @@ export default function DoctorPage() {
 
   const navigate = useNavigate()
 
+  const importButtonRef = useRef(null)
 
-  const { isLoading: doctorLoading, data: doctors } = useQuery('doctorsTemp',
+
+  const { isLoading: doctorLoading, refetch, data: doctors } = useQuery('doctorsTemp',
     async () => {
       return AuthRequest.get(`/api/v1/doctor/`).then(data => data.data.data)
     }
@@ -206,9 +208,6 @@ export default function DoctorPage() {
   const { id } = loggedUser
 
   const loadUserInfo = useCallback(() => {
-
-
-
     AuthRequest.get(`/api/v1/users/${id}`)
       .then(res => {
         setUser(res.data.data)
@@ -216,13 +215,34 @@ export default function DoctorPage() {
       })
   }, [id])
 
+
+  const { mutateAsync, isLoading: importDoctorLoading } = useMutation((importDoctor) => {
+
+    return AuthRequest.post(`/api/v1/users/import-doctor`, importDoctor,
+      {
+        headers: { "Content-Type": "multipart/form-data" }
+      }
+    )
+      .then(res => {
+        toast.success("Import Successful!", res, {
+          toastId: 'success1198'
+        })
+        refetch()
+      })
+      .catch((err) => {
+        toast.error(err?.response?.data?.message, {
+          toastId: 'error13541'
+        })
+      })
+  })
+
   useEffect(() => {
     setLoading(true);
     loadUserInfo()
   }, [loadUserInfo])
 
 
-  if (!doctors || doctorLoading || patientLoading || !user) {
+  if (!doctors || doctorLoading || patientLoading || !user || importDoctorLoading) {
     return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <CircularProgress />
     </Box>
@@ -248,7 +268,6 @@ export default function DoctorPage() {
     })
   };
 
-
   const handelAddPatientToDoctor = async (e) => {
     e.preventDefault()
     const data = {
@@ -268,6 +287,45 @@ export default function DoctorPage() {
       })
     setAddPatientOpen(false)
   };
+
+  const exportDoctor = async () => {
+
+    const resp = await AuthRequest.get("/api/v1/users/export-doctor", {
+      responseType: 'arraybuffer',
+      headers: { 'Content-Type': 'blob' },
+    })
+
+    const link = document.createElement('a');
+    const fileName = 'Doctors-List.xlsx';
+    link.setAttribute('download', fileName);
+    link.href = URL.createObjectURL(new Blob([resp.data]));
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  const handleImportButtonClick = (e) => {
+    e.preventDefault()
+    importButtonRef.current.click()
+  }
+
+  const handleImportFormSubmit = (e) => {
+    e.preventDefault()
+    const file = e.target.importFile.files[0]
+    const formData = new FormData()
+    formData.append('doctor-list', file)
+
+    if (!!formData.entries().next().value) {
+      mutateAsync(formData)
+
+    } else {
+      toast.warning('Please Upload documents', {
+        toastId: "warning1"
+      })
+    }
+  }
+
+
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -314,21 +372,53 @@ export default function DoctorPage() {
 
       <Container maxWidth="1350px">
 
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Stack direction={{ sm: "col", lg: "row", xl: "row" }} alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             Doctor
           </Typography>
 
-          <Box>
-            <Button sx={{ mx: 2 }} variant="outlined" startIcon={<Iconify icon="material-symbols:add" />}
+          <Stack direction="row" alignItems="center" justifyContent="center" gap={1} >
+            <Tooltip
+              title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be First name > Last name > Full name > Title > Email > Password > Category > Country > City > State > Zip > NPI Number > Company Name > Address > Phone Number"
+              arrow
+              placement="left">
+              <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
+            </Tooltip>
+
+            <form onSubmit={(e) => handleImportFormSubmit(e)}>
+              <Button
+                variant="contained"
+                component="label"
+                color="success"
+                style={{ color: "white", width: "110px" }}
+                startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
+                Import
+                <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
+              </Button>
+              <input ref={importButtonRef} hidden type="submit" />
+            </form>
+
+
+            <Button
+              variant="contained"
+              component="label"
+              color="warning"
+              style={{ color: "white", width: "110px" }}
+              onClick={() => { exportDoctor() }}
+              startIcon={<Iconify icon="mdi:calendar-export" />}>
+              Export
+            </Button>
+
+            <Button variant="outlined" startIcon={<Iconify icon="material-symbols:add" />}
               onClick={() => { navigate('/DME-supplier/dashboard/add-doctor') }}>
               New Doctor
             </Button>
+
             <Button variant="contained" onClick={() => { setInviteOpen(true) }} startIcon={
               <Iconify icon="material-symbols:mark-email-read-sharp" />}>
               Invite New Doctor
             </Button>
-          </Box>
+          </Stack>
 
         </Stack>
 

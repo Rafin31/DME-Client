@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 
 // @mui
@@ -101,6 +101,8 @@ export default function VeteranPage() {
 
     const navigate = useNavigate()
 
+    const importButtonRef = useRef(null)
+
 
     const { isLoading: veteranLoading, refetch: veteranRefetch, data: veteran } = useQuery(
         ["veteran", addedVeteran !== null && addedVeteran],
@@ -154,6 +156,46 @@ export default function VeteranPage() {
         addVaToVeteran(data)
 
     };
+
+
+    const exportDoctor = async () => {
+
+        // const resp = await AuthRequest.get("/api/v1/users/export-patient", {
+        //   responseType: 'arraybuffer',
+        //   headers: { 'Content-Type': 'blob' },
+        // })
+
+        // const link = document.createElement('a');
+        // const fileName = 'Patient-List.xlsx';
+        // link.setAttribute('download', fileName);
+        // link.href = URL.createObjectURL(new Blob([resp.data]));
+        // document.body.appendChild(link);
+        // link.click();
+        // link.remove();
+    }
+
+    const handleImportButtonClick = (e) => {
+        e.preventDefault()
+        importButtonRef.current.click()
+    }
+
+    const handleImportFormSubmit = (e) => {
+        e.preventDefault()
+        // const file = e.target.importFile.files[0]
+        // const formData = new FormData()
+        // formData.append('patient-list', file)
+
+        // if (!!formData.entries().next().value) {
+        //   mutateAsync(formData)
+
+        // } else {
+        //   toast.warning('Please Upload documents', {
+        //     toastId: "warning1"
+        //   })
+        // }
+    }
+
+
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -226,10 +268,44 @@ export default function VeteranPage() {
                         spacing={1}
                         divider={<Divider orientation="vertical" flexItem />}>
 
-                        <Button variant="contained" startIcon={<Iconify icon="material-symbols:add" />}
-                            onClick={() => { navigate('/DME-supplier/dashboard/add-veteran') }}>
-                            New Veteran
-                        </Button>
+                        <Stack direction="row" alignItems="center" justifyContent="center" gap={1} >
+                            <Tooltip
+                                title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Age > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
+                                arrow
+                                placement="left">
+                                <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
+                            </Tooltip>
+
+                            <form onSubmit={(e) => handleImportFormSubmit(e)}>
+                                <Button
+                                    variant="contained"
+                                    component="label"
+                                    color="success"
+                                    style={{ color: "white", width: "110px" }}
+                                    startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
+                                    Import
+                                    <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
+                                </Button>
+                                <input ref={importButtonRef} hidden type="submit" />
+                            </form>
+
+
+                            <Button
+                                variant="contained"
+                                component="label"
+                                color="warning"
+                                style={{ color: "white", width: "110px" }}
+                                onClick={() => { exportDoctor() }}
+                                startIcon={<Iconify icon="mdi:calendar-export" />}>
+                                Export
+                            </Button>
+
+                            <Button variant="contained" startIcon={<Iconify icon="material-symbols:add" />}
+                                onClick={() => { navigate('/DME-supplier/dashboard/add-veteran') }}>
+                                New Veteran
+                            </Button>
+
+                        </Stack>
                     </Stack>
                 </Stack>
 
