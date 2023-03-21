@@ -250,7 +250,7 @@ export default function PatientPage() {
                         divider={<Divider orientation="vertical" flexItem />}>
 
                         <Tooltip
-                            title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Age > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
+                            title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
                             arrow
                             placement="left">
                             <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />

@@ -133,7 +133,27 @@ export default function VeteranPage() {
             })
     })
 
-    if (!veteran || veteranLoading || addVALoading) {
+    const { mutateAsync: importVeteran, isLoading: importDoctorLoading } = useMutation((importVeteran) => {
+
+        return AuthRequest.post(`/api/v1/users/import-veteran`, importVeteran,
+            {
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        )
+            .then(res => {
+                toast.success("Import Successful!", res, {
+                    toastId: 'success11w98'
+                })
+                veteranRefetch()
+            })
+            .catch((err) => {
+                toast.error(err?.response?.data?.message, {
+                    toastId: 'error13e541'
+                })
+            })
+    })
+
+    if (!veteran || veteranLoading || addVALoading || importDoctorLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -158,20 +178,20 @@ export default function VeteranPage() {
     };
 
 
-    const exportDoctor = async () => {
+    const exportVeteran = async () => {
 
-        // const resp = await AuthRequest.get("/api/v1/users/export-patient", {
-        //   responseType: 'arraybuffer',
-        //   headers: { 'Content-Type': 'blob' },
-        // })
+        const resp = await AuthRequest.get("/api/v1/users/export-veteran", {
+            responseType: 'arraybuffer',
+            headers: { 'Content-Type': 'blob' },
+        })
 
-        // const link = document.createElement('a');
-        // const fileName = 'Patient-List.xlsx';
-        // link.setAttribute('download', fileName);
-        // link.href = URL.createObjectURL(new Blob([resp.data]));
-        // document.body.appendChild(link);
-        // link.click();
-        // link.remove();
+        const link = document.createElement('a');
+        const fileName = 'Veterans-List.xlsx';
+        link.setAttribute('download', fileName);
+        link.href = URL.createObjectURL(new Blob([resp.data]));
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     }
 
     const handleImportButtonClick = (e) => {
@@ -181,18 +201,18 @@ export default function VeteranPage() {
 
     const handleImportFormSubmit = (e) => {
         e.preventDefault()
-        // const file = e.target.importFile.files[0]
-        // const formData = new FormData()
-        // formData.append('patient-list', file)
+        const file = e.target.importFile.files[0]
+        const formData = new FormData()
+        formData.append('veteran-list', file)
 
-        // if (!!formData.entries().next().value) {
-        //   mutateAsync(formData)
+        if (!!formData.entries().next().value) {
+            importVeteran(formData)
 
-        // } else {
-        //   toast.warning('Please Upload documents', {
-        //     toastId: "warning1"
-        //   })
-        // }
+        } else {
+            toast.warning('Please Upload documents', {
+                toastId: "warning1"
+            })
+        }
     }
 
 
@@ -270,7 +290,7 @@ export default function VeteranPage() {
 
                         <Stack direction="row" alignItems="center" justifyContent="center" gap={1} >
                             <Tooltip
-                                title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Age > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
+                                title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be, First name > Last name > Full name > last Four > Email > Password > User Category > Country > City > State > Address > Phone Number"
                                 arrow
                                 placement="left">
                                 <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
@@ -295,7 +315,7 @@ export default function VeteranPage() {
                                 component="label"
                                 color="warning"
                                 style={{ color: "white", width: "110px" }}
-                                onClick={() => { exportDoctor() }}
+                                onClick={() => { exportVeteran() }}
                                 startIcon={<Iconify icon="mdi:calendar-export" />}>
                                 Export
                             </Button>
