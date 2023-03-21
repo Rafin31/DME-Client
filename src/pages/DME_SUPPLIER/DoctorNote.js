@@ -89,7 +89,7 @@ function applySortFilter(array, comparator, query) {
     return stabilizedThis.map((el) => el[0]);
 }
 
-export default function PatientNotes() {
+export default function DoctorNotes() {
 
     const [addNotesOpen, setAddNotesOpen] = useState(false)
 
@@ -143,14 +143,14 @@ export default function PatientNotes() {
         }
     )
 
-    const { isLoading: patientLoading, data: patient2 } = useQuery('patient2',
+    const { isLoading: patientLoading, data: doctor } = useQuery('patient2',
         async () => {
             return AuthRequest.get(`/api/v1/users/${noteFor}`)
                 .then(data => data.data.data)
         }
     )
 
-    if (!notes || !user || !patient2) {
+    if (!notes || !user || !doctor) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -280,7 +280,7 @@ export default function PatientNotes() {
     return (
         <>
             <Helmet>
-                <title> Patients Notes</title>
+                <title> Doctor Notes</title>
             </Helmet>
 
             <Container maxWidth="1350px">
@@ -300,7 +300,7 @@ export default function PatientNotes() {
                             style={{ color: "black", cursor: "pointer", marginLeft: "6px" }}
                             color="inherit" variant="subtitle2" underline="hover" nowrap="true"
                             target="_blank" rel="noopener noreferrer"
-                        >{patient2.fullName}</Link>
+                        >{doctor.fullName}</Link>
                     </Typography>
                     <Button variant="contained" onClick={() => { setAddNotesOpen(true) }} startIcon={
                         <Iconify icon="material-symbols:add" />}>

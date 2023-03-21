@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import DmeDashboardLayout from './layouts/dashboard';
 
@@ -74,6 +74,7 @@ import { PrivateMessageContext } from './Context/PrivateMessageContext';
 import Chat from './pages/Shared/PrivateMessage/Chat';
 import AddDoctor from './pages/DME_SUPPLIER/AddDoctor';
 import AddTherapist from './pages/DME_SUPPLIER/AddTherapist';
+import DoctorNotes from './pages/DME_SUPPLIER/DoctorNote';
 
 
 
@@ -193,6 +194,7 @@ export default function Router() {
         <Route path='update-password/:id' element={<UpdatePassword />} />
         <Route path='edit-order/:id' element={<EditOrder />} />
         <Route path='add-patient-note/:id' element={<PatientNotes />} />
+        <Route path='add-doctor-note/:id' element={<DoctorNotes />} />
         <Route path='settings/:id' element={<Settings />} />
         <Route path='order-note-log/:id' element={<AllOrderNotes />} />
         <Route path='edit-va-prosthetics-staff/:id' element={<EditVaProstheticPage />} />

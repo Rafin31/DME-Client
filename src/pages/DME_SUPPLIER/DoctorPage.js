@@ -33,6 +33,7 @@ import { UserListHead } from '../../sections/@dashboard/user';
 import InviteModal from '../Shared/InviteModal';
 import AddPatienttToDoctor from '../Shared/AddPatientToDoctorModal';
 import { Link, useNavigate } from 'react-router-dom';
+import PopOver from 'src/components/Popover/PopOver';
 
 
 
@@ -157,7 +158,8 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+      _user.userId.email.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -435,7 +437,7 @@ export default function DoctorPage() {
               padding: "10px 5px",
               width: "220px"
             }}
-            placeholder="Search by Name"
+            placeholder="Search by Name or Email"
             value={filterName}
             onChange={handleFilterByName} />
 
@@ -482,12 +484,18 @@ export default function DoctorPage() {
 
                         <TableCell>
 
-                          <Button
-                            onClick={() => { setAddPatientOpen(true) }}
-                            onMouseUp={() => setInvitedDoctor(userId._id)}
-                            variant="contained" size='small' startIcon={<Iconify icon="eva:plus-fill" />}>
-                            Add Patient
-                          </Button>
+                          <PopOver
+                            key={userId._id}
+                            source="doctor-page"
+                            option={[
+                              { label: "Assign Patient" },
+                              { label: "Note" },
+                            ]}
+                            id={userId._id}
+                            setAddPatientOpen={setAddPatientOpen}
+                            setInvitedDoctor={setInvitedDoctor}
+
+                          />
 
                         </TableCell>
                       </TableRow>

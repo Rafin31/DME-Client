@@ -31,6 +31,16 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 navigate(`/DME-supplier/dashboard/order-history/${id}`)
             }
         }
+        if (source === "doctor-page") {
+            if (lebel === "Assign Patient") {
+                other.setAddPatientOpen(true)
+                other.setInvitedDoctor(id)
+            }
+            if (lebel === "Note") {
+                navigate(`/DME-supplier/dashboard/add-doctor-note/${id}`)
+            }
+        }
+
         if (source === "veteran-page") {
             if (lebel === "Edit") {
                 navigate(`/DME-supplier/dashboard/edit-user-profile/${id}?user=veteran`)
@@ -60,8 +70,6 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 } else {
                     navigate(`/DME-supplier/dashboard/order-note-log/${id}?orderCategory=equipment-order`)
                 }
-
-
             }
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
