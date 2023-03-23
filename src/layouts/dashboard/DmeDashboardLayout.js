@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import Header from './header';
 import Nav from './nav';
 import { AuthRequest } from '../../services/AuthRequest';
+import { Box, CircularProgress } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -41,18 +42,25 @@ export default function DmeDashboardLayout() {
 
   let loggedInUser = JSON.parse(localStorage.getItem('user'));
 
-
-  const { id } = loggedInUser
+  const { id, staffId } = loggedInUser
 
   const loadUserInfo = useCallback(() => {
 
-    AuthRequest.get(`/api/v1/users/${id}`)
-      .then(res => {
-        setUser(res.data.data)
-        setLoading(false)
-      })
+    if (!staffId) {
+      AuthRequest.get(`/api/v1/users/${id}`)
+        .then(res => {
+          setUser(res.data.data)
+          setLoading(false)
+        })
+    } else {
+      AuthRequest.get(`/api/v1/users/${staffId}`)
+        .then(res => {
+          setUser(res.data.data)
+          setLoading(false)
+        })
+    }
 
-  })
+  }, [id, staffId])
 
 
   useEffect(() => {
@@ -60,6 +68,12 @@ export default function DmeDashboardLayout() {
     loadUserInfo()
   }, [])
 
+
+  if (loading || !user) {
+    return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <CircularProgress />
+    </Box>
+  }
 
   return (
 

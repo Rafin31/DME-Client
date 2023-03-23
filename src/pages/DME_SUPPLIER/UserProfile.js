@@ -156,7 +156,7 @@ export default function UserProfile() {
                                                     sx={{ fontWeight: 800, mr: 1, my: 1 }}
                                                     onClick={() => handleChipClick(doc._id)}
                                                     onDelete={
-                                                        loggedUser?.category === "DME-Supplier" ?
+                                                        (loggedUser?.category === "DME-Supplier" || loggedUser?.category === "DME-Staff") ?
                                                             () => { handleDeleteDoctorClick(doc._id) }
                                                             :
                                                             false
@@ -182,7 +182,7 @@ export default function UserProfile() {
                                                     label={therapist?.fullName}
                                                     sx={{ fontWeight: 800, mr: 1, my: 1 }}
                                                     onClick={() => handleChipClick(therapist._id)}
-                                                    onDelete={loggedUser?.category === "DME-Supplier" ?
+                                                    onDelete={(loggedUser?.category === "DME-Supplier" || loggedUser?.category === "DME-Staff") ?
                                                         () => handleTherapistDelete(therapist._id)
                                                         :
                                                         false

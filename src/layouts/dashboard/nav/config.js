@@ -43,11 +43,7 @@ const navConfig = [
     path: '/DME-supplier/dashboard/patient',
     icon: <Iconify icon="mdi:patient" />,
   },
-  {
-    title: 'Staff',
-    path: '/DME-supplier/dashboard/staff',
-    icon: <Iconify icon="medical-icon:care-staff-area" />,
-  },
+
 ];
 
 export default navConfig;

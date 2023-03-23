@@ -103,6 +103,8 @@ export default function VeteranPage() {
 
     const importButtonRef = useRef(null)
 
+    let { staffId } = JSON.parse(localStorage.getItem('user'));
+
 
     const { isLoading: veteranLoading, refetch: veteranRefetch, data: veteran } = useQuery(
         ["veteran", addedVeteran !== null && addedVeteran],
@@ -289,36 +291,40 @@ export default function VeteranPage() {
                         divider={<Divider orientation="vertical" flexItem />}>
 
                         <Stack direction="row" alignItems="center" justifyContent="center" gap={1} >
-                            <Tooltip
-                                title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be, First name > Last name > Full name > last Four > Email > Password > User Category > Country > City > State > Address > Phone Number"
-                                arrow
-                                placement="left">
-                                <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
-                            </Tooltip>
+                            {
+                                !staffId && <>
+                                    <Tooltip
+                                        title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be, First name > Last name > Full name > last Four > Email > Password > User Category > Country > City > State > Address > Phone Number"
+                                        arrow
+                                        placement="left">
+                                        <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
+                                    </Tooltip>
 
-                            <form onSubmit={(e) => handleImportFormSubmit(e)}>
-                                <Button
-                                    variant="contained"
-                                    component="label"
-                                    color="success"
-                                    style={{ color: "white", width: "110px" }}
-                                    startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
-                                    Import
-                                    <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
-                                </Button>
-                                <input ref={importButtonRef} hidden type="submit" />
-                            </form>
+                                    <form onSubmit={(e) => handleImportFormSubmit(e)}>
+                                        <Button
+                                            variant="contained"
+                                            component="label"
+                                            color="success"
+                                            style={{ color: "white", width: "110px" }}
+                                            startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
+                                            Import
+                                            <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
+                                        </Button>
+                                        <input ref={importButtonRef} hidden type="submit" />
+                                    </form>
 
 
-                            <Button
-                                variant="contained"
-                                component="label"
-                                color="warning"
-                                style={{ color: "white", width: "110px" }}
-                                onClick={() => { exportVeteran() }}
-                                startIcon={<Iconify icon="mdi:calendar-export" />}>
-                                Export
-                            </Button>
+                                    <Button
+                                        variant="contained"
+                                        component="label"
+                                        color="warning"
+                                        style={{ color: "white", width: "110px" }}
+                                        onClick={() => { exportVeteran() }}
+                                        startIcon={<Iconify icon="mdi:calendar-export" />}>
+                                        Export
+                                    </Button>
+                                </>
+                            }
 
                             <Button variant="contained" startIcon={<Iconify icon="material-symbols:add" />}
                                 onClick={() => { navigate('/DME-supplier/dashboard/add-veteran') }}>

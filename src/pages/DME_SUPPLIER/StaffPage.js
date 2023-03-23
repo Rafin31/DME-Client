@@ -155,12 +155,12 @@ export default function StaffPage() {
 
     const { isLoading: invitedStaff, refetch, data: INVITED_STAFF_LIST } = useQuery('INVITED_STAFF_LIST',
         async () => {
-            return AuthRequest.get(`/api/v1/staff/invited-staff/${id}`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/dme-staff/invited-staff/${id}`).then(data => data.data.data)
         }
     )
     const { isLoading: registeredStaff, refetch: refetchRegisteredStaff, data: REGISTERED_STAFF_LIST } = useQuery('REGISTERED_PROSTHETIC_STAFF_LIST',
         async () => {
-            return AuthRequest.get(`/api/v1/staff`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/dme-staff`).then(data => data.data.data)
         }
     )
 
@@ -174,7 +174,7 @@ export default function StaffPage() {
 
     const handelDeleteInvitedStaff = async (token) => {
 
-        await AuthRequest.delete(`/api/v1/staff/delete-invited-staff/${token}`)
+        await AuthRequest.delete(`/api/v1/dme-staff/delete-invited-staff/${token}`)
             .then(res => {
                 refetch()
                 toast.success(`Invitation Deleted`, {
@@ -188,7 +188,7 @@ export default function StaffPage() {
 
     const handelDeleteRegisteredStaff = async (id) => {
 
-        await AuthRequest.delete(`/api/v1/staff/delete-registered-staff/${id}`)
+        await AuthRequest.delete(`/api/v1/dme-staff/delete-registered-staff/${id}`)
             .then(res => {
                 refetchRegisteredStaff()
                 toast.success(`Staff Deleted`, {
@@ -206,23 +206,26 @@ export default function StaffPage() {
 
     const handelInviteStaff = async (e) => {
         e.preventDefault()
-
+        setLoading(true)
         await AuthRequest.post(`/api/v1/dme/invite-staff`, {
             dmeSupplierEmail: loggedUser.email,
             staffEmail: e.target.invitedEmail.value
         }).then(res => {
             refetch()
+            setLoading(false)
             toast.success(`Invitation sent to ${e.target.invitedEmail.value}`, {
                 toastId: "success12"
             })
         })
             .catch((err) => {
                 refetch()
+                setLoading(false)
                 toast.error(err.response?.data?.data?.split('email:')[1], {
                     toastId: "error19"
                 })
             })
 
+        setLoading(false)
         setInviteOpen(false)
     };
 
@@ -320,7 +323,7 @@ export default function StaffPage() {
                     </Button>
                 </Stack>
 
-                <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteStaff} title="Invite Staff" />
+                <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteStaff} title="Invite Staff" loading={loading} />
                 {/* -------------------------------------------------------------------------
                                    TABS
               --------------------------------------------------------------------------- */}

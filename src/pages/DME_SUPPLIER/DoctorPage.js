@@ -207,7 +207,7 @@ export default function DoctorPage() {
   let loggedUser = localStorage.getItem('user');
   loggedUser = JSON.parse(loggedUser);
 
-  const { id } = loggedUser
+  const { id, staffId } = loggedUser
 
   const loadUserInfo = useCallback(() => {
     AuthRequest.get(`/api/v1/users/${id}`)
@@ -380,36 +380,41 @@ export default function DoctorPage() {
           </Typography>
 
           <Stack direction="row" alignItems="center" justifyContent="center" gap={1} >
-            <Tooltip
-              title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be First name > Last name > Full name > Title > Email > Password > Category > Country > City > State > Zip > NPI Number > Company Name > Address > Phone Number"
-              arrow
-              placement="left">
-              <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
-            </Tooltip>
+            {
+              !staffId &&
+              <>
+                <Tooltip
+                  title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be First name > Last name > Full name > Title > Email > Password > Category > Country > City > State > Zip > NPI Number > Company Name > Address > Phone Number"
+                  arrow
+                  placement="left">
+                  <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
+                </Tooltip>
 
-            <form onSubmit={(e) => handleImportFormSubmit(e)}>
-              <Button
-                variant="contained"
-                component="label"
-                color="success"
-                style={{ color: "white", width: "110px" }}
-                startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
-                Import
-                <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
-              </Button>
-              <input ref={importButtonRef} hidden type="submit" />
-            </form>
+                <form onSubmit={(e) => handleImportFormSubmit(e)}>
+                  <Button
+                    variant="contained"
+                    component="label"
+                    color="success"
+                    style={{ color: "white", width: "110px" }}
+                    startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
+                    Import
+                    <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
+                  </Button>
+                  <input ref={importButtonRef} hidden type="submit" />
+                </form>
 
 
-            <Button
-              variant="contained"
-              component="label"
-              color="warning"
-              style={{ color: "white", width: "110px" }}
-              onClick={() => { exportDoctor() }}
-              startIcon={<Iconify icon="mdi:calendar-export" />}>
-              Export
-            </Button>
+                <Button
+                  variant="contained"
+                  component="label"
+                  color="warning"
+                  style={{ color: "white", width: "110px" }}
+                  onClick={() => { exportDoctor() }}
+                  startIcon={<Iconify icon="mdi:calendar-export" />}>
+                  Export
+                </Button>
+              </>
+            }
 
             <Button variant="outlined" startIcon={<Iconify icon="material-symbols:add" />}
               onClick={() => { navigate('/DME-supplier/dashboard/add-doctor') }}>

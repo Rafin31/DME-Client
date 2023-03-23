@@ -20,6 +20,11 @@ export default function AccountPopover({ id, user }) {
 
   const queryClient = useQueryClient()
 
+  if (user?.category === "DME-Staff") {
+    let loggedInUser = JSON.parse(localStorage.getItem('user'));
+    id = loggedInUser.staffId
+  }
+
   const MENU_OPTIONS = [
     {
       label: 'Profile',

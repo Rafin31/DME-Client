@@ -98,6 +98,8 @@ export default function PatientPage() {
     const importButtonRef = useRef(null)
 
 
+    let { staffId } = JSON.parse(localStorage.getItem('user'));
+
 
     const { isLoading: patientLoading, refetch, data: patient } = useQuery('patient',
         async () => {
@@ -249,36 +251,41 @@ export default function PatientPage() {
                         spacing={1}
                         divider={<Divider orientation="vertical" flexItem />}>
 
-                        <Tooltip
-                            title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
-                            arrow
-                            placement="left">
-                            <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
-                        </Tooltip>
+                        {
+                            !staffId &&
+                            <>
+                                <Tooltip
+                                    title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
+                                    arrow
+                                    placement="left">
+                                    <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
+                                </Tooltip>
+                                <form onSubmit={(e) => handleImportFormSubmit(e)}>
+                                    <Button
+                                        variant="contained"
+                                        component="label"
+                                        color="success"
+                                        style={{ color: "white", width: "110px" }}
+                                        startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
+                                        Import
+                                        <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
+                                    </Button>
+                                    <input ref={importButtonRef} hidden type="submit" />
+                                </form>
+                                <Button
+                                    variant="contained"
+                                    component="label"
+                                    color="warning"
+                                    style={{ color: "white", width: "110px" }}
+                                    onClick={() => { exportPatient() }}
+                                    startIcon={<Iconify icon="mdi:calendar-export" />}>
+                                    Export
+                                </Button>
+                            </>
+                        }
 
-                        <form onSubmit={(e) => handleImportFormSubmit(e)}>
-                            <Button
-                                variant="contained"
-                                component="label"
-                                color="success"
-                                style={{ color: "white", width: "110px" }}
-                                startIcon={<Iconify icon="ri:file-excel-2-fill" />}>
-                                Import
-                                <input name="importFile" hidden type="file" onChange={(e) => handleImportButtonClick(e)} />
-                            </Button>
-                            <input ref={importButtonRef} hidden type="submit" />
-                        </form>
 
 
-                        <Button
-                            variant="contained"
-                            component="label"
-                            color="warning"
-                            style={{ color: "white", width: "110px" }}
-                            onClick={() => { exportPatient() }}
-                            startIcon={<Iconify icon="mdi:calendar-export" />}>
-                            Export
-                        </Button>
 
 
 

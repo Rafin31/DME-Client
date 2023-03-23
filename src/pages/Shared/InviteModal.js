@@ -1,3 +1,4 @@
+import { LoadingButton } from '@mui/lab';
 import { Backdrop, Box, Button, Fade, Modal, TextField, Typography } from '@mui/material';
 import React from 'react';
 import Iconify from '../../components/iconify';
@@ -16,7 +17,7 @@ const style = {
 
 };
 
-export default function InviteModal({ open, setOpen, user = { user }, handelFormSubmit, title }) {
+export default function InviteModal({ open, setOpen, user = { user }, handelFormSubmit, title, ...other }) {
     return (
         <div>
             <Modal
@@ -56,9 +57,12 @@ export default function InviteModal({ open, setOpen, user = { user }, handelForm
                                 required
                                 variant="outlined" />
 
-                            <Button variant="contained" type="submit" fullWidth sx={{ my: 1 }}>
+                            {/* <Button variant="contained" type="submit" fullWidth sx={{ my: 1 }}>
                                 Invite
-                            </Button>
+                            </Button> */}
+                            <LoadingButton loading={other.loading} variant="contained" type="submit" fullWidth sx={{ my: 1 }}>
+                                Invite
+                            </LoadingButton>
                         </form>
                         <Button variant="contained" color='warning' fullWidth onClick={(e) => { setOpen(!open) }}>
                             Cancel

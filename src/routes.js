@@ -100,7 +100,7 @@ export default function Router() {
         ----------------------------------------*/}
       <Route path='/DME-supplier/dashboard' element={
         <AuthRoute>
-          <CheckCategory category={"DME-Supplier"}>
+          <CheckCategory category={"DME-Supplier, DME-Staff"}>
             <DmeDashboardLayout />
           </CheckCategory>
         </AuthRoute>
@@ -160,7 +160,12 @@ export default function Router() {
         <Route path='add-therapist' element={<AddTherapist />} />
         <Route path='patient' element={<PatientPage />} />
         <Route path='add-patient' element={<AddPatient />} />
-        <Route path='staff' element={<StaffPage />} />
+        <Route path='staff' element={
+          <CheckCategory category={"DME-Supplier"}>
+            <StaffPage />
+          </CheckCategory>
+
+        } />
         <Route path='add-tasks' element={<AddTasks />} />
 
 

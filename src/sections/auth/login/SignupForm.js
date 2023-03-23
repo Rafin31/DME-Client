@@ -80,12 +80,11 @@ export default function SignupForm() {
         setDbError(false)
         const { userCategory, ...rest } = data
 
-        if (invitationToken && decodedToken.invitationFor === "Staff") {
+        if (invitationToken && decodedToken.invitationFor === "DME-Staff") {
             finalData = {
                 ...rest,
                 fullName: data.firstName + " " + data.lastName,
                 status: "63861954b3b3ded1ee267309",
-                country: "USA",
                 userCategory: "638f7714a7f2be8abe01d2d2", //staff
                 inviteToken: invitationToken
             }
@@ -122,8 +121,6 @@ export default function SignupForm() {
             </Box>
         }
     }
-
-
 
     return (
         <>
@@ -190,7 +187,7 @@ export default function SignupForm() {
                             </Grid>
                     }
                     {
-                        (!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor === "Staff")) &&
+                        (!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor !== "DME-Staff")) &&
                         <>
                             <Grid item xs={6}>
                                 <TextField
@@ -234,24 +231,27 @@ export default function SignupForm() {
                             </Grid>
                         </>
                     }
-                    <Grid item xs={(!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor === "Staff")) ? 12 : 6}>
-                        <TextField
-                            {...register("phoneNumber", {
-                                required: "Field is required",
-                                minLength: { value: 6, message: "Phone number should be at last 6 characters" },
-                            })}
-
-                            error={errors.phoneNumber && true}
-                            label="Phone Number*"
-                            type={"tel"}
-                            fullWidth
-                            variant="outlined"
-                            helperText={errors?.phoneNumber?.message}
-
-                        />
-                    </Grid>
                     {
-                        (!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor === "Staff")) &&
+                        (!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor !== "DME-Staff")) &&
+                        <Grid item xs={(!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor === "DME-Staff")) ? 12 : 6}>
+                            <TextField
+                                {...register("phoneNumber", {
+                                    required: "Field is required",
+                                    minLength: { value: 6, message: "Phone number should be at last 6 characters" },
+                                })}
+
+                                error={errors.phoneNumber && true}
+                                label="Phone Number*"
+                                type={"tel"}
+                                fullWidth
+                                variant="outlined"
+                                helperText={errors?.phoneNumber?.message}
+
+                            />
+                        </Grid>
+                    }
+                    {
+                        (!invitationToken || (decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor !== "DME-Staff")) &&
                         <Grid item xs={12}>
                             <TextField
                                 {...register("address", { required: "Field is required" })}
@@ -288,16 +288,16 @@ export default function SignupForm() {
                                 </FormControl>
                             </Grid>
                             :
-                            invitationToken && decodedToken.invitationFor === "Staff" ?
+                            invitationToken && decodedToken.invitationFor === "DME-Staff" ?
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("userCategory", { required: "Field is required", value: "Staff" })}
+                                        {...register("userCategory", { required: "Field is required", value: "DME-Staff" })}
 
                                         label="Sign up as"
                                         error={errors.userCategory && true}
                                         fullWidth
                                         multiline
-                                        defaultValue={"Staff"}
+                                        defaultValue={"DME-Staff"}
                                         disabled
                                         helperText={errors.userCategory?.message}
                                         variant="outlined" />
@@ -322,7 +322,7 @@ export default function SignupForm() {
 
                     {(
                         (showField !== "patient" || showField === "other") &&
-                        (!invitationToken || (invitationToken && decodedToken?.invitationFor !== "va-prosthetics"))) &&
+                        (!invitationToken || (invitationToken && decodedToken?.invitationFor !== "va-prosthetics" && decodedToken?.invitationFor !== "DME-Staff"))) &&
                         <>
                             <Grid item xs={6}>
                                 <TextField
@@ -444,7 +444,7 @@ export default function SignupForm() {
                             {...register("password", { required: "Field is required" })}
                             error={errors.password && true}
                             helperText={errors.password?.message}
-                            label="Password"
+                            label="Password*"
                             type={showPassword ? 'text' : 'password'}
                             InputProps={{
                                 endAdornment: (
@@ -463,7 +463,7 @@ export default function SignupForm() {
                             error={errors.confirmPassword && true}
                             helperText={errors.confirmPassword?.message}
                             name="confirmPassword"
-                            label="Confirm Password"
+                            label="Confirm Password*"
                             type={'password'}
                         />
                     </Grid>

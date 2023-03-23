@@ -23,6 +23,11 @@ const AuthContext = ({ children }) => {
             id: user.data?.data?._id,
             email: user.data?.data?.email
         }
+        if (user.data.data.staffId) {
+            userInfo.staffId = user.data.data.staffId
+            userInfo.staffEmail = user.data.data.staffEmail
+        }
+
         localStorage.setItem('user', JSON.stringify(userInfo))
         localStorage.setItem('accessToken', user.data?.data?.token)
 

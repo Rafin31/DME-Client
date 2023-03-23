@@ -61,6 +61,8 @@ const bottomNavConfig = [
 
 ];
 
+let navElem = navConfig;
+
 
 export default function Nav({ openNav, onCloseNav, user, loading }) {
 
@@ -75,6 +77,25 @@ export default function Nav({ openNav, onCloseNav, user, loading }) {
     }
   }, [pathname]);
 
+
+  if (user?.category === "DME-Supplier") {
+
+    if (!navElem.some(obj => obj.title === "Staff")) {
+      navElem.push(
+        {
+          title: 'Staff',
+          path: '/DME-supplier/dashboard/staff',
+          icon: <Iconify icon="medical-icon:care-staff-area" />,
+        },
+      )
+    }
+  }
+
+  if (user?.category === "DME-Staff") {
+    if (navElem.some(obj => obj.title === "Staff")) {
+      navElem = navElem.filter(obj => obj.title !== "Staff");
+    }
+  }
 
   const renderContent = (
     <Scrollbar
@@ -117,7 +138,7 @@ export default function Nav({ openNav, onCloseNav, user, loading }) {
           </Box>
       }
 
-      <NavSection data={navConfig} />
+      <NavSection data={navElem} />
 
       <Box sx={{ flexGrow: 0.5, borderBottom: 1.5, borderColor: "#ffff" }} />
 
