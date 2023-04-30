@@ -83,7 +83,7 @@ const Chat = () => {
         <Container maxWidth="1350px" className="ChatContainer" margin="0px auto">
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={0}>
 
-                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", width: "150px" }} sx={{
                     "&:hover": {
                         color: "#3498db",
                     },

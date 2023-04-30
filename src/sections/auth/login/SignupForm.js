@@ -11,6 +11,7 @@ import { fDate } from '../../../utils/formatTime';
 
 import Iconify from '../../../components/iconify';
 import { useJwt } from 'react-jwt';
+import { usePatientContext } from '../../../../src/Context/PatientSignupContext';
 
 
 
@@ -27,6 +28,7 @@ export default function SignupForm() {
 
     const [showPassword, setShowPassword] = useState(false);
 
+    const { setPatientData } = usePatientContext()
 
     const queryParams = new URLSearchParams(window.location.search)
     const invitationToken = queryParams.get("invitationToken")
@@ -34,6 +36,12 @@ export default function SignupForm() {
 
     const createUser = async (data) => {
         setLoading(true)
+        if (data.userCategory === "63861b794e45673948bb7c9f") {
+            setPatientData(data)
+            setLoading(false)
+            navigate('patient/selectDme')
+            return
+        }
         await axios.post('/api/v1/users', data)
             .then(res => {
                 reset()
@@ -121,7 +129,6 @@ export default function SignupForm() {
             </Box>
         }
     }
-
     return (
         <>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -405,13 +412,10 @@ export default function SignupForm() {
                             <Grid item xs={6}>
                                 <TextField
                                     {...register("primaryInsurance", {
-                                        required: "Field is required", minLength: {
-                                            value: 10,
-                                            message: "Must be longer than 10 characters!"
-                                        }
+                                        required: "Field is required"
                                     })}
                                     error={errors.primaryInsurance && true}
-                                    type={'number'}
+                                    type={'text'}
                                     label="Primary Insurance*"
                                     fullWidth
                                     variant="outlined"
@@ -422,13 +426,10 @@ export default function SignupForm() {
                             <Grid item xs={6}>
                                 <TextField
                                     {...register("secondaryInsurance", {
-                                        required: "Field is required", minLength: {
-                                            value: 10,
-                                            message: "Must be longer than 10 characters!"
-                                        }
+                                        required: "Field is required"
                                     })}
                                     error={errors.secondaryInsurance && true}
-                                    type={'number'}
+                                    type={'text'}
                                     label="Secondary Insurance*"
                                     fullWidth
                                     variant="outlined"

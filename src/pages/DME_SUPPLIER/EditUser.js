@@ -12,7 +12,7 @@ import { fDate } from '../../utils/formatTime';
 import { AuthRequest } from '../../services/AuthRequest';
 
 export default function EditUser() {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const { register, watch, handleSubmit, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
     const { id: userId } = useParams()
     const navigate = useNavigate()
@@ -21,6 +21,8 @@ export default function EditUser() {
     const { search } = window.location;
     const params = new URLSearchParams(search);
     const userCategory = params.get('user');
+
+    const patientEmail = watch("email")
 
 
     const { isLoading: userLoading, refetch, data: user } = useQuery(`user-${userId}`,
@@ -75,13 +77,14 @@ export default function EditUser() {
             ...data,
             fullName: data.firstName + " " + data.lastName,
         }
+        console.log(patientEmail === data.email)
 
-        delete data.email
+        userCategory !== "patient" && delete data.email
+        userCategory === "patient" && patientEmail === user.email && delete data.email
 
         setDbError(false)
         mutateAsync(data)
     };
-
 
     return (
         <>
@@ -90,7 +93,7 @@ export default function EditUser() {
             </Helmet>
             <Container maxWidth="1350px">
 
-                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", width: "150px" }} sx={{
                     "&:hover": {
                         color: "#3498db",
                     },
@@ -168,7 +171,7 @@ export default function EditUser() {
                                         variant="outlined"
                                         helperText={errors.email?.message}
                                         InputProps={{
-                                            readOnly: true,
+                                            readOnly: userCategory !== "patient" ? true : false,
                                         }}
 
 
@@ -181,7 +184,7 @@ export default function EditUser() {
                                         <TextField
                                             {...register("lastFour", { required: "Field is required" })}
                                             error={errors.lastFour && true}
-
+                                            defaultValue={user.details.lastFour}
                                             label="Last Four*"
                                             fullWidth
                                             variant="outlined"

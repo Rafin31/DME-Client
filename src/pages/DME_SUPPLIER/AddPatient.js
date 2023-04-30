@@ -14,10 +14,14 @@ import { AuthRequest } from "../../services/AuthRequest";
 
 
 export default function AddPatient() {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const { register, watch, handleSubmit, reset, formState: { errors }, setValue } = useForm();
     const [dbError, setDbError] = useState(false)
     const navigate = useNavigate()
 
+    const firstName = watch('firstName');
+    const lastName = watch('lastName');
+
+    const { id } = JSON.parse(localStorage.getItem('user'));
 
     const { mutateAsync, isLoading: addPatientLoading } = useMutation((patient) => {
 
@@ -56,10 +60,23 @@ export default function AddPatient() {
             primaryInsurance: data?.primaryInsurance,
             userCategory: "63861b794e45673948bb7c9f",
             status: "63861954b3b3ded1ee267309",
+            dmeSupplier: id,
         }
         mutateAsync(data)
-
     };
+
+
+    const generateEmail = () => {
+        if (!firstName || !lastName) {
+            toast.warning("Please provide First and Last name first!")
+            return
+        }
+        const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+
+        const generatedEmail = `${firstName.toLowerCase()}-${randomNumber}-${lastName.toLowerCase()}@gcm.com`;
+
+        setValue("email", generatedEmail)
+    }
 
     return (
         <>
@@ -68,7 +85,7 @@ export default function AddPatient() {
             </Helmet>
             <Container maxWidth="1350px">
 
-                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", width: "150px" }} sx={{
                     "&:hover": {
                         color: "#3498db",
                     },
@@ -126,6 +143,11 @@ export default function AddPatient() {
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.email?.message}
+                                        InputProps={{
+                                            endAdornment: <Button onClick={() => generateEmail()} size="small" variant="contained">
+                                                Generate
+                                            </Button>
+                                        }}
 
                                     />
                                 </Grid>
@@ -170,13 +192,13 @@ export default function AddPatient() {
                                     <FormControl fullWidth>
                                         <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Gender*</InputLabel>
                                         <Select
+                                            {...register("gender", { required: "Field is required" })}
                                             variant="outlined"
                                             size="small"
                                             error={errors.gender && true}
                                             helperText={errors.gender?.message}
                                             rows={2}
                                             defaultValue=""
-                                            {...register("gender", { required: "Field is required" })}
                                         >
                                             <MenuItem value={"male"}>Male</MenuItem>
                                             <MenuItem value={"female"}>Female</MenuItem>
@@ -310,7 +332,7 @@ export default function AddPatient() {
                         </form>
                     </Card>
                 </Grid>
-            </Container>
+            </Container >
         </>
     );
 };

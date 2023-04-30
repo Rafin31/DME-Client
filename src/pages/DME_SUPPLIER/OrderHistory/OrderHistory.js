@@ -44,7 +44,7 @@ const OrderHistory = () => {
             <Container maxWidth="1350px">
                 <Typography variant='h5' sx={{ pb: 3 }}>Order History</Typography>
 
-                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", }} sx={{
+                <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", width: "150px" }} sx={{
                     "&:hover": {
                         color: "#3498db",
                     },

@@ -99,11 +99,11 @@ export default function PatientPage() {
 
 
     let { staffId } = JSON.parse(localStorage.getItem('user'));
-
+    let { id: dmeSupplierId } = JSON.parse(localStorage.getItem('user'));
 
     const { isLoading: patientLoading, refetch, data: patient } = useQuery('patient',
         async () => {
-            return AuthRequest.get(`/api/v1/patient/`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/patient/byDmeSupplier?dmeSupplier=${dmeSupplierId}`).then(data => data.data.data)
         }
     )
 

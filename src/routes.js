@@ -75,6 +75,8 @@ import Chat from './pages/Shared/PrivateMessage/Chat';
 import AddDoctor from './pages/DME_SUPPLIER/AddDoctor';
 import AddTherapist from './pages/DME_SUPPLIER/AddTherapist';
 import DoctorNotes from './pages/DME_SUPPLIER/DoctorNote';
+import SelectDME from './pages/Authentication/SelectDME';
+import { PatientSignupContext } from './Context/PatientSignupContext';
 
 
 
@@ -87,7 +89,16 @@ export default function Router() {
     <Routes>
 
       <Route path='login' element={<LoginPage />} />
-      <Route path='signup' element={<SignupPage />} />
+      <Route path='signup' element={
+        <PatientSignupContext>
+          <SignupPage />
+        </PatientSignupContext>
+      } />
+      <Route path='signup/patient/selectDme' element={
+        <PatientSignupContext>
+          <SelectDME />
+        </PatientSignupContext>
+      } />
       <Route path='/' element={<Navigate to="/login" />} />
 
       <Route path='login/forget-password-request' element={<ForgetPassword />} />
