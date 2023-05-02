@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Helmet } from 'react-helmet-async';
 import { React, useState } from 'react';
-import { Alert, Button, Card, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, Card, Container, FormControl, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
@@ -10,12 +10,14 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
 import { fDate } from "../../utils/formatTime";
 import { AuthRequest } from "../../services/AuthRequest";
-
+import { enc, lib } from "crypto-js";
 
 
 export default function AddPatient() {
-    const { register, watch, handleSubmit, reset, formState: { errors }, setValue } = useForm();
+    const { register, watch, handleSubmit, reset, formState: { errors }, setValue, setFocus } = useForm();
     const [dbError, setDbError] = useState(false)
+
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate()
 
     const firstName = watch('firstName');
@@ -68,15 +70,40 @@ export default function AddPatient() {
 
     const generateEmail = () => {
         if (!firstName || !lastName) {
-            toast.warning("Please provide First and Last name first!")
+            toast.warning("Please provide First and Last Name first!")
             return
         }
         const randomNumber = Math.floor(Math.random() * 9000) + 1000;
 
-        const generatedEmail = `${firstName.toLowerCase()}-${randomNumber}-${lastName.toLowerCase()}@gcm.com`;
-
+        const generatedEmail = `${firstName.toLowerCase()}_${randomNumber}_${lastName.toLowerCase()}@gcm.com`;
+        setFocus("email")
         setValue("email", generatedEmail)
     }
+
+    const handleGeneratePassword = () => {
+
+        if (!firstName || !lastName) {
+            toast.warning("Please provide First and Last Name first!")
+            return
+        }
+
+        const specialChars = "!@#$";
+        const specialChar = specialChars.charAt(Math.floor(Math.random() * specialChars.length));
+        const randomBytes = lib.WordArray.random(4).toString(enc.Hex);
+        const password = `${firstName.substring(0, 2).toUpperCase()}${specialChar}${lastName.substring(0, 2)}${randomBytes}`;
+        const truncatedPassword = password.substring(0, 8);
+
+        setFocus("password")
+        setValue("password", truncatedPassword)
+        setFocus("confirmPassword")
+        setValue("confirmPassword", truncatedPassword)
+
+        navigator.clipboard.writeText(password);
+
+        toast.success("Generated Password has been copied to your clipboard!")
+
+    }
+
 
     return (
         <>
@@ -144,9 +171,13 @@ export default function AddPatient() {
                                         variant="outlined"
                                         helperText={errors.email?.message}
                                         InputProps={{
-                                            endAdornment: <Button onClick={() => generateEmail()} size="small" variant="contained">
-                                                Generate
-                                            </Button>
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={() => generateEmail()} color="primary" edge="end" sx={{ fontSize: "12px" }}>
+                                                        Generate
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
                                         }}
 
                                     />
@@ -161,12 +192,23 @@ export default function AddPatient() {
 
                                         )}
                                         error={errors.password && true}
-
                                         label="Password*"
-                                        type={'password'}
+                                        type={showPassword ? 'text' : 'password'}
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.password?.message}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                        <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                                    </IconButton>
+                                                    <IconButton onClick={() => handleGeneratePassword()} color="primary" edge="end" sx={{ fontSize: "12px" }}>
+                                                        Generate
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
 
                                     />
                                 </Grid>

@@ -12,6 +12,7 @@ import PopOver from '../../../components/Popover/PopOver';
 
 import { UserListHead } from '../../../sections/@dashboard/user';
 import Scrollbar from '../../../components/scrollbar';
+import { toast } from 'react-toastify';
 
 
 
@@ -27,22 +28,55 @@ const TABLE_HEAD = [
 ];
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "PatientName") {
+        if (b.patientId.fullName < a.patientId.fullName) {
+            return -1;
+        }
+        if (b.patientId.fullName > a.patientId.fullName) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+    if (orderBy === "dob") {
+        const dateA = new Date(a.patientId.patientDob);
+        const dateB = new Date(b.patientId.patientDob);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
     }
+    if (orderBy === "Description") {
+        if (b.description < a.description) {
+            return -1;
+        }
+        if (b.description > a.description) {
+            return 1;
+        }
+    }
+    if (orderBy === "notes") {
+        if (b.notes < a.notes) {
+            return -1;
+        }
+        if (b.notes > a.notes) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
 function getComparator(order, orderBy) {
+
     return order === 'desc'
         ? (a, b) => descendingComparator(a, b, orderBy)
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 function applySortFilter(array, comparator, query) {
+
     if (array) {
         const stabilizedThis = array?.map((el, index) => [el, index]);
         stabilizedThis?.sort((a, b) => {
@@ -82,6 +116,7 @@ const NewReferral = () => {
     let row
 
 
+
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -110,7 +145,6 @@ const NewReferral = () => {
             <CircularProgress />
         </Box>
     }
-
 
     if (orders !== "No order found!") {
         newReferralOrders = orders?.filter((order) => order.status === "New-Referral")
@@ -229,7 +263,6 @@ const NewReferral = () => {
                                                         source='order-page'
                                                         option={[
                                                             { label: "Edit" },
-                                                            { label: "Add Note" },
                                                             { label: "Note Log" },
                                                             { label: "Status" },
                                                             { label: "Documents" },
@@ -246,7 +279,7 @@ const NewReferral = () => {
 
                                 {newReferralEmptyRows > 0 || (
                                     <TableRow style={{ height: 53 * newReferralEmptyRows }}>
-                                        <TableCell colSpan={6} />
+                                        <TableCell colSpan={7} />
                                     </TableRow>
                                 )}
 
@@ -256,7 +289,7 @@ const NewReferral = () => {
                                 newReferralIsNotFound && (
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                            <TableCell align="center" colSpan={7} sx={{ py: 3 }}>
                                                 <Paper
                                                     sx={{
                                                         textAlign: 'center',

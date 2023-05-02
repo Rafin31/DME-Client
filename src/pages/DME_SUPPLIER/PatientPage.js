@@ -50,12 +50,44 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "Fname") {
+        if (b.userId.fullName < a.userId.fullName) {
+            return -1;
+        }
+        if (b.userId.fullName > a.userId.fullName) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+    if (orderBy === "email") {
+        if (b.userId.email < a.userId.email) {
+            return -1;
+        }
+        if (b.userId.email > a.userId.email) {
+            return 1;
+        }
     }
+    if (orderBy === "dob") {
+        const dateA = new Date(a.dob);
+        const dateB = new Date(b.dob);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+
+    else {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 

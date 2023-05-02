@@ -77,10 +77,15 @@ export default function EditUser() {
             ...data,
             fullName: data.firstName + " " + data.lastName,
         }
-        console.log(patientEmail === data.email)
 
-        userCategory !== "patient" && delete data.email
-        userCategory === "patient" && patientEmail === user.email && delete data.email
+        if (userCategory !== "patient" && userCategory !== "veteran") {
+            delete data.email
+        }
+
+        if ((userCategory !== "patient" || userCategory !== "veteran") && patientEmail === user.email) {
+            console.log("second in")
+            delete data.email
+        }
 
         setDbError(false)
         mutateAsync(data)
@@ -171,7 +176,7 @@ export default function EditUser() {
                                         variant="outlined"
                                         helperText={errors.email?.message}
                                         InputProps={{
-                                            readOnly: userCategory !== "patient" ? true : false,
+                                            readOnly: userCategory !== "patient" && userCategory !== "veteran" ? true : false,
                                         }}
 
 

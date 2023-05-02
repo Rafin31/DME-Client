@@ -56,7 +56,7 @@ export default function AddOrder() {
             if (orderCategory === "veteran-order") {
                 return AuthRequest.get(`/api/v1/veteran`).then(data => data.data.data)
             } else {
-                return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+                return AuthRequest.get(`/api/v1/patient/byDmeSupplier?dmeSupplier=${id}`).then(data => data.data.data)
             }
 
         }

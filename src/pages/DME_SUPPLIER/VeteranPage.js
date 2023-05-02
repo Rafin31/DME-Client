@@ -75,7 +75,7 @@ function applySortFilter(array, comparator, query) {
         return a[1] - b[1];
     });
     if (query) {
-        return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.userId._id.substring(_user.userId._id.length - 4, _user.userId._id.length).toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        return filter(array, (_user) => _user.userId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.userId._id.substring(_user.userId._id.length - 4, _user.userId._id.length).toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.lastFour.toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
 }
@@ -345,7 +345,7 @@ export default function VeteranPage() {
                             padding: "10px 5px",
                             width: "220px"
                         }}
-                        placeholder="Search by Full Name or ID#"
+                        placeholder="Full Name or Last four or ID#"
                         value={filterName}
                         onChange={handleFilterByName} />
 
@@ -421,7 +421,7 @@ export default function VeteranPage() {
                                 {isNotFound && (
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                            <TableCell align="center" colSpan={8} sx={{ py: 3 }}>
                                                 <Paper
                                                     sx={{
                                                         textAlign: 'center',

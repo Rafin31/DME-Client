@@ -34,12 +34,88 @@ const TABLE_HEAD = [
 ];
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "Fname") {
+        if (b.veteranId.firstName < a.veteranId.firstName) {
+            return -1;
+        }
+        if (b.veteranId.firstName > a.veteranId.firstName) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+    if (orderBy === "Lname") {
+        if (b.veteranId.lastName < a.veteranId.lastName) {
+            return -1;
+        }
+        if (b.veteranId.lastName > a.veteranId.lastName) {
+            return 1;
+        }
     }
+    if (orderBy === "dateCreated") {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "lastFOur") {
+        const dateA = parseInt(a.veteranId.lastFour);
+        const dateB = parseInt(b.veteranId.lastFour);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "firstAttempt") {
+        const dateA = new Date(a.firstAttempt);
+        const dateB = new Date(b.firstAttempt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "secondAttempt") {
+        const dateA = new Date(a.secondAttempt);
+        const dateB = new Date(b.secondAttempt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "schedule") {
+        const dateA = new Date(a.schedule);
+        const dateB = new Date(b.schedule);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+
+    else {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -58,7 +134,7 @@ function applySortFilter(array, comparator, query) {
             return a[1] - b[1];
         });
         if (query) {
-            return filter(array, (_user) => _user.veteranId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+            return filter(array, (_user) => _user.veteranId.fullName.toLowerCase().indexOf(query.toLowerCase()) !== -1 || _user.veteranId.lastFour.toLowerCase().indexOf(query.toLowerCase()) !== -1);
         }
         return stabilizedThis?.map((el) => el[0]);
     }
@@ -139,7 +215,7 @@ const VeteranCompleted = () => {
                         width: "220px",
                     }}
                     ref={searchFieldRef}
-                    placeholder="Search Orders by Patient Name"
+                    placeholder="Patient Name or Last Four#"
                     value={filterName}
                     onChange={handleFilterByName} />
 
@@ -231,7 +307,6 @@ const VeteranCompleted = () => {
                                                         source='veteran-order-page'
                                                         option={[
                                                             { label: "Edit" },
-                                                            { label: "Add Note" },
                                                             { label: "Note Log" },
                                                             { label: "Status" },
                                                             { label: "Documents" },

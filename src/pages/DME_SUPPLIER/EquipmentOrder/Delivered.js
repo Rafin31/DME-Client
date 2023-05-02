@@ -28,12 +28,43 @@ const TABLE_HEAD = [
 ];
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "PatientName") {
+        if (b.patientId.fullName < a.patientId.fullName) {
+            return -1;
+        }
+        if (b.patientId.fullName > a.patientId.fullName) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+    if (orderBy === "dob") {
+        const dateA = new Date(a.patientId.patientDob);
+        const dateB = new Date(b.patientId.patientDob);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
     }
+    if (orderBy === "Description") {
+        if (b.description < a.description) {
+            return -1;
+        }
+        if (b.description > a.description) {
+            return 1;
+        }
+    }
+    if (orderBy === "notes") {
+        if (b.notes < a.notes) {
+            return -1;
+        }
+        if (b.notes > a.notes) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -227,7 +258,6 @@ const Delivered = () => {
                                                         source='order-page'
                                                         option={[
                                                             { label: "Edit" },
-                                                            { label: "Add Note" },
                                                             { label: "Note Log" },
                                                             { label: "Status" },
                                                             { label: "Documents" },
@@ -244,7 +274,7 @@ const Delivered = () => {
 
                                 {deliveredEmptyRows > 0 || (
                                     <TableRow style={{ height: 53 * deliveredEmptyRows }}>
-                                        <TableCell colSpan={6} />
+                                        <TableCell colSpan={7} />
                                     </TableRow>
                                 )}
 
@@ -254,7 +284,7 @@ const Delivered = () => {
                                 deliveredIsNotFound && (
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                            <TableCell align="center" colSpan={7} sx={{ py: 3 }}>
                                                 <Paper
                                                     sx={{
                                                         textAlign: 'center',

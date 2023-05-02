@@ -21,7 +21,6 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 const TABLE_HEAD = [
     { id: 'TimeStamp', label: 'Created At', alignRight: false },
     { id: 'companyName', label: 'Company Name', alignRight: false },
-    { id: 'name', label: 'Name', alignRight: false },
     { id: 'designation', label: 'Designation', alignRight: false },
     { id: 'note', label: 'Note', alignRight: false },
     // { id: 'action', label: 'Action', alignRight: false },
@@ -267,7 +266,6 @@ export default function AllOrderNotes() {
                                             <TableRow hover key={_id} tabIndex={-1}>
                                                 <TableCell align="left">{fDateTime(createdAt)}</TableCell>
                                                 <TableCell align="left">{writerId?.companyName ? writerId.companyName : "Not given"}</TableCell>
-                                                <TableCell align="left">{writerId?.fullName}</TableCell>
                                                 <TableCell align="left">{writerId?.userCategory?.category}</TableCell>
                                                 <TableCell sx={{ width: "50%" }} component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={0}>

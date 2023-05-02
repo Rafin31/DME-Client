@@ -118,17 +118,18 @@ export default function TherapistPage() {
         }
     )
 
-
-    const { isLoading: patientLoading, data: patients } = useQuery('patient',
-        async () => {
-            return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
-        }
-    )
-
     let loggedUser = localStorage.getItem('user');
     loggedUser = JSON.parse(loggedUser);
 
     const { id } = loggedUser
+
+    const { isLoading: patientLoading, data: patients } = useQuery('patient',
+        async () => {
+            return AuthRequest.get(`/api/v1/patient/byDmeSupplier?dmeSupplier=${id}`).then(data => data.data.data)
+        }
+    )
+
+
 
     const loadUserInfo = useCallback(() => {
 
