@@ -135,7 +135,7 @@ const HoldingRTO = () => {
     };
 
 
-    const [statesLoading, orders] = useOutletContext();
+    const [statesLoading, orders, deleteOrder] = useOutletContext();
 
     if (statesLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -261,8 +261,10 @@ const HoldingRTO = () => {
                                                             { label: "Note Log" },
                                                             { label: "Status" },
                                                             { label: "Documents" },
+                                                            { label: "Delete" },
                                                         ]}
                                                         id={row._id}
+                                                        deleteOrder={deleteOrder}
                                                     />
                                                 </TableCell>
 

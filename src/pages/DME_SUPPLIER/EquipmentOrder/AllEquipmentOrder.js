@@ -13,6 +13,7 @@ import PopOver from '../../../components/Popover/PopOver';
 import { UserListHead } from '../../../sections/@dashboard/user';
 import Scrollbar from '../../../components/scrollbar';
 import { toast } from 'react-toastify';
+import { AuthRequest } from 'src/services/AuthRequest';
 
 
 
@@ -138,7 +139,8 @@ const AllEquipmentOrder = () => {
     };
 
 
-    const [statesLoading, orders] = useOutletContext();
+    const [statesLoading, orders, deleteOrder] = useOutletContext();
+
 
     if (statesLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -266,8 +268,10 @@ const AllEquipmentOrder = () => {
                                                             { label: "Note Log" },
                                                             { label: "Status" },
                                                             { label: "Documents" },
+                                                            { label: "Delete" },
                                                         ]}
                                                         id={row._id}
+                                                        deleteOrder={deleteOrder}
                                                     />
                                                 </TableCell>
 

@@ -74,6 +74,9 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
             }
+            if (lebel === "Delete") {
+                other.deleteOrder(id)
+            }
         }
 
         else if (source === "repair-order-page") {

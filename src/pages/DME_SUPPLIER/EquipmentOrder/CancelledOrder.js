@@ -135,7 +135,7 @@ const CancelledOrder = () => {
     };
 
 
-    const [statesLoading, orders] = useOutletContext();
+    const [statesLoading, orders, deleteOrder] = useOutletContext();
 
     if (statesLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -253,15 +253,17 @@ const CancelledOrder = () => {
 
                                                 <TableCell >
                                                     <PopOver
-                                                        key={row._id}
+                                                        key={index}
                                                         source='order-page'
                                                         option={[
                                                             { label: "Edit" },
                                                             { label: "Note Log" },
                                                             { label: "Status" },
                                                             { label: "Documents" },
+                                                            { label: "Delete" },
                                                         ]}
                                                         id={row._id}
+                                                        deleteOrder={deleteOrder}
                                                     />
                                                 </TableCell>
 

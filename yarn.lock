@@ -1721,7 +1721,7 @@
     "prop-types" "^15.8.1"
     "react-is" "^18.2.0"
 
-"@mui/material@^5.0.0", "@mui/material@^5.10.9", "@mui/material@^5.4.1":
+"@mui/material@^5.0.0", "@mui/material@^5.10.9", "@mui/material@^5.4.1", "@mui/material@>= 5.0.0":
   "integrity" "sha512-sdOzlgpCmyw48je+E7o9UGGJpgBaF+60FlTRpVpcd/z+LUhnuzzuis891yPI5dPPXLBDL/bO4SsGg51lgNeLBw=="
   "resolved" "https://registry.npmjs.org/@mui/material/-/material-5.10.9.tgz"
   "version" "5.10.9"
@@ -6296,6 +6296,11 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
     "remove-accents" "0.4.2"
+
+"material-ui-confirm@^3.0.9":
+  "integrity" "sha512-WEAEG9z4MfwojoUyQiAjrjl8378tYbGKfiwOKz3zHaQKyXcHnFktUmV7b+F+G0yVo8kYrEMk9Bw+HxhA/2Enlw=="
+  "resolved" "https://registry.npmjs.org/material-ui-confirm/-/material-ui-confirm-3.0.9.tgz"
+  "version" "3.0.9"
 
 "mdn-data@2.0.14":
   "integrity" "sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow=="

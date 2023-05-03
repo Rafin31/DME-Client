@@ -10,6 +10,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
 import { AuthContext } from './Context/AuthContext';
+import { ConfirmProvider } from 'material-ui-confirm';
 
 
 
@@ -31,7 +32,9 @@ root.render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <AuthContext>
-          <App />
+          <ConfirmProvider>
+            <App />
+          </ConfirmProvider>
         </AuthContext>
       </QueryClientProvider>
     </BrowserRouter>
