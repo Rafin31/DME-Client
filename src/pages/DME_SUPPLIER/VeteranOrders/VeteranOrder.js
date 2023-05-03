@@ -132,7 +132,9 @@ const VeteranOrder = () => {
                         scrollButtons="auto"
                         aria-label="basic tabs example">
 
-                        <Tab label="Equip (No 1090)" to="/DME-supplier/dashboard/veteran-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
+                        <Tab label="All Orders" to="/DME-supplier/dashboard/veteran-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
+
+                        <Tab label="Equip (No 1090)" to="/DME-supplier/dashboard/veteran-order/equip-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
 
                         <Tab label="New Repair (No 1090)" style={{ backgroundColor: "#f9fafc" }} to="/DME-supplier/dashboard/veteran-order/new-repair" component={Link} draggable="true" />
 

@@ -136,7 +136,9 @@ const EquipmentOrder = () => {
                         scrollButtons="auto"
                         aria-label="basic tabs example">
 
-                        <Tab label="New Referral" to="/DME-supplier/dashboard/equipment-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
+                        <Tab label="All Orders" to="/DME-supplier/dashboard/equipment-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
+
+                        <Tab label="New Referral" to="/DME-supplier/dashboard/equipment-order/new-referral-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
 
                         <Tab label="Cancelled Order" style={{ backgroundColor: "#f9fafc" }} to="/DME-supplier/dashboard/equipment-order/cancelled-order" component={Link} draggable="true" />
 

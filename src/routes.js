@@ -77,6 +77,9 @@ import AddTherapist from './pages/DME_SUPPLIER/AddTherapist';
 import DoctorNotes from './pages/DME_SUPPLIER/DoctorNote';
 import SelectDME from './pages/Authentication/SelectDME';
 import { PatientSignupContext } from './Context/PatientSignupContext';
+import AllEquipmentOrder from './pages/DME_SUPPLIER/EquipmentOrder/AllEquipmentOrder';
+import AllRepairOrder from './pages/DME_SUPPLIER/RepairOrder/AllRepairOrder';
+import AllVeteranOrder from './pages/DME_SUPPLIER/VeteranOrders/AllVeteranOrder';
 
 
 
@@ -121,7 +124,8 @@ export default function Router() {
 
 
         <Route path='equipment-order' element={<EquipmentOrder />}>
-          <Route index element={<NewReferral />} />
+          <Route index element={<AllEquipmentOrder />} />
+          <Route path="new-referral-order" element={<NewReferral />} />
           <Route path="cancelled-order" element={<CancelledOrder />} />
           <Route path="evaluation" element={<Evaluation />} />
           <Route path="evaluation-completed" element={<EvaluationCompleted />} />
@@ -137,7 +141,8 @@ export default function Router() {
 
 
         <Route path='repair-order' element={<RepairOrder />}>
-          <Route index element={<PRR />} />
+          <Route index element={<AllRepairOrder />} />
+          <Route path="prr-order" element={<PRR />} />
           <Route path="cancelled-order" element={<Cancelled />} />
           <Route path="pending-rx" element={<PendingRx />} />
           <Route path="pending-assess" element={<PendingAssess />} />
@@ -151,7 +156,8 @@ export default function Router() {
 
 
         <Route path='veteran-order' element={<VeteranOrder />}>
-          <Route index element={<Equip />} />
+          <Route index element={<AllVeteranOrder />} />
+          <Route path="equip-order" element={<Equip />} />
           <Route path="new-repair" element={<NewRepair />} />
           <Route path="rcvd-pend-schdling" element={<RcvdPend />} />
           <Route path="estimate-sent" element={<EstimateSent />} />

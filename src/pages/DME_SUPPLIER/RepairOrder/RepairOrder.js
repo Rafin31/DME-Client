@@ -132,7 +132,9 @@ const RepairOrder = () => {
                         scrollButtons="auto"
                         aria-label="basic tabs example">
 
-                        <Tab label="PRR" to="/DME-supplier/dashboard/repair-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
+                        <Tab label="All Orders" to="/DME-supplier/dashboard/repair-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
+
+                        <Tab label="PRR" to="/DME-supplier/dashboard/repair-order/prr-order" style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
 
                         <Tab label="Cancelled" style={{ backgroundColor: "#f9fafc" }} to="/DME-supplier/dashboard/repair-order/cancelled-order" component={Link} draggable="true" />
 
