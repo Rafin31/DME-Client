@@ -115,6 +115,20 @@ const NewReferral = () => {
     let newReferralIsNotFound
     let row
 
+    let { staffId } = JSON.parse(localStorage.getItem('user'));
+
+    const options = [
+        { label: "Edit" },
+        { label: "Note Log" },
+        { label: "Status" },
+        { label: "Documents" },
+
+    ];
+
+    if (!staffId) {
+        options.push({ label: "Delete" });
+    }
+
 
 
     const handleRequestSort = (event, property) => {
@@ -261,13 +275,7 @@ const NewReferral = () => {
                                                     <PopOver
                                                         key={index}
                                                         source='order-page'
-                                                        option={[
-                                                            { label: "Edit" },
-                                                            { label: "Note Log" },
-                                                            { label: "Status" },
-                                                            { label: "Documents" },
-                                                            { label: "Delete" },
-                                                        ]}
+                                                        option={options}
                                                         id={row._id}
                                                         deleteOrder={deleteOrder}
                                                     />

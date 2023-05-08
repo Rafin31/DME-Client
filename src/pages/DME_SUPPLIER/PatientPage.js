@@ -36,6 +36,7 @@ import PopOver from '../../components/Popover/PopOver';
 // sections
 import { UserListHead } from '../../sections/@dashboard/user';
 import { AuthRequest } from '../../services/AuthRequest';
+import { useConfirm } from 'material-ui-confirm';
 
 
 const TABLE_HEAD = [
@@ -110,6 +111,8 @@ function applySortFilter(array, comparator, query) {
     return stabilizedThis.map((el) => el[0]);
 }
 
+
+
 export default function PatientPage() {
     const [open, setOpen] = useState(null);
 
@@ -132,6 +135,19 @@ export default function PatientPage() {
 
     let { staffId } = JSON.parse(localStorage.getItem('user'));
     let { id: dmeSupplierId } = JSON.parse(localStorage.getItem('user'));
+
+    const options = [
+        { label: "Edit" },
+        { label: "Note" },
+        { label: "Documents" },
+        { label: "Order History" },
+    ];
+
+    if (!staffId) {
+        options.push({ label: "Delete" });
+    }
+
+    const confirm = useConfirm();
 
     const { isLoading: patientLoading, refetch, data: patient } = useQuery('patient',
         async () => {
@@ -236,6 +252,41 @@ export default function PatientPage() {
 
     const isNotFound = !filteredUsers.length && !!filterName;
 
+    const deletePatient = (id) => {
+        try {
+            confirm({
+                description: "Are you sure you want to Delete this Patient Permanently?",
+                confirmationText: "Yes",
+                confirmationButtonProps: { variant: "outlined", color: "error" },
+            })
+                .then(() => {
+                    toast.promise(
+                        AuthRequest.delete(`/api/v1/patient/${id}`)
+                            .then((res) => {
+                                refetch();
+
+                            })
+                            .catch((err) => {
+                                return
+                            }),
+                        {
+                            pending: "Deleting Patient...",
+                            success: "Patient Deleted",
+                            error: "Something Went Wrong!",
+                        },
+                        {
+                            toastId: "deleteOrder",
+                        }
+                    );
+                })
+                .catch(() => {
+                    return
+                });
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
 
 
     // ---------------------------------Tabs-------------------------------------
@@ -269,13 +320,13 @@ export default function PatientPage() {
     return (
         <>
             <Helmet>
-                <title> Patients</title>
+                <title> Clients</title>
             </Helmet>
 
             <Container maxWidth="1350px">
                 <Stack sx={{ flexDirection: { xs: "column", md: "row" } }} alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
-                        Patients
+                        Clients
                     </Typography>
 
                     <Stack
@@ -287,7 +338,8 @@ export default function PatientPage() {
                             !staffId &&
                             <>
                                 <Tooltip
-                                    title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number"
+                                    title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number > DME Supplier ID. 
+                                    Collect the DME Supplier ID from DME Supplier Profile"
                                     arrow
                                     placement="left">
                                     <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
@@ -383,13 +435,9 @@ export default function PatientPage() {
                                                     <PopOver
                                                         key={userId._id}
                                                         source="patient-page"
-                                                        option={[
-                                                            { label: "Edit" },
-                                                            { label: "Note" },
-                                                            { label: "Documents" },
-                                                            { label: "Order History" },
-                                                        ]}
+                                                        option={options}
                                                         id={userId._id}
+                                                        deletePatient={deletePatient}
                                                     />
                                                 </TableCell>
                                             </TableRow>

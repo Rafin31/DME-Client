@@ -83,6 +83,7 @@ export default function DmeSupplierProfile() {
                         <Stack>
                             <Typography variant='h5'>{user.fullName}</Typography>
                             <Typography variant='subtitle'>{user.category}</Typography>
+                            <Typography variant='subtitle'>ID: {id}</Typography>
                         </Stack>
                     </Stack>
 

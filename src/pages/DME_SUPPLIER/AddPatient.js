@@ -108,7 +108,7 @@ export default function AddPatient() {
     return (
         <>
             <Helmet>
-                <title> Add Patient </title>
+                <title> Add Client </title>
             </Helmet>
             <Container maxWidth="1350px">
 
@@ -119,7 +119,7 @@ export default function AddPatient() {
                 }} >
                     <ArrowBackIcon /> <span>Back</span>
                 </Stack>
-                <Typography variant="h5">Add Patient</Typography>
+                <Typography variant="h5">Add Client</Typography>
                 <Grid
                     container
                     spacing={0}

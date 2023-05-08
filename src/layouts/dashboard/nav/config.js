@@ -39,7 +39,7 @@ const navConfig = [
     icon: <Iconify icon="tabler:physotherapist" />,
   },
   {
-    title: 'Patient',
+    title: 'Client',
     path: '/DME-supplier/dashboard/patient',
     icon: <Iconify icon="mdi:patient" />,
   },

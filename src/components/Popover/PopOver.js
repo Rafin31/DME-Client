@@ -30,9 +30,12 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Order History") {
                 navigate(`/DME-supplier/dashboard/order-history/${id}`)
             }
+            if (lebel === "Delete") {
+                other.deletePatient(id)
+            }
         }
         if (source === "doctor-page") {
-            if (lebel === "Assign Patient") {
+            if (lebel === "Assign Client") {
                 other.setAddPatientOpen(true)
                 other.setInvitedDoctor(id)
             }

@@ -280,7 +280,7 @@ export default function PatientNotes() {
     return (
         <>
             <Helmet>
-                <title> Patients Notes</title>
+                <title> Client Notes</title>
             </Helmet>
 
             <Container maxWidth="1350px">

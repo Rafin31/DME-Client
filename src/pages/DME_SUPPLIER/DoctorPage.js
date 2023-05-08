@@ -433,7 +433,7 @@ export default function DoctorPage() {
         <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteDoctor} title="Invite Doctors" />
 
         <AddPatienttToDoctor open={addPatientOpen} setOpen={setAddPatientOpen}
-          handelFormSubmit={handelAddPatientToDoctor} patients={patients} user={user} title="Add Patient to Doctor" />
+          handelFormSubmit={handelAddPatientToDoctor} patients={patients} user={user} title="Add Client to Doctor" />
 
 
         <Card className='new-referal'>
@@ -494,7 +494,7 @@ export default function DoctorPage() {
                             key={userId._id}
                             source="doctor-page"
                             option={[
-                              { label: "Assign Patient" },
+                              { label: "Assign Client" },
                               { label: "Note" },
                             ]}
                             id={userId._id}

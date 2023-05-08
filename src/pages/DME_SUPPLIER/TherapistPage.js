@@ -257,7 +257,7 @@ export default function TherapistPage() {
 
                 <InviteModal open={inviteOpen} setOpen={setInviteOpen} user={user} handelFormSubmit={handelInviteTherapist} title="Invite Therapist" />
 
-                <AddPatientToTherapist open={addPatientOpen} setOpen={setAddPatientOpen} handelFormSubmit={handelAddPatientToTherapist} patients={patients} user={user} title="Add Patient" />
+                <AddPatientToTherapist open={addPatientOpen} setOpen={setAddPatientOpen} handelFormSubmit={handelAddPatientToTherapist} patients={patients} user={user} title="Add Client" />
 
                 <Card className='new-referal'>
 
@@ -316,7 +316,7 @@ export default function TherapistPage() {
                                                         onClick={() => { setAddPatientOpen(true) }}
                                                         onMouseUp={() => setInvitedTherapist(userId._id)}
                                                         variant="contained" size='small' startIcon={<Iconify icon="eva:plus-fill" />}>
-                                                        Add Patient
+                                                        Add Client
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
