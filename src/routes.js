@@ -80,6 +80,7 @@ import { PatientSignupContext } from './Context/PatientSignupContext';
 import AllEquipmentOrder from './pages/DME_SUPPLIER/EquipmentOrder/AllEquipmentOrder';
 import AllRepairOrder from './pages/DME_SUPPLIER/RepairOrder/AllRepairOrder';
 import AllVeteranOrder from './pages/DME_SUPPLIER/VeteranOrders/AllVeteranOrder';
+import PatientStates from './pages/DME_SUPPLIER/PatientStates';
 
 
 
@@ -204,6 +205,7 @@ export default function Router() {
 
 
 
+        <Route path='patient-states/:id' element={<PatientStates />} />
         <Route path='patient-document/:id' element={<UploadPatientDocuments />} />
         <Route path='order-history/:id' element={<OrderHistory />} />
         <Route path='order-document/:id' element={<UploadOrderDocuments />} />

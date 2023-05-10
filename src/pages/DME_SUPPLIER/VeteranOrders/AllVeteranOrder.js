@@ -165,6 +165,19 @@ const AllVeteranOrder = () => {
     let cancelledIsNotFound
     let row
 
+    let { staffId } = JSON.parse(localStorage.getItem('user'));
+
+    const options = [
+        { label: "Edit" },
+        { label: "Note Log" },
+        { label: "Status" },
+        { label: "Documents" }
+    ];
+
+    if (!staffId) {
+        options.push({ label: "Delete" });
+    }
+
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -187,7 +200,7 @@ const AllVeteranOrder = () => {
     };
 
 
-    const [statesLoading, orders] = useOutletContext();
+    const [statesLoading, orders, deleteOrder] = useOutletContext();
 
     if (statesLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -306,13 +319,10 @@ const AllVeteranOrder = () => {
                                                     <PopOver
                                                         key={index}
                                                         source='veteran-order-page'
-                                                        option={[
-                                                            { label: "Edit" },
-                                                            { label: "Note Log" },
-                                                            { label: "Status" },
-                                                            { label: "Documents" },
-                                                        ]}
+                                                        option={options}
                                                         id={row._id}
+                                                        deleteOrder={deleteOrder}
+
                                                     />
                                                 </TableCell>
 

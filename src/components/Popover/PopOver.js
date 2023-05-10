@@ -102,6 +102,9 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
             }
+            if (lebel === "Delete") {
+                other.deleteOrder(id)
+            }
         }
 
         else if (source === "veteran-order-page") {
@@ -125,6 +128,18 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Status") {
                 navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
             }
+            if (lebel === "Delete") {
+                other.deleteOrder(id)
+            }
+        }
+
+        else if (source === "veteran-notes-page") {
+            if (lebel === "Edit") {
+                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
+            }
+            if (lebel === "Delete") {
+                other.deleteFunction(id)
+            }
         }
 
         else if (source === "patient-notes-page") {
@@ -135,6 +150,12 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             }
             if (lebel === "Delete") {
                 other.deleteFunction(id)
+            }
+            if (lebel === "Publish") {
+                const note = other.note
+                const writerId = other.writerId
+                other.setPublishNote({ note, writerId })
+                other.setPublish(true)
             }
         }
 

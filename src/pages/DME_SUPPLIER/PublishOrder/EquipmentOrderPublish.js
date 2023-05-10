@@ -1,70 +1,42 @@
-import { Box, Card, CircularProgress, Paper, Stack, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Tooltip, Typography } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import { Card, Paper, Stack, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Tooltip, Typography } from '@mui/material';
+import React, { useState } from 'react';
 import { filter } from 'lodash';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 import { sentenceCase } from 'change-case';
 import ReactShowMoreText from 'react-show-more-text';
 import Label from '../../../components/label';
-import PopOver from '../../../components/Popover/PopOver';
+
 
 import { UserListHead } from '../../../sections/@dashboard/user';
 import Scrollbar from '../../../components/scrollbar';
+import { fDate } from '../../../utils/formatTime';
 
 
 
 
 const TABLE_HEAD = [
+    { id: 'create', label: 'Date Created', alignRight: false },
     { id: 'PatientName', label: 'Patient Name', alignRight: false },
     { id: 'dob', label: 'Date of Birth', alignRight: false },
     { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'status', label: 'Status', alignRight: false },
-    { id: 'action', label: 'Action', alignRight: false },
+    { id: 'Progress', label: 'Progress', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
-
-    if (orderBy === "PatientName") {
-        if (b.patientId.fullName < a.patientId.fullName) {
-            return -1;
-        }
-        if (b.patientId.fullName > a.patientId.fullName) {
-            return 1;
-        }
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
     }
-    if (orderBy === "dob") {
-        const dateA = new Date(a.patientId.patientDob);
-        const dateB = new Date(b.patientId.patientDob);
-
-        if (dateB < dateA) {
-            return -1;
-        }
-        if (dateB > dateA) {
-            return 1;
-        }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
     }
-    if (orderBy === "Description") {
-        if (b.description < a.description) {
-            return -1;
-        }
-        if (b.description > a.description) {
-            return 1;
-        }
-    }
-    if (orderBy === "notes") {
-        if (b.notes < a.notes) {
-            return -1;
-        }
-        if (b.notes > a.notes) {
-            return 1;
-        }
-    }
-
     return 0;
 }
+
 function getComparator(order, orderBy) {
     return order === 'desc'
         ? (a, b) => descendingComparator(a, b, orderBy)
@@ -88,7 +60,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const RTOStatus = () => {
+const EquipmentOrderPublish = ({ orders, publishNoteHandle }) => {
 
     const [page, setPage] = useState(0);
 
@@ -102,27 +74,16 @@ const RTOStatus = () => {
 
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    const searchFieldRef = useRef(null)
-
     let newReferralOrders
     let newReferralEmptyRows
     let filteredNewReferralOrders
     let newReferralIsNotFound
     let row
 
-    let { staffId } = JSON.parse(localStorage.getItem('user'));
 
-    const options = [
-        { label: "Edit" },
-        { label: "Note Log" },
-        { label: "Status" },
-        { label: "Documents" },
-    ];
-
-    if (!staffId) {
-        options.push({ label: "Delete" });
-    }
-
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -130,57 +91,27 @@ const RTOStatus = () => {
         setOrderBy(property);
     };
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
     const handleChangeRowsPerPage = (event) => {
         setPage(0);
         setRowsPerPage(parseInt(event.target.value, 10));
     };
 
-    const handleFilterByName = (event) => {
-        setPage(0);
-        setFilterName(event.target.value);
-    };
-
-
-    const [statesLoading, orders, deleteOrder] = useOutletContext();
-
-
-    if (statesLoading) {
-        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <CircularProgress />
-        </Box>
-    }
-
-
     if (orders !== "No order found!") {
-        newReferralOrders = orders?.filter((order) => order.status === "RTO-Status")
+        newReferralOrders = orders
         newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrders.length) : 0;
         filteredNewReferralOrders = applySortFilter(newReferralOrders, getComparator(order, orderBy), filterName);
         newReferralIsNotFound = !filteredNewReferralOrders.length && !!filterName;
         row = filteredNewReferralOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     }
 
-
     return (
         <>
 
             <Card style={{ margin: "20px 0px" }}>
-                <input type="text"
-                    style={{
-                        margin: "20px 15px",
-                        padding: "10px 5px",
-                        width: "220px"
-                    }}
-                    ref={searchFieldRef}
-                    placeholder="Search Orders by Patient Name"
-                    value={filterName}
-                    onChange={handleFilterByName} />
 
                 <Scrollbar>
                     <TableContainer sx={{ minWidth: 800 }}>
+
                         <Table size="small">
 
                             <UserListHead
@@ -192,28 +123,23 @@ const RTOStatus = () => {
                                 onRequestSort={handleRequestSort}
                             />
 
+
                             <TableBody>
 
                                 {
-                                    row.map((row, index) => {
-                                        const { _id, patientId, status, notes, description } = row;
+                                    row?.map((row, index) => {
+                                        const { _id, createdAt, dateCompleted, patientId, status, notes, description, progress } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
-                                            <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
+                                            <TableRow hover style={{ cursor: "pointer" }} key={index} tabIndex={-1} selected={selectedUser}
+                                                onClick={() => publishNoteHandle(_id, "equipment-order")}>
 
-
+                                                <TableCell align="left">{fDate(createdAt)}</TableCell>
                                                 <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={10}>
-                                                        {/* <Avatar alt={name} src={avatarUrl} /> */}
-                                                        <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
-                                                            style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
-                                                            <Tooltip title="Profile">
-                                                                <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
-                                                                    {patientId.fullName}
-                                                                </Typography>
-                                                            </Tooltip>
-                                                        </Link>
-
+                                                        <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                            {patientId.fullName}
+                                                        </Typography>
                                                     </Stack>
                                                 </TableCell>
 
@@ -226,30 +152,31 @@ const RTOStatus = () => {
                                                         <TableCell align="left">No Description Available</TableCell>
                                                 }
 
-                                                {notes && notes?.length !== 0 ?
-                                                    <TableCell width="30%" align="left">
-                                                        <ReactShowMoreText
-                                                            lines={1}
-                                                            more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                            less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                            anchorClass=""
-                                                            expanded={false}
-                                                        >
-                                                            {notes}
-                                                        </ReactShowMoreText >
-                                                    </TableCell>
-                                                    :
-                                                    <TableCell width="30%" align="left">
-                                                        <ReactShowMoreText
-                                                            lines={1}
-                                                            more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                            less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
-                                                            anchorClass=""
-                                                            expanded={false}
-                                                        >
-                                                            {"No Notes available"}
-                                                        </ReactShowMoreText >
-                                                    </TableCell>
+                                                {
+                                                    notes && notes?.length !== 0 ?
+                                                        <TableCell width="30%" align="left">
+                                                            <ReactShowMoreText
+                                                                lines={1}
+                                                                more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                anchorClass=""
+                                                                expanded={false}
+                                                            >
+                                                                {notes}
+                                                            </ReactShowMoreText >
+                                                        </TableCell>
+                                                        :
+                                                        <TableCell width="30%" align="left">
+                                                            <ReactShowMoreText
+                                                                lines={1}
+                                                                more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                less={<ExpandLessIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
+                                                                anchorClass=""
+                                                                expanded={false}
+                                                            >
+                                                                {"No Notes available"}
+                                                            </ReactShowMoreText >
+                                                        </TableCell>
                                                 }
                                                 <TableCell align="left">
                                                     <Label
@@ -260,17 +187,7 @@ const RTOStatus = () => {
                                                     </Label>
                                                 </TableCell>
 
-                                                <TableCell >
-
-                                                    <PopOver
-                                                        key={index}
-                                                        source='repair-order-page'
-                                                        option={options}
-                                                        id={row._id}
-                                                        deleteOrder={deleteOrder}
-                                                    />
-
-                                                </TableCell>
+                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
 
                                             </TableRow>
                                         )
@@ -280,7 +197,7 @@ const RTOStatus = () => {
 
                                 {newReferralEmptyRows > 0 || (
                                     <TableRow style={{ height: 53 * newReferralEmptyRows }}>
-                                        <TableCell colSpan={6} />
+                                        <TableCell colSpan={9} />
                                     </TableRow>
                                 )}
 
@@ -290,7 +207,7 @@ const RTOStatus = () => {
                                 newReferralIsNotFound && (
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                            <TableCell align="center" colSpan={9} sx={{ py: 3 }}>
                                                 <Paper
                                                     sx={{
                                                         textAlign: 'center',
@@ -312,13 +229,14 @@ const RTOStatus = () => {
                                 )
                             }
                         </Table>
+
                     </TableContainer>
                 </Scrollbar>
 
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={newReferralOrders.length}
+                    count={newReferralOrders?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -326,8 +244,9 @@ const RTOStatus = () => {
                 />
 
             </Card>
+
         </>
     );
 };
 
-export default RTOStatus;
+export default EquipmentOrderPublish;

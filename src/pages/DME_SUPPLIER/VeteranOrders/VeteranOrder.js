@@ -6,6 +6,8 @@ import { DayPicker } from 'react-day-picker';
 import { AuthRequest } from '../../../services/AuthRequest';
 import Iconify from "../../../components/iconify"
 import { parseISO } from 'date-fns';
+import { toast } from 'react-toastify';
+import { useConfirm } from 'material-ui-confirm';
 
 
 
@@ -20,12 +22,14 @@ const VeteranOrder = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [updatedOrder, setUpdatedOrder] = useState([]);
 
+    const confirm = useConfirm();
+
     let footer = <p>Select Range of days</p>
 
     const { id } = JSON.parse(localStorage.getItem('user'));
 
 
-    const { isLoading: statesLoading, data: orders } = useQuery('veteranOrders',
+    const { isLoading: statesLoading, refetch, data: orders } = useQuery('veteranOrders',
         async () => {
             return AuthRequest.get(`/api/v1/veteran-order/creator/${id}`).then(data => data.data.data)
         }
@@ -40,6 +44,43 @@ const VeteranOrder = () => {
         setUpdatedOrder([])
     }
     const handleFilterClick = () => setFilterOpen(!filterOpen);
+
+
+    const deleteOrder = async (id) => {
+        try {
+            confirm({
+                description: "Are you sure you want to Delete this Order Permanently?",
+                confirmationText: "Yes",
+                confirmationButtonProps: { variant: "outlined", color: "error" },
+            })
+                .then(() => {
+                    toast.promise(
+                        AuthRequest.delete(`/api/v1/veteran-order/${id}`)
+                            .then((res) => {
+                                refetch();
+
+                            })
+                            .catch((err) => {
+                                return
+                            }),
+                        {
+                            pending: "Deleting Order...",
+                            success: "Order Deleted",
+                            error: "Something Went Wrong!",
+                        },
+                        {
+                            toastId: "deleteOrder",
+                        }
+                    );
+                })
+                .catch(() => {
+                    return
+                });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
 
     useEffect(() => {
         const path = window.location.pathname
@@ -165,9 +206,9 @@ const VeteranOrder = () => {
                         <main>
                             {
                                 range?.from && range?.to ?
-                                    <Outlet context={[statesLoading, updatedOrder]} />
+                                    <Outlet context={[statesLoading, updatedOrder, deleteOrder]} />
                                     :
-                                    <Outlet context={[statesLoading, orders]} />
+                                    <Outlet context={[statesLoading, orders, deleteOrder]} />
                             }
                         </main>
                 }

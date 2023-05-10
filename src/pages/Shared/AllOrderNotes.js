@@ -16,6 +16,7 @@ import ReactShowMoreText from 'react-show-more-text';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import PopOver from 'src/components/Popover/PopOver';
 
 
 const TABLE_HEAD = [
@@ -195,6 +196,11 @@ export default function AllOrderNotes() {
     };
 
 
+    const handleDelete = (id) => {
+        console.log(id)
+    }
+
+
     if (isLoading || loading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
@@ -286,15 +292,13 @@ export default function AllOrderNotes() {
                                                 {/* <TableCell >
                                                     <PopOver
                                                         key={_id}
-                                                        source="patient-notes-page"
+                                                        source="veteran-notes-page"
                                                         option={[
                                                             { label: "Edit" },
                                                             { label: "Delete" }
                                                         ]}
                                                         id={_id}
                                                         deleteFunction={handleDelete}
-                                                        setEdit={setEdit}
-                                                        setEditNoteId={setEditNoteId}
                                                         setOpen={setAddNotesOpen}
                                                     />
                                                 </TableCell> */}

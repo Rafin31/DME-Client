@@ -43,6 +43,7 @@ import InviteModal from '../Shared/InviteModal';
 import { fDateTime } from '../../utils/formatTime';
 import AddNotesToPatientModal from '../Shared/AddNotesToPatientModal';
 import { AuthRequest } from '../../services/AuthRequest';
+import PublishNoteModal from "../Shared/PublishNoteModal";
 
 
 
@@ -103,16 +104,16 @@ export default function PatientNotes() {
 
     const [filterName, setFilterName] = useState('');
 
+    const [publish, setPublish] = useState(false);
+
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [user, setUser] = useState()
     const [loading, setLoading] = useState()
     const [isEdit, setEdit] = useState(false)
     const [editNoteId, setEditNoteId] = useState(false)
+    const [publishNote, setPublishNote] = useState({})
 
     const navigate = useNavigate()
-
-    const theme = useTheme();
-
 
     let loggedUser = JSON.parse(localStorage.getItem('user'));
 
@@ -310,6 +311,8 @@ export default function PatientNotes() {
 
                 <AddNotesToPatientModal open={addNotesOpen} setOpen={setAddNotesOpen} handelFormSubmit={handelAddNotesToPatient} data={{ notes: "" }} title="Add Note" user={user} />
 
+                <PublishNoteModal open={publish} setOpen={setPublish} patient={patient2} publishNote={publishNote} title="Publish Note" />
+
                 <Card className='new-referal'>
                     <input type="text"
                         style={{
@@ -364,13 +367,18 @@ export default function PatientNotes() {
                                                         source="patient-notes-page"
                                                         option={[
                                                             { label: "Edit" },
-                                                            { label: "Delete" }
+                                                            { label: "Delete" },
+                                                            { label: "Publish" }
                                                         ]}
                                                         id={_id}
                                                         deleteFunction={handleDelete}
                                                         setEdit={setEdit}
                                                         setEditNoteId={setEditNoteId}
                                                         setOpen={setAddNotesOpen}
+                                                        setPublish={setPublish}
+                                                        note={note}
+                                                        writerId={writerId}
+                                                        setPublishNote={setPublishNote}
                                                     />
                                                 </TableCell>
                                             </TableRow>

@@ -58,7 +58,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const RepairOrderHistory = ({ orders }) => {
+const RepairOrderHistory = ({ orders, fromPage }) => {
 
     const [page, setPage] = useState(0);
 
@@ -73,6 +73,7 @@ const RepairOrderHistory = ({ orders }) => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const searchFieldRef = useRef(null)
+    let { staffId } = JSON.parse(localStorage.getItem('user'));
 
     let newReferralOrders
     let newReferralEmptyRows
@@ -80,6 +81,17 @@ const RepairOrderHistory = ({ orders }) => {
     let newReferralIsNotFound
     let row
 
+
+    const options = [
+
+        { label: "Note Log" },
+        { label: "Documents" },
+    ];
+
+
+    fromPage === "patientStates" && options.push({ label: "Edit" })
+    fromPage === "patientStates" && options.push({ label: "Status" })
+    fromPage === "patientStates" && !staffId && options.push({ label: "Delete" })
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -223,10 +235,7 @@ const RepairOrderHistory = ({ orders }) => {
                                                         key={index}
                                                         source='repair-order-page'
                                                         orderStatus="archived"
-                                                        option={[
-                                                            { label: "Note Log" },
-                                                            { label: "Documents" },
-                                                        ]}
+                                                        option={options}
                                                         id={row._id}
                                                     />
                                                 </TableCell>

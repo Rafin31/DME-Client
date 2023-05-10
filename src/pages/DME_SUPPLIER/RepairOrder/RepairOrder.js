@@ -6,6 +6,10 @@ import { DayPicker } from 'react-day-picker';
 import { AuthRequest } from '../../../services/AuthRequest';
 import Iconify from "../../../components/iconify"
 import { parseISO } from 'date-fns';
+import { useConfirm } from 'material-ui-confirm';
+import { toast } from 'react-toastify';
+
+
 
 
 const RepairOrder = () => {
@@ -18,12 +22,14 @@ const RepairOrder = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [updatedOrder, setUpdatedOrder] = useState([]);
 
+    const confirm = useConfirm();
+
     let footer = <p>Select Range of days</p>
     const loggedUser = JSON.parse(localStorage.getItem('user'));
 
     const { id } = loggedUser
 
-    const { isLoading: statesLoading, data: orders } = useQuery('repairOrders',
+    const { isLoading: statesLoading, refetch, data: orders } = useQuery('repairOrders',
         async () => {
             return AuthRequest.get(`/api/v1/repair-order/dme-supplier/${id}`).then(data => data.data.data)
         }
@@ -76,6 +82,45 @@ const RepairOrder = () => {
 
     }, [range.from, range.to])
 
+
+
+    const deleteOrder = async (id) => {
+        try {
+            confirm({
+                description: "Are you sure you want to Delete this Order Permanently?",
+                confirmationText: "Yes",
+                confirmationButtonProps: { variant: "outlined", color: "error" },
+            })
+                .then(() => {
+                    toast.promise(
+                        AuthRequest.delete(`/api/v1/repair-order/${id}`)
+                            .then((res) => {
+                                refetch();
+
+                            })
+                            .catch((err) => {
+                                return
+                            }),
+                        {
+                            pending: "Deleting Order...",
+                            success: "Order Deleted",
+                            error: "Something Went Wrong!",
+                        },
+                        {
+                            toastId: "deleteOrder",
+                        }
+                    );
+                })
+                .catch(() => {
+                    return
+                });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+
+
     if (statesLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
@@ -90,6 +135,7 @@ const RepairOrder = () => {
             </p>
         )
     }
+
 
 
     return (
@@ -166,9 +212,9 @@ const RepairOrder = () => {
                         <main>
                             {
                                 range?.from && range?.to ?
-                                    <Outlet context={[statesLoading, updatedOrder]} />
+                                    <Outlet context={[statesLoading, updatedOrder, deleteOrder]} />
                                     :
-                                    <Outlet context={[statesLoading, orders]} />
+                                    <Outlet context={[statesLoading, orders, deleteOrder]} />
                             }
                         </main>
                 }

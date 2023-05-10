@@ -421,7 +421,7 @@ export default function PatientPage() {
 
                                                 <TableCell align="left">
                                                     <Tooltip title="Profile">
-                                                        <Link to={`/DME-supplier/dashboard/user-profile/${userId._id}`}
+                                                        <Link to={`/DME-supplier/dashboard/patient-states/${userId._id}`}
                                                             style={{ display: "inline", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             {userId.fullName}
                                                         </Link>
