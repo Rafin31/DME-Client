@@ -478,7 +478,7 @@ export default function PatientPage() {
                                                     }}
                                                 >
                                                     <Typography variant="body2">
-                                                        No Patient found  &nbsp;
+                                                        No Client found  &nbsp;
                                                     </Typography>
 
                                                 </Paper>

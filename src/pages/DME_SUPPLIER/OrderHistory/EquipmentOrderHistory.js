@@ -62,7 +62,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const EquipmentOrderHistory = ({ orders, fromPage }) => {
+const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
 
     const [page, setPage] = useState(0);
 
@@ -124,7 +124,7 @@ const EquipmentOrderHistory = ({ orders, fromPage }) => {
     // }
 
 
-    if (orders !== "No order found!") {
+    if (orders !== "No order found!" || orders.length !== 0) {
         newReferralOrders = orders
         newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrders.length) : 0;
         filteredNewReferralOrders = applySortFilter(newReferralOrders, getComparator(order, orderBy), filterName);
@@ -137,16 +137,19 @@ const EquipmentOrderHistory = ({ orders, fromPage }) => {
         <>
 
             <Card style={{ margin: "20px 0px" }}>
-                <input type="text"
-                    style={{
-                        margin: "20px 15px",
-                        padding: "10px 5px",
-                        width: "220px"
-                    }}
-                    ref={searchFieldRef}
-                    placeholder="Search Orders by Patient Name"
-                    value={filterName}
-                    onChange={handleFilterByName} />
+                {
+                    (fromPage !== "patientStates" && fromPage !== "ClientOrderHistory") &&
+                    <input type="text"
+                        style={{
+                            margin: "20px 15px",
+                            padding: "10px 5px",
+                            width: "220px"
+                        }}
+                        ref={searchFieldRef}
+                        placeholder="Search Orders by Patient Name"
+                        value={filterName}
+                        onChange={handleFilterByName} />
+                }
 
                 <Scrollbar>
                     <TableContainer sx={{ minWidth: 800 }}>
@@ -244,6 +247,7 @@ const EquipmentOrderHistory = ({ orders, fromPage }) => {
                                                         orderStatus="archived"
                                                         option={options}
                                                         id={row._id}
+                                                        deleteOrder={deleteEquipmentOrder ? deleteEquipmentOrder : ""}
                                                     />
                                                 </TableCell>
 

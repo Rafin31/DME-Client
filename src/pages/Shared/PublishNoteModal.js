@@ -84,18 +84,22 @@ export default function PublishNoteModal({ open, setOpen, patient, publishNote, 
                             </Box>
                         }
 
-                        <p style={{ textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "larger" }}>{title}</p>
+                        <p style={{ textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "larger" }}>{`Current orders of ${patient.fullName}`}</p>
 
                         {
                             data?.equipmentOrder !== "No order found!" && <div className="eqipmentOrder">
                                 <Typography variant='h6' sx={{ pb: 1 }}>Equipment Order</Typography>
-                                <EquipmentOrderPublish orders={data?.equipmentOrder} publishNoteHandle={publishNoteHandle} />
+                                <EquipmentOrderPublish
+                                    orders={data?.equipmentOrder?.filter(eq => eq.status !== "Archived")}
+                                    publishNoteHandle={publishNoteHandle} />
                             </div>
                         }
                         {
                             data?.repairOrder !== "No order found!" && <div className="repaireOrder">
                                 <Typography variant='h6' sx={{ pb: 1 }}>Repair Order</Typography>
-                                <RepairOrderPublish orders={data?.repairOrder} publishNoteHandle={publishNoteHandle} />
+                                <RepairOrderPublish
+                                    orders={data?.repairOrder?.filter(eq => eq.status !== "Archived")}
+                                    publishNoteHandle={publishNoteHandle} />
                             </div>
                         }
 
@@ -105,9 +109,15 @@ export default function PublishNoteModal({ open, setOpen, patient, publishNote, 
                             <Typography variant='body' sx={{ py: 10, display: "block", textAlign: "center" }}>No Order for this Client!</Typography>
                         }
 
-                        <Button variant="contained" color='primary' onClick={(e) => { setOpen(!open) }}>
-                            Cancel
-                        </Button>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={(e) => { setOpen(!open) }}
+                            >
+                                Cancel
+                            </Button>
+                        </div>
                     </Box>
                 </Fade>
             </Modal>

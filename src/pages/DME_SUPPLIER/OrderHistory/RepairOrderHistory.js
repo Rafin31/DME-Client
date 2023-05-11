@@ -58,7 +58,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const RepairOrderHistory = ({ orders, fromPage }) => {
+const RepairOrderHistory = ({ orders, fromPage, deleteRepairOrder }) => {
 
     const [page, setPage] = useState(0);
 
@@ -136,16 +136,18 @@ const RepairOrderHistory = ({ orders, fromPage }) => {
         <>
 
             <Card style={{ margin: "20px 0px" }}>
-                <input type="text"
-                    style={{
-                        margin: "20px 15px",
-                        padding: "10px 5px",
-                        width: "220px"
-                    }}
-                    ref={searchFieldRef}
-                    placeholder="Search Orders by Patient Name"
-                    value={filterName}
-                    onChange={handleFilterByName} />
+                {
+                    fromPage !== "patientStates" && <input type="text"
+                        style={{
+                            margin: "20px 15px",
+                            padding: "10px 5px",
+                            width: "220px"
+                        }}
+                        ref={searchFieldRef}
+                        placeholder="Search Orders by Patient Name"
+                        value={filterName}
+                        onChange={handleFilterByName} />
+                }
 
                 <Scrollbar>
                     <TableContainer sx={{ minWidth: 800 }}>
@@ -237,6 +239,7 @@ const RepairOrderHistory = ({ orders, fromPage }) => {
                                                         orderStatus="archived"
                                                         option={options}
                                                         id={row._id}
+                                                        deleteOrder={deleteRepairOrder ? deleteRepairOrder : ""}
                                                     />
                                                 </TableCell>
 
