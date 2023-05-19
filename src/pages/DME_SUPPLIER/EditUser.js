@@ -1,5 +1,5 @@
 import { Alert, Box, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
@@ -10,6 +10,8 @@ import { LoadingButton } from '@mui/lab';
 import Iconify from '../../components/iconify';
 import { fDate } from '../../utils/formatTime';
 import { AuthRequest } from '../../services/AuthRequest';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 
 export default function EditUser() {
     const { register, watch, handleSubmit, reset, formState: { errors } } = useForm();
@@ -17,6 +19,7 @@ export default function EditUser() {
     const { id: userId } = useParams()
     const navigate = useNavigate()
 
+    const [dob, setDob] = useState()
 
     const { search } = window.location;
     const params = new URLSearchParams(search);
@@ -50,6 +53,9 @@ export default function EditUser() {
     })
 
 
+    useEffect(() => {
+        user && setDob(user.details.dob)
+    }, [user])
 
     if (!user) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -57,21 +63,22 @@ export default function EditUser() {
         </Box>
     }
 
+
     const onSubmit = data => {
         let givenDate
         let presentDate
 
-        if (data?.dob) givenDate = new Date(data?.dob);
-        if (data?.dob) presentDate = new Date()
+        if (dob) givenDate = new Date(dob);
+        if (dob) presentDate = new Date()
 
-        if (data?.dob) {
+        if (dob) {
             if (givenDate > presentDate) {
                 setDbError(true)
                 return
             }
         }
 
-        if (data?.dob) data.dob = fDate(data.dob)
+        if (dob) data.dob = fDate(dob)
 
         data = {
             ...data,
@@ -83,7 +90,6 @@ export default function EditUser() {
         }
 
         if ((userCategory !== "patient" || userCategory !== "veteran") && patientEmail === user.email) {
-            console.log("second in")
             delete data.email
         }
 
@@ -225,19 +231,16 @@ export default function EditUser() {
                                 {
                                     userCategory === "patient" &&
                                     <Grid item xs={6}>
-                                        <TextField
-                                            {...register("dob", { required: "Field is required" })}
-                                            error={errors.dob && true}
-
-                                            label="Date of Birth*"
-                                            onFocus={(e) => { (e.target.type = "date") }}
-                                            onBlur={(e) => { (e.target.type = "text") }}
-                                            type="text"
-                                            fullWidth
-                                            variant="outlined"
-                                            defaultValue={user.details.dob}
-                                            helperText={errors.dob?.message}
-                                        />
+                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                            <DatePicker
+                                                label="Date of Birth"
+                                                value={dob}
+                                                onChange={(newValue) => {
+                                                    setDob(newValue);
+                                                }}
+                                                renderInput={(params) => <TextField {...params} fullWidth />}
+                                            />
+                                        </LocalizationProvider>
                                         {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
                                     </Grid>
                                 }
@@ -250,7 +253,7 @@ export default function EditUser() {
                                             error={errors.weight && true}
 
                                             type={'number'}
-                                            label="Weight (lbs)*"
+                                            label="Weight (lbs)"
                                             fullWidth
                                             variant="outlined"
                                             defaultValue={user.details.weight}
@@ -266,7 +269,7 @@ export default function EditUser() {
                                         {...register("country")}
                                         error={errors.country && true}
 
-                                        label="Country*"
+                                        label="Country"
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user.details.country}
@@ -280,7 +283,7 @@ export default function EditUser() {
                                         {...register("city")}
                                         error={errors.city && true}
 
-                                        label="City*"
+                                        label="City"
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user.details.city}
@@ -296,7 +299,7 @@ export default function EditUser() {
                                         {...register("state")}
                                         error={errors.state && true}
 
-                                        label="State*"
+                                        label="State"
                                         fullWidth
                                         variant="outlined"
                                         defaultValue={user.details.state}
@@ -313,7 +316,7 @@ export default function EditUser() {
                                         })}
 
                                         error={errors.phoneNumber && true}
-                                        label="Phone Number*"
+                                        label="Phone Number"
                                         type={"tel"}
                                         fullWidth
                                         variant="outlined"
@@ -332,7 +335,7 @@ export default function EditUser() {
                                             {...register("primaryInsurance")}
                                             error={errors.primaryInsurance && true}
                                             type="text"
-                                            label="Primary Insurance*"
+                                            label="Primary Insurance"
                                             fullWidth
                                             defaultValue={user.details?.primaryInsurance}
                                             variant="outlined"
@@ -349,7 +352,7 @@ export default function EditUser() {
                                             {...register("secondaryInsurance")}
                                             error={errors.secondaryInsurance && true}
                                             type="text"
-                                            label="Secondary Insurance*"
+                                            label="Secondary Insurance"
                                             fullWidth
                                             defaultValue={user.details?.secondaryInsurance}
                                             variant="outlined"

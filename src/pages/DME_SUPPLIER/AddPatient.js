@@ -11,11 +11,14 @@ import Iconify from '../../components/iconify';
 import { fDate } from "../../utils/formatTime";
 import { AuthRequest } from "../../services/AuthRequest";
 import { enc, lib } from "crypto-js";
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 
 
 export default function AddPatient() {
     const { register, watch, handleSubmit, reset, formState: { errors }, setValue, setFocus } = useForm();
     const [dbError, setDbError] = useState(false)
+    const [dob, setDob] = useState(null)
 
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate()
@@ -45,14 +48,14 @@ export default function AddPatient() {
 
 
     const onSubmit = data => {
-        if (data?.dob !== "") {
-            const givenDate = new Date(data?.dob);
+        if (dob !== "") {
+            const givenDate = new Date(dob);
             const presentDate = new Date()
             if (givenDate > presentDate) {
                 setDbError(true)
                 return
             }
-            data.dob = fDate(data?.dob)
+            data.dob = fDate(dob)
         }
         setDbError(false)
         data = {
@@ -248,7 +251,7 @@ export default function AddPatient() {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={6}>
+                                {/* <Grid item xs={6}>
                                     <TextField
                                         {...register("dob", { required: "Field is required" })}
                                         error={errors.dob && true}
@@ -261,6 +264,19 @@ export default function AddPatient() {
                                         variant="outlined"
                                         helperText={errors.dob?.message}
                                     />
+                                    {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
+                                </Grid> */}
+                                <Grid item xs={6} >
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DatePicker
+                                            label="Date of Birth"
+                                            value={dob}
+                                            onChange={(newValue) => {
+                                                setDob(newValue);
+                                            }}
+                                            renderInput={(params) => <TextField {...params} fullWidth />}
+                                        />
+                                    </LocalizationProvider>
                                     {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
                                 </Grid>
                                 <Grid item xs={6}>
