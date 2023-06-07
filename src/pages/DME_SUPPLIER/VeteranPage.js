@@ -95,7 +95,7 @@ export default function VeteranPage() {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const [invitedVeteran, setVeteranId] = useState()
 
@@ -294,7 +294,7 @@ export default function VeteranPage() {
                             {
                                 !staffId && <>
                                     <Tooltip
-                                        title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be, First name > Last name > Full name > last Four > Email > Password > User Category > Country > City > State > Address > Phone Number"
+                                        title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be, First name > Last name > Full name > last Four > Email > Password > User Category > Zip > City > State > Address > Phone Number"
                                         arrow
                                         placement="left">
                                         <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
@@ -465,7 +465,7 @@ export default function VeteranPage() {
                     </Scrollbar>
 
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[100, 50, 25]}
                         component="div"
                         count={veteran.length}
                         rowsPerPage={rowsPerPage}

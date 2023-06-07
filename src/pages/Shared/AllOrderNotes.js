@@ -76,7 +76,7 @@ export default function AllOrderNotes() {
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('name');
     const [filterName, setFilterName] = useState('');
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
 
 
@@ -340,7 +340,7 @@ export default function AllOrderNotes() {
                     </Scrollbar>
 
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[100, 50, 25]}
                         component="div"
                         count={note.length}
                         rowsPerPage={rowsPerPage}

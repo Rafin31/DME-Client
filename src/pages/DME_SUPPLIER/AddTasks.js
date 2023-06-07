@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Autocomplete, Box, Button, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { useForm } from "react-hook-form";
@@ -21,7 +21,8 @@ import { fDateTime } from '../../utils/formatTime';
 
 export default function AddTasks() {
     const [date, setDate] = useState(new Date())
-    const [data, setData] = useState()
+    const [toValue, setToValue] = useState("")
+    let patientArray = []
     const [dateError, setError] = useState({
         status: false,
         message: " "
@@ -34,7 +35,7 @@ export default function AddTasks() {
 
     const { isLoading: patientLoading, data: patients } = useQuery('patient',
         async () => {
-            return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/patient/byDmeSupplier?dmeSupplier=${user?.id}`).then(data => data.data.data)
         }
     )
     //   add Task
@@ -53,6 +54,12 @@ export default function AddTasks() {
 
 
     const onSubmit = data => {
+
+        if (toValue === "") {
+            return toast.error("Patient is missing!")
+        }
+
+
         if (!date) {
             setError({
                 status: true,
@@ -71,12 +78,25 @@ export default function AddTasks() {
             return
         }
         const { patient, ...other } = data
-        data = { ...other, taskDate: fDateTime(givenDate), dmeSupplierId: user.id }
-        setData(data)
+        data = { ...other, taskDate: fDateTime(givenDate), dmeSupplierId: user.id, patientId: toValue.id }
         mutateAsync(data)
     };
 
 
+    if (!user || patientLoading) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+    patients.map(pt => {
+        const patientInfo = {
+            id: pt?.userId?._id,
+            label: pt?.userId?.fullName
+        }
+        patientArray.push(patientInfo)
+        return patientArray
+    })
 
 
     return (
@@ -117,30 +137,26 @@ export default function AddTasks() {
 
                                 <Grid item xs={12} style={{ margin: "10px 0px" }}>
                                     <FormControl fullWidth>
-                                        <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >{"Patient"}</InputLabel>
-                                        <Select
-                                            variant="outlined"
-                                            defaultValue=""
-                                            size="small"
-                                            error={errors.supplier && true}
-                                            rows={2}
-                                            {...register("patientId", { required: true })}
+                                        {
 
-                                        >
-                                            {
-                                                !patientLoading ?
+                                            <Autocomplete
+                                                disablePortal
+                                                id="combo-box-demo"
+                                                isOptionEqualToValue={(option, value) => option.value === value.value}
+                                                options={patientArray}
+                                                required
+                                                sx={{ width: "100%" }}
+                                                onChange={(e, newValue) => { setToValue(newValue) }}
+                                                renderInput={(params) => <TextField {...params} label={"Patients"} />}
+                                                renderOption={(props, option, state) => (
+                                                    <li {...props} style={{ backgroundColor: state.selected ? 'white' : 'dark' }}>
+                                                        {option.label}
+                                                    </li>
+                                                )}
 
 
-                                                    patients.map((patient, index) => {
-                                                        return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
-                                                    })
-
-                                                    :
-                                                    <Box style={{ height: "50px", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                        <CircularProgress />
-                                                    </Box>
-                                            }
-                                        </Select>
+                                            />
+                                        }
                                     </FormControl>
                                 </Grid>
 

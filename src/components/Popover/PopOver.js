@@ -21,6 +21,9 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             if (lebel === "Documents") {
                 navigate(`/DME-supplier/dashboard/patient-document/${id}`)
             }
+            if (lebel === "Profile") {
+                navigate(`/DME-supplier/dashboard/user-profile/${id}`)
+            }
             if (lebel === "Edit") {
                 navigate(`/DME-supplier/dashboard/edit-user-profile/${id}?user=patient`)
             }

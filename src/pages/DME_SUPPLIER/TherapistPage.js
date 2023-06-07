@@ -100,7 +100,7 @@ export default function TherapistPage() {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const theme = useTheme();
 
@@ -375,7 +375,7 @@ export default function TherapistPage() {
                     </Scrollbar>
 
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[100, 50, 25]}
                         component="div"
                         count={therapist.length}
                         rowsPerPage={rowsPerPage}

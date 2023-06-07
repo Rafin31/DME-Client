@@ -508,25 +508,19 @@ export default function EditOrder() {
                                         variant="outlined" />
                                 </Grid>
 
-                                {
 
-                                    orderCategory === "equipment-order" &&
+                                <Grid item xs={12} >
+                                    <TextField
+                                        {...register("progress")}
+                                        id="outlined-basic"
+                                        label="Order Progress"
+                                        error={errors.progress && true}
+                                        fullWidth
+                                        helperText={errors.progress?.message}
+                                        defaultValue={order?.progress}
+                                        variant="outlined" />
+                                </Grid>
 
-                                    <>
-                                        <Grid item xs={12} >
-                                            <TextField
-                                                {...register("progress")}
-                                                id="outlined-basic"
-                                                label="Order Progress"
-                                                error={errors.progress && true}
-                                                fullWidth
-                                                helperText={errors.progress?.message}
-                                                defaultValue={order?.progress}
-                                                variant="outlined" />
-                                        </Grid>
-                                    </>
-
-                                }
                                 <Grid item xs={12}>
                                     <LoadingButton loading={updateOrderLoading} type={"submit"} sx={{ width: "200px", margin: "15px 0px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Update</LoadingButton>
                                 </Grid>

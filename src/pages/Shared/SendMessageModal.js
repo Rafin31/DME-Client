@@ -20,7 +20,7 @@ export default function SendMessageModal({ open, setOpen, handelFormSubmit, to =
 
     let toOption = to.filter((e) => { return e._id !== from._id })?.map((f) => ({
         id: f._id,
-        label: f.fullName + " " + "|" + " " + f.category
+        label: f.fullName + " " + "|" + " " + f.companyName
     }))
 
     return (

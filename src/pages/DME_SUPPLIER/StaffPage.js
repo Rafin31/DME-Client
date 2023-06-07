@@ -115,7 +115,7 @@ export default function StaffPage() {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const [value, setValue] = useState(0);
 
@@ -455,7 +455,7 @@ export default function StaffPage() {
                                     </Scrollbar>
 
                                     <TablePagination
-                                        rowsPerPageOptions={[5, 10, 25]}
+                                        rowsPerPageOptions={[100, 50, 25]}
                                         component="div"
                                         count={INVITED_STAFF_LIST.length}
                                         rowsPerPage={rowsPerPage}
@@ -584,7 +584,7 @@ export default function StaffPage() {
                                     </Scrollbar>
 
                                     <TablePagination
-                                        rowsPerPageOptions={[5, 10, 25]}
+                                        rowsPerPageOptions={[100, 50, 25]}
                                         component="div"
                                         count={INVITED_STAFF_LIST.length}
                                         rowsPerPage={rowsPerPage}

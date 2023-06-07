@@ -74,7 +74,7 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const searchFieldRef = useRef(null)
     let { staffId } = JSON.parse(localStorage.getItem('user'));
@@ -296,7 +296,7 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
                 </Scrollbar>
 
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[100, 50, 25]}
                     component="div"
                     count={newReferralOrders?.length}
                     rowsPerPage={rowsPerPage}

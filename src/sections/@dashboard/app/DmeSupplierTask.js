@@ -56,7 +56,8 @@ NewsItem.propTypes = {
 };
 
 function NewsItem({ news }) {
-  const { id, title, patientName, description, postedAt, rftch: refetch } = news;
+  console.log(news)
+  const { id, title, patientId, patientName, description, postedAt, rftch: refetch } = news;
   const [open, setOpen] = useState(null);
   const navigate = useNavigate()
 
@@ -94,7 +95,7 @@ function NewsItem({ news }) {
           {title}
         </Link>
 
-        <Link to={`/DME-supplier/dashboard/user-profile/${98}`} style={{ display: "inline", fontSize: "small", cursor: "pointer" }} color="inherit" underline="hover" nowrap="true">
+        <Link to={`/DME-supplier/dashboard/user-profile/${patientId}`} style={{ display: "inline", fontSize: "small", textDecoration: "none" }} color="inherit" nowrap="true">
           <FaUserAlt style={{ marginRight: "5px" }} /> Patient: {patientName}
         </Link>
 

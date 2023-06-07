@@ -16,6 +16,8 @@ const PrivateMessagePage = () => {
     user = JSON.parse(user);
 
     const { allActiveUsersLoading,
+        allActiveDmeLoading,
+        allActiveDme,
         allActiveUsers,
         fromLoading,
         fromUsers,
@@ -64,30 +66,10 @@ const PrivateMessagePage = () => {
             return []
         }
 
-        console.log(data)
-
         const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         const conversationThreads = new Map();
 
-        //     sortedData.forEach((message) => {
-        //         const { senderId, receiverId } = message;
-
-        //         if (!senderId || !receiverId) {
-        //             continue;
-        //         }
-        //         const key1 = `${senderId?._id}+${receiverId?._id}`;
-        //         const key2 = `${receiverId?._id}+${senderId?._id}`;
-
-        //         if (!conversationThreads.has(key1) && !conversationThreads.has(key2)) {
-        //             conversationThreads.set(key1, message);
-        //         }
-        //     });
-
-        //     const result = Array.from(conversationThreads.values());
-        //     return result
-
-        // }
 
         for (let i = 0; i < sortedData.length; i++) {
             const message = sortedData[i];
@@ -131,7 +113,7 @@ const PrivateMessagePage = () => {
                 </Button>
             </Stack>
 
-            <SendMessageModal open={sendMessage} setOpen={setSendMessage} handelFormSubmit={handleSendMessage} to={allActiveUsers} setToValue={setToValue} from={fromUsers} title={"Send Message"} loading={allActiveUsersLoading || fromLoading} />
+            <SendMessageModal open={sendMessage} setOpen={setSendMessage} handelFormSubmit={handleSendMessage} to={allActiveDme} setToValue={setToValue} from={fromUsers} title={"Send Message"} loading={allActiveDmeLoading || fromLoading} />
 
             <Stack>
                 {

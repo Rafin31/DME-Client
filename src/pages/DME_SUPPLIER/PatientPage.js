@@ -53,10 +53,10 @@ const TABLE_HEAD = [
 function descendingComparator(a, b, orderBy) {
 
     if (orderBy === "Fname") {
-        if (b.userId.fullName < a.userId.fullName) {
+        if (b.userId.lastName < a.userId.lastName) {
             return -1;
         }
-        if (b.userId.fullName > a.userId.fullName) {
+        if (b.userId.lastName > a.userId.lastName) {
             return 1;
         }
     }
@@ -126,7 +126,7 @@ export default function PatientPage() {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const navigate = useNavigate()
 
@@ -137,6 +137,7 @@ export default function PatientPage() {
     let { id: dmeSupplierId } = JSON.parse(localStorage.getItem('user'));
 
     const options = [
+        { label: "Profile" },
         { label: "Edit" },
         { label: "Note" },
         { label: "Documents" },
@@ -338,7 +339,7 @@ export default function PatientPage() {
                             !staffId &&
                             <>
                                 <Tooltip
-                                    title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Weight > Country > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number > DME Supplier ID. 
+                                    title="File type should be xlsx. And the colum sequence should be First name > Last name > Full name > Email > Password > Category > Gender > Date of Birth > Weight > Zip > City > State > Address > Primary Insurance > Secondary Insurance > Phone Number > DME Supplier ID. 
                                     Collect the DME Supplier ID from DME Supplier Profile"
                                     arrow
                                     placement="left">
@@ -420,7 +421,7 @@ export default function PatientPage() {
                                                 </TableCell>
 
                                                 <TableCell align="left">
-                                                    <Tooltip title="Profile">
+                                                    <Tooltip title="Client States">
                                                         <Link to={`/DME-supplier/dashboard/patient-states/${userId._id}`}
                                                             style={{ display: "inline", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             {userId.fullName}
@@ -492,7 +493,7 @@ export default function PatientPage() {
                     </Scrollbar>
 
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[100, 50, 25]}
                         component="div"
                         count={patient.length}
                         rowsPerPage={rowsPerPage}

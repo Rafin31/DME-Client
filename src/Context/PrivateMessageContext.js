@@ -8,6 +8,11 @@ const PrivateMessageContext = ({ children }) => {
     let user = localStorage.getItem('user');
     user = JSON.parse(user);
 
+    const { isLoading: allActiveDmeLoading, data: allActiveDme } = useQuery(`allActiveDme`,
+        async () => {
+            return AuthRequest.get(`/api/v1/dme/active-dme`,).then(data => data.data.data)
+        }
+    )
 
     const { isLoading: allActiveUsersLoading, data: allActiveUsers } = useQuery(`allActiveUser`,
         async () => {
@@ -55,6 +60,8 @@ const PrivateMessageContext = ({ children }) => {
         <MessageContext.Provider
             value={{
                 allActiveUsersLoading: allActiveUsersLoading,
+                allActiveDmeLoading: allActiveDmeLoading,
+                allActiveDme: allActiveDme,
                 allActiveUsers: allActiveUsers,
                 fromLoading: fromLoading,
                 fromUsers: fromUsers,

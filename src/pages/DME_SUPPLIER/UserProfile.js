@@ -257,10 +257,10 @@ export default function UserProfile() {
                             </Grid>
                         }
                         {
-                            user.details.country &&
+                            user.details.zip &&
                             <Grid item xs={6} sm={6} md={4}>
-                                <Typography variant='subtitle'>Country</Typography>
-                                <Typography variant='h6'>{user.details.country}</Typography>
+                                <Typography variant='subtitle'>Zip</Typography>
+                                <Typography variant='h6'>{user.details.zip}</Typography>
                             </Grid>
                         }
                         {

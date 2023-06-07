@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Helmet } from 'react-helmet-async';
 import { React, useState } from 'react';
-import { Alert, Button, Card, Container, FormControl, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Card, Container, FormControl, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +26,9 @@ export default function AddPatient() {
     const firstName = watch('firstName');
     const lastName = watch('lastName');
 
+
+
+
     const { id } = JSON.parse(localStorage.getItem('user'));
 
     const { mutateAsync, isLoading: addPatientLoading } = useMutation((patient) => {
@@ -45,7 +48,36 @@ export default function AddPatient() {
             })
     })
 
+    const nameOnchange = () => {
+        // generateEmail()
+    }
 
+    const generateEmail = () => {
+
+        const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+        const generatedEmail = `${firstName?.toLowerCase()}_${randomNumber}_${lastName?.toLowerCase()}@gcm.com`;
+        // setValue("email", generatedEmail)
+        return generatedEmail;
+    }
+
+    const handleGeneratePassword = () => {
+
+        const specialChars = "!@#$";
+        const specialChar = specialChars.charAt(Math.floor(Math.random() * specialChars.length));
+        const randomBytes = lib.WordArray.random(4).toString(enc.Hex);
+        const password = `${firstName.substring(0, 2).toUpperCase()}${specialChar}${lastName.substring(0, 2)}${randomBytes}`;
+        const truncatedPassword = password.substring(0, 8);
+
+        // setFocus("password")
+        // setValue("password", truncatedPassword)
+        // setFocus("confirmPassword")
+        // setValue("confirmPassword", truncatedPassword)
+        // navigator.clipboard.writeText(password);
+        // toast.success("Generated Password has been copied to your clipboard!")
+
+        return truncatedPassword;
+
+    }
 
     const onSubmit = data => {
         if (dob !== "") {
@@ -58,6 +90,24 @@ export default function AddPatient() {
             data.dob = fDate(dob)
         }
         setDbError(false)
+
+        if (!data.email) {
+            data.email = generateEmail()
+        }
+
+        if (!data.password) {
+            data.password = handleGeneratePassword()
+        }
+
+        if (!data.confirmPassword) {
+            data.confirmPassword = data.password
+        }
+
+        if (data.confirmPassword !== data.password) {
+            data.password = handleGeneratePassword()
+            data.confirmPassword = data.password
+        }
+
         data = {
             ...data,
             fullName: data?.firstName + " " + data?.lastName,
@@ -67,46 +117,13 @@ export default function AddPatient() {
             status: "63861954b3b3ded1ee267309",
             dmeSupplier: id,
         }
+
+        if (!data.email || !data.password || !data.confirmPassword) {
+            return toast.error("Please provide email, password and confirm password!")
+        }
+
         mutateAsync(data)
     };
-
-
-    const generateEmail = () => {
-        if (!firstName || !lastName) {
-            toast.warning("Please provide First and Last Name first!")
-            return
-        }
-        const randomNumber = Math.floor(Math.random() * 9000) + 1000;
-
-        const generatedEmail = `${firstName.toLowerCase()}_${randomNumber}_${lastName.toLowerCase()}@gcm.com`;
-        setFocus("email")
-        setValue("email", generatedEmail)
-    }
-
-    const handleGeneratePassword = () => {
-
-        if (!firstName || !lastName) {
-            toast.warning("Please provide First and Last Name first!")
-            return
-        }
-
-        const specialChars = "!@#$";
-        const specialChar = specialChars.charAt(Math.floor(Math.random() * specialChars.length));
-        const randomBytes = lib.WordArray.random(4).toString(enc.Hex);
-        const password = `${firstName.substring(0, 2).toUpperCase()}${specialChar}${lastName.substring(0, 2)}${randomBytes}`;
-        const truncatedPassword = password.substring(0, 8);
-
-        setFocus("password")
-        setValue("password", truncatedPassword)
-        setFocus("confirmPassword")
-        setValue("confirmPassword", truncatedPassword)
-
-        navigator.clipboard.writeText(password);
-
-        toast.success("Generated Password has been copied to your clipboard!")
-
-    }
-
 
     return (
         <>
@@ -135,12 +152,13 @@ export default function AddPatient() {
                             <Grid
                                 container
                                 rowSpacing={2}
-                                columnSpacing={{ xs: 2, sm: 3, md: 5, lg: 5 }}
+                                columnSpacing={{ xs: 2, sm: 3, md: 1, lg: 1 }}
                             >
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <TextField
                                         {...register("firstName", { required: "Field is required" })}
                                         error={errors.Fname && true}
+                                        onChange={() => nameOnchange()}
                                         label="First Name*"
                                         type="text"
                                         fullWidth
@@ -149,11 +167,11 @@ export default function AddPatient() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <TextField
                                         {...register("lastName", { required: "Field is required" })}
                                         error={errors.Lname && true}
-
+                                        onChange={() => nameOnchange()}
                                         label="Last Name*"
                                         type="text"
                                         fullWidth
@@ -162,78 +180,8 @@ export default function AddPatient() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("email", { required: "Field is required" })}
-                                        error={errors.email && true}
 
-                                        label="Email*"
-                                        autoComplete="false"
-                                        type={'email'}
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.email?.message}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={() => generateEmail()} color="primary" edge="end" sx={{ fontSize: "12px" }}>
-                                                        Generate
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            )
-                                        }}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("password",
-                                            {
-                                                required: "Field is required",
-                                                minLength: { value: 8, message: "Password must be at last 8 characters" },
-                                            }
-
-                                        )}
-                                        error={errors.password && true}
-                                        label="Password*"
-                                        type={showPassword ? 'text' : 'password'}
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.password?.message}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                                                        <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                                                    </IconButton>
-                                                    <IconButton onClick={() => handleGeneratePassword()} color="primary" edge="end" sx={{ fontSize: "12px" }}>
-                                                        Generate
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ),
-                                        }}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("confirmPassword",
-                                            {
-                                                required: "Field is required",
-                                            }
-
-                                        )}
-                                        error={errors.password && true}
-
-                                        label="Confirm Password*"
-                                        type={'password'}
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.confirmPassword?.message}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <FormControl fullWidth>
                                         <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Gender*</InputLabel>
                                         <Select
@@ -251,25 +199,11 @@ export default function AddPatient() {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                {/* <Grid item xs={6}>
-                                    <TextField
-                                        {...register("dob", { required: "Field is required" })}
-                                        error={errors.dob && true}
 
-                                        label="Date of Birth*"
-                                        onFocus={(e) => { (e.target.type = "date") }}
-                                        onBlur={(e) => { (e.target.type = "text") }}
-                                        type="text"
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.dob?.message}
-                                    />
-                                    {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
-                                </Grid> */}
                                 <Grid item xs={6} >
                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                         <DatePicker
-                                            label="Date of Birth"
+                                            label="Date of Birth*"
                                             value={dob}
                                             onChange={(newValue) => {
                                                 setDob(newValue);
@@ -292,42 +226,6 @@ export default function AddPatient() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("country")}
-                                        error={errors.country && true}
-
-                                        label="Country"
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.country?.message}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("city")}
-                                        error={errors.city && true}
-
-                                        label="City"
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.city?.message}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("state")}
-                                        error={errors.state && true}
-
-                                        label="State"
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.state?.message}
-
-                                    />
-                                </Grid>
                                 <Grid item xs={12}>
                                     <TextField
                                         {...register("phoneNumber", {
@@ -344,7 +242,53 @@ export default function AddPatient() {
                                     />
 
                                 </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        {...register("address")}
 
+                                        label="Address"
+                                        error={errors.address && true}
+                                        fullWidth
+                                        multiline
+                                        helperText={errors.address?.message}
+                                        rows={2}
+                                        variant="outlined" />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("city")}
+                                        error={errors.city && true}
+
+                                        label="City"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.city?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("state")}
+                                        error={errors.state && true}
+
+                                        label="State"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.state?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("zip")}
+                                        error={errors.zip && true}
+                                        label="Zip"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.zip?.message}
+
+                                    />
+                                </Grid>
                                 <Grid item xs={6}>
                                     <TextField
                                         {...register("primaryInsurance")}
@@ -366,21 +310,67 @@ export default function AddPatient() {
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.secondaryInsurance?.message}
-
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("address")}
-
-                                        label="Address"
-                                        error={errors.address && true}
+                                        {...register("email")}
+                                        error={errors.email && true}
+                                        label="Email"
+                                        autoComplete="off"
+                                        type={'email'}
                                         fullWidth
-                                        multiline
-                                        helperText={errors.address?.message}
-                                        rows={4}
-                                        variant="outlined" />
+                                        variant="outlined"
+                                        helperText={errors.email?.message}
+
+                                    />
                                 </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("password",
+                                            // {
+                                            //     required: "Field is required",
+                                            //     minLength: { value: 8, message: "Password must be at last 8 characters" },
+                                            // }
+
+                                        )}
+                                        error={errors.password && true}
+                                        label="Password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.password?.message}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                        <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("confirmPassword",
+                                            // {
+                                            //     required: "Field is required",
+                                            // }
+
+                                        )}
+                                        error={errors.password && true}
+
+                                        label="Confirm Password"
+                                        type={'password'}
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.confirmPassword?.message}
+
+                                    />
+                                </Grid>
+
 
                                 <Grid item xs={12}>
                                     <LoadingButton loading={addPatientLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</LoadingButton>

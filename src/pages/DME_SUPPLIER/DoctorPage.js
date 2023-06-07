@@ -179,7 +179,7 @@ export default function DoctorPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
 
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(false)
@@ -385,7 +385,7 @@ export default function DoctorPage() {
               !staffId &&
               <>
                 <Tooltip
-                  title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be First name > Last name > Full name > Title > Email > Password > Category > Country > City > State > Zip > NPI Number > Company Name > Address > Phone Number"
+                  title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be First name > Last name > Full name > Title > Email > Password > Category > Zip > City > State > Zip > NPI Number > Company Name > Address > Phone Number"
                   arrow
                   placement="left">
                   <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
@@ -561,7 +561,7 @@ export default function DoctorPage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[100, 50, 25]}
             component="div"
             count={doctors.length}
             rowsPerPage={rowsPerPage}

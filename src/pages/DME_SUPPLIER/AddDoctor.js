@@ -166,12 +166,12 @@ export default function AddDoctor() {
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("country")}
-                                        error={errors.country && true}
-                                        label="Country"
+                                        {...register("zip")}
+                                        error={errors.zip && true}
+                                        label="Zip"
                                         fullWidth
                                         variant="outlined"
-                                        helperText={errors.country?.message}
+                                        helperText={errors.zip?.message}
 
                                     />
                                 </Grid>

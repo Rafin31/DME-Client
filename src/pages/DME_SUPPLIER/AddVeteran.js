@@ -21,7 +21,6 @@ export default function AddVeteran() {
     const firstName = watch('firstName');
     const lastName = watch('lastName');
 
-    console.log(firstName, lastName)
 
     const { mutateAsync, isLoading: addVeteranLoading } = useMutation((veteran) => {
 
@@ -40,30 +39,15 @@ export default function AddVeteran() {
             })
     })
 
-
-
-    const onSubmit = data => {
-
-        data = {
-            ...data,
-            fullName: data.firstName + " " + data.lastName,
-            userCategory: "63caa0348ceb169589e611c8",
-            status: "63861954b3b3ded1ee267309",
-        }
-        mutateAsync(data)
-
-    };
-
     const generateEmail = () => {
         if (!firstName || !lastName) {
             toast.warning("Please provide First and Last Name first!")
             return
         }
         const randomNumber = Math.floor(Math.random() * 9000) + 1000;
-
         const generatedEmail = `${firstName.toLowerCase()}_${randomNumber}_${lastName.toLowerCase()}@vamcgnv.com`;
-        setFocus("email")
-        setValue("email", generatedEmail)
+
+        return generatedEmail
     }
 
     const handleGeneratePassword = () => {
@@ -79,16 +63,47 @@ export default function AddVeteran() {
         const password = `${firstName.substring(0, 2).toUpperCase()}${specialChar}${lastName.substring(0, 2)}${randomBytes}`;
         const truncatedPassword = password.substring(0, 8);
 
-        setFocus("password")
-        setValue("password", truncatedPassword)
-        setFocus("confirmPassword")
-        setValue("confirmPassword", truncatedPassword)
-
-        navigator.clipboard.writeText(password);
-
-        toast.success("Generated Password has been copied to your clipboard!")
+        return truncatedPassword
 
     }
+
+
+
+
+    const onSubmit = data => {
+
+        if (!data.email) {
+            data.email = generateEmail()
+        }
+
+        if (!data.password) {
+            data.password = handleGeneratePassword()
+        }
+
+        if (!data.confirmPassword) {
+            data.confirmPassword = data.password
+        }
+
+        if (data.confirmPassword !== data.password) {
+            data.password = handleGeneratePassword()
+            data.confirmPassword = data.password
+        }
+
+        data = {
+            ...data,
+            fullName: data.firstName + " " + data.lastName,
+            userCategory: "63caa0348ceb169589e611c8",
+            status: "63861954b3b3ded1ee267309",
+        }
+
+
+        if (!data.email || !data.password || !data.confirmPassword) {
+            return toast.error("Please provide email, password and confirm password!")
+        }
+
+        mutateAsync(data)
+
+    };
 
 
 
@@ -119,9 +134,9 @@ export default function AddVeteran() {
                             <Grid
                                 container
                                 rowSpacing={2}
-                                columnSpacing={{ xs: 2, sm: 3, md: 5, lg: 5 }}
+                                columnSpacing={{ xs: 2, sm: 1, md: 1, lg: 1 }}
                             >
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <TextField
                                         {...register("firstName", { required: "Field is required" })}
                                         error={errors.firstName && true}
@@ -133,7 +148,7 @@ export default function AddVeteran() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <TextField
                                         {...register("lastName", { required: "Field is required" })}
                                         error={errors.lastName && true}
@@ -146,80 +161,7 @@ export default function AddVeteran() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("email", { required: "Field is required" })}
-                                        error={errors.email && true}
-
-                                        label="Email*"
-                                        autoComplete="false"
-                                        type={'email'}
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.email?.message}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={() => generateEmail()} color="primary" edge="end" sx={{ fontSize: "12px" }}>
-                                                        Generate
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            )
-                                        }}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("password",
-                                            {
-                                                required: "Field is required",
-                                                minLength: { value: 8, message: "Password must be at last 8 characters" },
-                                            }
-
-                                        )}
-                                        error={errors.password && true}
-
-                                        label="Password*"
-                                        type={showPassword ? 'text' : 'password'}
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.password?.message}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                                                        <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                                                    </IconButton>
-                                                    <IconButton onClick={() => handleGeneratePassword()} color="primary" edge="end" sx={{ fontSize: "12px" }}>
-                                                        Generate
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ),
-                                        }}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("confirmPassword",
-                                            {
-                                                required: "Field is required",
-                                            }
-
-                                        )}
-                                        error={errors.confirmPassword && true}
-
-                                        label="Confirm Password*"
-                                        type={'password'}
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.confirmPassword?.message}
-
-                                    />
-                                </Grid>
-
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <TextField
                                         {...register("lastFour", { required: "Field is required" })}
                                         error={errors.lastFour && true}
@@ -231,44 +173,7 @@ export default function AddVeteran() {
 
                                     />
                                 </Grid>
-
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("country", { required: "Field is required" })}
-                                        error={errors.country && true}
-
-                                        label="Country*"
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.country?.message}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("city", { required: "Field is required" })}
-                                        error={errors.city && true}
-
-                                        label="City*"
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.city?.message}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("state", { required: "Field is required" })}
-                                        error={errors.state && true}
-
-                                        label="State*"
-                                        fullWidth
-                                        variant="outlined"
-                                        helperText={errors.state?.message}
-
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <TextField
                                         {...register("phoneNumber", {
                                             required: "Field is required",
@@ -298,6 +203,92 @@ export default function AddVeteran() {
                                         rows={4}
                                         variant="outlined" />
                                 </Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("city", { required: "Field is required" })}
+                                        error={errors.city && true}
+
+                                        label="City*"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.city?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("state", { required: "Field is required" })}
+                                        error={errors.state && true}
+
+                                        label="State*"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.state?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("zip", { required: "Field is required" })}
+                                        error={errors.zip && true}
+
+                                        label="Zip*"
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.zip?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        {...register("email")}
+                                        error={errors.email && true}
+
+                                        label="Email"
+                                        autoComplete="false"
+                                        type={'email'}
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.email?.message}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("password")}
+                                        error={errors.password && true}
+                                        label="Password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.password?.message}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                        <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        {...register("confirmPassword")}
+                                        error={errors.confirmPassword && true}
+
+                                        label="Confirm Password*"
+                                        type={'password'}
+                                        fullWidth
+                                        variant="outlined"
+                                        helperText={errors.confirmPassword?.message}
+
+                                    />
+                                </Grid>
+
+
 
                                 <Grid item xs={12}>
                                     <LoadingButton loading={addVeteranLoading} type={"submit"} sx={{ width: "200px" }} size="medium" variant="contained" endIcon={<Iconify icon="eva:plus-fill" />}>Add</LoadingButton>

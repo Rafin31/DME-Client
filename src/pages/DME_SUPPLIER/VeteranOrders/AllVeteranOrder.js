@@ -29,6 +29,7 @@ const TABLE_HEAD = [
     { id: 'secondAttempt', label: '2nd Attempt', alignRight: false },
     { id: 'schedule', label: 'Schedule', alignRight: false },
     { id: 'status', label: 'status', alignRight: false },
+    { id: 'progress', label: 'Progress', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'action', label: '', alignRight: false },
 ];
@@ -155,7 +156,7 @@ const AllVeteranOrder = () => {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const searchFieldRef = useRef(null)
 
@@ -250,7 +251,7 @@ const AllVeteranOrder = () => {
 
                                 {
                                     row.map((row, index) => {
-                                        const { _id, createdAt, veteranId, firstAttempt, secondAttempt, schedule, notes, status, labourPo, partsPo } = row;
+                                        const { _id, createdAt, veteranId, firstAttempt, secondAttempt, schedule, progress, notes, status, labourPo, partsPo } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
@@ -287,6 +288,8 @@ const AllVeteranOrder = () => {
                                                         {sentenceCase(status)}
                                                     </Label>
                                                 </TableCell>
+
+                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
 
                                                 {
                                                     notes && notes?.length !== 0 ?
@@ -370,7 +373,7 @@ const AllVeteranOrder = () => {
                 </Scrollbar>
 
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[100, 50, 25]}
                     component="div"
                     count={allVeteranOrder.length}
                     rowsPerPage={rowsPerPage}

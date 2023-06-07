@@ -21,6 +21,7 @@ const TABLE_HEAD = [
     { id: 'dob', label: 'Date of Birth', alignRight: false },
     { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
+    { id: 'progress', label: 'Progress', alignRight: false },
     { id: 'status', label: 'Status', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
@@ -28,10 +29,10 @@ const TABLE_HEAD = [
 function descendingComparator(a, b, orderBy) {
 
     if (orderBy === "PatientName") {
-        if (b.patientId.fullName < a.patientId.fullName) {
+        if (b.patientId.lastName < a.patientId.lastName) {
             return -1;
         }
-        if (b.patientId.fullName > a.patientId.fullName) {
+        if (b.patientId.lastName > a.patientId.lastName) {
             return 1;
         }
     }
@@ -102,7 +103,7 @@ const PRR = () => {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const searchFieldRef = useRef(null)
 
@@ -198,7 +199,7 @@ const PRR = () => {
 
                                 {
                                     row.map((row, index) => {
-                                        const { _id, patientId, status, notes, description } = row;
+                                        const { _id, patientId, status, notes, progress, description } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
@@ -253,6 +254,7 @@ const PRR = () => {
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                 }
+                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
                                                 <TableCell align="left">
                                                     <Label
                                                         color={
@@ -316,7 +318,7 @@ const PRR = () => {
                 </Scrollbar>
 
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[100, 50, 25]}
                     component="div"
                     count={newReferralOrders.length}
                     rowsPerPage={rowsPerPage}

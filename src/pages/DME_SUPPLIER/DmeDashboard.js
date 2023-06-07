@@ -112,6 +112,7 @@ export default function DmeDashboard() {
                 list={tasks.map((task, index) => ({
                   id: task._id,
                   title: task.title,
+                  patientId: task.patientId._id,
                   patientName: task.patientId.fullName,
                   description: task.description,
                   image: `/assets/images/covers/cover_${index + 1}.jpg`,

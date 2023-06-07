@@ -1,4 +1,4 @@
-import { Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material';
 
 import { useForm } from "react-hook-form";
 import React, { useCallback, useEffect, useState } from 'react';
@@ -19,10 +19,21 @@ import { fDate } from '../../utils/formatTime';
 
 
 
+
 export default function AddOrder() {
+    const { search } = window.location;
+    const params = new URLSearchParams(search);
+    const orderCategory = params.get('orderCategory');
+
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [user, setUser] = useState()
+    let patientArray = []
     const [loading, setLoading] = useState(false)
+    const [toValue, setToValue] = useState("")
+    const [toStatus, setToStatus] = useState(orderCategory === "equipment-order" ? "New-Referral" :
+        orderCategory === "repair-order" ? "PRR" :
+            orderCategory === "veteran-order" && "Equip")
+
     const navigate = useNavigate()
 
 
@@ -33,6 +44,135 @@ export default function AddOrder() {
     const [secondAttempt, setSecondAttempt] = useState(null);
     const [schedule, setSchedule] = useState(null);
 
+
+    const equipOrderStatus = [
+        {
+            id: "New-Referral",
+            label: "New-Referral"
+        },
+        {
+            id: "Evaluation",
+            label: "Evaluation"
+        },
+        {
+            id: "Evaluation-Completed",
+            label: "Evaluation-Completed"
+        },
+        {
+            id: "Paper-Work-In-Process",
+            label: "Paper-Work-In-Process"
+        },
+        {
+            id: "Prior-Auth-Status",
+            label: "Prior-Auth-Status"
+        },
+        {
+            id: "Prior-Auth-Receive",
+            label: "Prior-Auth-Receive"
+        },
+        {
+            id: "Holding-RTO",
+            label: "Holding-RTO"
+        },
+        {
+            id: "RTO",
+            label: "RTO"
+        },
+        {
+            id: "Delivered",
+            label: "Delivered"
+        },
+        {
+            id: "Authorization-Expiration-F/U",
+            label: "Authorization-Expiration-F/U"
+        },
+        {
+            id: "Order-Request",
+            label: "Order-Request"
+        },
+
+    ]
+
+    const repairOrderStatus = [
+        {
+            id: "PRR",
+            label: "PRR"
+        },
+        {
+            id: "Pending-Rx",
+            label: "Pending-Rx"
+        },
+        {
+            id: "Pending-Assess",
+            label: "Pending-Assess"
+        },
+        {
+            id: "Workup",
+            label: "Workup"
+        },
+        {
+            id: "Pa-Status",
+            label: "Pa-Status"
+        },
+        {
+            id: "RTO-Status",
+            label: "RTO-Status"
+        },
+        {
+            id: "Pending-Parts",
+            label: "Pending-Parts"
+        },
+        {
+            id: "Pending-Scheduling",
+            label: "Pending-Scheduling"
+        },
+        {
+            id: "Completed",
+            label: "Completed"
+        }
+    ]
+
+
+    const veteranOrderStatus = [
+        {
+            id: "Equip",
+            label: "Equip"
+        },
+        {
+            id: "New Repair",
+            label: "New Repair"
+        },
+        {
+            id: "Rcvd-pending-scheduling",
+            label: "Rcvd-pending-scheduling"
+        },
+        {
+            id: "Estimate-sent-pending-po",
+            label: "Estimate-sent-pending-po"
+        },
+        {
+            id: "Po-Received",
+            label: "Po-Received"
+        },
+        {
+            id: "Parts-ordered-by-VAMC",
+            label: "Parts-ordered-by-VAMC"
+        },
+        {
+            id: "Parts-ordered-by-GCM",
+            label: "Parts-ordered-by-GCM"
+        },
+        {
+            id: "Pending-scheduling",
+            label: "Pending-scheduling"
+        },
+        {
+            id: "Completed",
+            label: "Completed"
+        }
+    ]
+
+
     const loadUserInfo = useCallback(() => {
         AuthRequest.get(`/api/v1/users/${id}`)
             .then(res => {
@@ -41,9 +181,7 @@ export default function AddOrder() {
             })
     }, [id])
 
-    const { search } = window.location;
-    const params = new URLSearchParams(search);
-    const orderCategory = params.get('orderCategory');
+
 
     useEffect(() => {
         setLoading(true);
@@ -61,7 +199,6 @@ export default function AddOrder() {
 
         }
     )
-
 
 
     const { mutateAsync, isLoading: createOrderLoading } = useMutation((order) => {
@@ -112,24 +249,19 @@ export default function AddOrder() {
         return 0
     })
 
+    const onSubmit = useCallback((data) => {
+        const { description, notes } = data
+        console.log(toValue)
+        const patientId = toValue?.id
 
-    if (!user || patientLoading) {
-        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <CircularProgress />
-        </Box>
-    }
+        if (!patientId) return toast.error("Please Select Patient")
 
-    const onSubmit = data => {
-        const { patientId, description, notes } = data
         const order = {
             dmeSupplierId: id,
             patientId,
             description,
             notes,
-            status:
-                orderCategory === "equipment-order" ? "New-Referral" :
-                    orderCategory === "repair-order" ? "PRR" :
-                        orderCategory === "veteran-order" && "Equip"
+            status: toStatus
         }
         if (orderCategory === "veteran-order") delete order.patientId
         if (orderCategory === "veteran-order") order.veteranId = patientId
@@ -138,11 +270,27 @@ export default function AddOrder() {
         if (schedule) order.schedule = fDate((schedule))
         if (data.partsPo) order.partsPo = data.partsPo
         if (data.labourPo) order.labourPo = data.labourPo
-
         mutateAsync(order)
         reset()
-    };
 
+    }, [toValue?.id, orderCategory, toStatus])
+
+
+
+    if (!user || patientLoading) {
+        return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+    patients.map(pt => {
+        const patientInfo = {
+            id: pt?.userId?._id,
+            label: pt?.userId?.fullName
+        }
+        patientArray.push(patientInfo)
+        return patientArray
+    })
 
     return (
         <>
@@ -170,7 +318,7 @@ export default function AddOrder() {
                     justify="center"
                     style={{ minHeight: '100vh', marginTop: '40px' }}
                 >
-                    <Card sx={{ paddingY: 4, paddingX: 3 }}>
+                    <Card sx={{ paddingY: 4, paddingX: 3, minHeight: "560px" }}>
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <Grid
                                 container
@@ -194,37 +342,63 @@ export default function AddOrder() {
                                     />
                                 </Grid>
 
+                                <Grid item xs={12} >
+                                    <FormControl fullWidth>
+                                        {
+
+                                            <Autocomplete
+                                                disablePortal
+                                                id="combo-box-demo"
+                                                isOptionEqualToValue={(option, value) => option.value === value.value}
+                                                options={patientArray}
+                                                required
+                                                sx={{ width: "100%" }}
+                                                onChange={(e, newValue) => { setToValue(newValue) }}
+                                                renderInput={(params) => <TextField {...params} label={orderCategory === "veteran-order" ? "Veteran" : "Patients"} />}
+                                                renderOption={(props, option, state) => (
+                                                    <li {...props} style={{ backgroundColor: state.selected ? 'white' : 'dark' }}>
+                                                        {option.label}
+                                                    </li>
+                                                )}
+
+
+                                            />
+                                        }
+
+                                    </FormControl>
+                                </Grid>
+
 
                                 <Grid item xs={12} >
                                     <FormControl fullWidth>
-                                        <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >
-                                            {orderCategory === "veteran-order" ? "Veteran" : "Patient"}
-                                        </InputLabel>
-                                        <Select
-                                            variant="outlined"
-                                            defaultValue=""
-                                            size="small"
-                                            error={errors.supplier && true}
-                                            rows={2}
-                                            {...register("patientId", { required: true })}
-                                            helperText={errors.patientId?.message}
+                                        {
 
-                                        >
-                                            {
-                                                !patientLoading ?
+                                            <Autocomplete
+                                                disablePortal
+                                                id="combo-box-demo"
+                                                value={toStatus}
+                                                isOptionEqualToValue={(option, value) => option.value === value.value}
+                                                options={
+                                                    orderCategory === "equipment-order" ? equipOrderStatus :
+                                                        orderCategory === "repair-order" ? repairOrderStatus :
+                                                            orderCategory === "veteran-order" && veteranOrderStatus
+                                                }
+                                                required
+                                                sx={{ width: "100%", height: "auto" }}
+                                                onChange={(e, newValue) => {
+                                                    setToStatus(newValue.id)
+                                                }}
+                                                renderInput={(params) => <TextField {...params} label="Order Stage" />}
+                                                renderOption={(props, option, state) => (
+                                                    <li {...props} style={{ backgroundColor: state.selected ? 'white' : 'dark' }}>
+                                                        {option.label}
+                                                    </li>
+                                                )}
 
 
-                                                    patients.length !== 0 ?
-                                                        patients.map((patient, index) => {
-                                                            return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
-                                                        }) : <MenuItem disabled>No Veteran Found</MenuItem>
+                                            />
+                                        }
 
-                                                    :
-                                                    <Box style={{ height: "50px", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                        <CircularProgress />
-                                                    </Box>
-                                            }
-                                        </Select>
                                     </FormControl>
                                 </Grid>
                                 {

@@ -103,7 +103,7 @@ export default function DoctorNotes() {
 
     const [filterName, setFilterName] = useState('');
 
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
     const [user, setUser] = useState()
     const [loading, setLoading] = useState()
     const [isEdit, setEdit] = useState(false)
@@ -411,7 +411,7 @@ export default function DoctorNotes() {
                     </Scrollbar>
 
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[100, 50, 25]}
                         component="div"
                         count={notes.length}
                         rowsPerPage={rowsPerPage}

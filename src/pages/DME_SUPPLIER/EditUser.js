@@ -1,9 +1,9 @@
-import { Alert, Box, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Card, CircularProgress, Container, FormControl, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LoadingButton } from '@mui/lab';
@@ -16,6 +16,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 export default function EditUser() {
     const { register, watch, handleSubmit, reset, formState: { errors } } = useForm();
     const [dbError, setDbError] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
     const { id: userId } = useParams()
     const navigate = useNavigate()
 
@@ -26,6 +27,7 @@ export default function EditUser() {
     const userCategory = params.get('user');
 
     const patientEmail = watch("email")
+
 
 
     const { isLoading: userLoading, refetch, data: user } = useQuery(`user-${userId}`,
@@ -57,7 +59,9 @@ export default function EditUser() {
         user && setDob(user.details.dob)
     }, [user])
 
-    if (!user) {
+    const [{ loggedInUser, loggedInUserLoading }] = useOutletContext();
+
+    if (!user || loggedInUserLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -80,6 +84,8 @@ export default function EditUser() {
 
         if (dob) data.dob = fDate(dob)
 
+        if (data.password === "") delete data.password
+
         data = {
             ...data,
             fullName: data.firstName + " " + data.lastName,
@@ -94,6 +100,7 @@ export default function EditUser() {
         }
 
         setDbError(false)
+        // console.log(data)
         mutateAsync(data)
     };
 
@@ -190,6 +197,37 @@ export default function EditUser() {
                                 </Grid>
 
                                 {
+                                    (loggedInUser.category === "DME-Supplier" || loggedInUser.category === "DME-Staff")
+                                    && (userCategory === "patient" || userCategory === "veteran") &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("password",
+                                                {
+                                                    minLength: { value: 8, message: "Password must be at last 8 characters" },
+                                                }
+
+                                            )}
+                                            error={errors.password && true}
+                                            label="Password"
+                                            type={showPassword ? 'text' : 'password'}
+                                            fullWidth
+                                            variant="outlined"
+                                            helperText={errors.password?.message}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                            <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+
+                                        />
+                                    </Grid>
+                                }
+
+                                {
                                     userCategory === "veteran" &&
                                     <Grid item xs={6}>
                                         <TextField
@@ -266,14 +304,14 @@ export default function EditUser() {
 
                                 <Grid item xs={6}>
                                     <TextField
-                                        {...register("country")}
-                                        error={errors.country && true}
+                                        {...register("zip")}
+                                        error={errors.zip && true}
 
-                                        label="Country"
+                                        label="Zip"
                                         fullWidth
                                         variant="outlined"
-                                        defaultValue={user.details.country}
-                                        helperText={errors.country?.message}
+                                        defaultValue={user.details.zip}
+                                        helperText={errors.zip?.message}
 
                                     />
                                 </Grid>

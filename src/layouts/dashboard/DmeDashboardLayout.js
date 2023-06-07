@@ -87,7 +87,7 @@ export default function DmeDashboardLayout() {
         setLoading={setLoading} />
 
       <Main>
-        <Outlet />
+        <Outlet context={[{ loggedInUser: user, loggedInUserLoading: loading }]} />
       </Main>
     </StyledRoot>
   );
