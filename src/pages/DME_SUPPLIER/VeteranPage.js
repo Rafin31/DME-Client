@@ -52,12 +52,50 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "id") {
+        if (b.userId._id < a.userId._id) {
+            return -1;
+        }
+        if (b.userId._id > a.userId._id) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+
+    if (orderBy === "Fname") {
+        if (b.userId.lastName < a.userId.lastName) {
+            return -1;
+        }
+        if (b.userId.lastName > a.userId.lastName) {
+            return 1;
+        }
     }
+    if (orderBy === "email") {
+        if (b.userId.email < a.userId.email) {
+            return -1;
+        }
+        if (b.userId.email > a.userId.email) {
+            return 1;
+        }
+    }
+    if (orderBy === "lastFour") {
+        if (b.lastFour < a.lastFour) {
+            return -1;
+        }
+        if (b.lastFour > a.lastFour) {
+            return 1;
+        }
+    }
+
+    else {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -104,12 +142,13 @@ export default function VeteranPage() {
     const importButtonRef = useRef(null)
 
     let { staffId } = JSON.parse(localStorage.getItem('user'));
+    let { id: dmeSupplierId } = JSON.parse(localStorage.getItem('user'));
 
 
     const { isLoading: veteranLoading, refetch: veteranRefetch, data: veteran } = useQuery(
         ["veteran", addedVeteran !== null && addedVeteran],
         async () => {
-            return AuthRequest.get(`/api/v1/veteran/`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/veteran/byDmeSupplier?dmeSupplier=${dmeSupplierId}`).then(data => data.data.data)
         }
     )
 
@@ -182,7 +221,7 @@ export default function VeteranPage() {
 
     const exportVeteran = async () => {
 
-        const resp = await AuthRequest.get("/api/v1/users/export-veteran", {
+        const resp = await AuthRequest.get(`/api/v1/users/export-veteran?dmeSupplier=${dmeSupplierId}`, {
             responseType: 'arraybuffer',
             headers: { 'Content-Type': 'blob' },
         })
@@ -294,7 +333,7 @@ export default function VeteranPage() {
                             {
                                 !staffId && <>
                                     <Tooltip
-                                        title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be, First name > Last name > Full name > last Four > Email > Password > User Category > Zip > City > State > Address > Phone Number"
+                                        title="File type should be xlsx.There might be a column heading, but data should start from the second row.The colum sequence should be, First name > Last name > Full name > last Four > Email > Password > User Category > Zip > City > State > Address > Phone Number > DME-Supplier ID"
                                         arrow
                                         placement="left">
                                         <Iconify style={{ marginTop: "5px" }} icon="material-symbols:info-outline" color="#2065d1" />
@@ -377,18 +416,18 @@ export default function VeteranPage() {
                                                 </TableCell>
 
                                                 <TableCell align="left">
-                                                    <Tooltip title="Profile">
-                                                        <Link to={`/DME-supplier/dashboard/user-profile/${userId._id}`}
+                                                    <Tooltip title="Veteran States">
+                                                        <Link to={`/DME-supplier/dashboard/veteran-states/${userId._id}`}
                                                             style={{ display: "inline", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             {userId.fullName}
                                                         </Link>
                                                     </Tooltip>
                                                 </TableCell>
 
-                                                <TableCell align="left">{lastFour ? lastFour : "Not given!"}</TableCell>
+                                                <TableCell align="left">{lastFour ? lastFour : "Not Given!"}</TableCell>
                                                 <TableCell align="left">{userId.email}</TableCell>
-                                                <TableCell align="left">{phoneNumber}</TableCell>
-                                                <TableCell align="left">{city}</TableCell>
+                                                <TableCell align="left">{!phoneNumber ? "Not Given!" : phoneNumber}</TableCell>
+                                                <TableCell align="left">{!city ? "Not Given!" : city}</TableCell>
 
                                                 <TableCell align="left">
                                                     {
@@ -403,7 +442,9 @@ export default function VeteranPage() {
                                                         key={userId._id}
                                                         source="veteran-page"
                                                         option={[
+                                                            { label: "Profile" },
                                                             { label: "Edit" },
+                                                            { label: "Notes" },
                                                             { label: "Add VA Prosthetics" },
                                                             { label: "Order History" },
                                                         ]}

@@ -24,7 +24,6 @@ const TABLE_HEAD = [
     { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'status', label: 'Status', alignRight: false },
-    { id: 'Progress', label: 'Progress', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
 
@@ -62,6 +61,14 @@ function descendingComparator(a, b, orderBy) {
             return -1;
         }
         if (b.notes > a.notes) {
+            return 1;
+        }
+    }
+    if (orderBy === "status") {
+        if (b.status < a.status) {
+            return -1;
+        }
+        if (b.status > a.status) {
             return 1;
         }
     }
@@ -210,13 +217,13 @@ const AllEquipmentOrder = () => {
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
 
 
-                                                <TableCell component="th" scope="row" padding="none">
+                                                <TableCell width="20%">
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
                                                         <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
                                                             style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             <Tooltip title="Profile">
-                                                                <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                                <Typography variant="subtitle2" nowrap="true">
                                                                     {patientId.fullName}
                                                                 </Typography>
                                                             </Tooltip>
@@ -225,7 +232,7 @@ const AllEquipmentOrder = () => {
                                                     </Stack>
                                                 </TableCell>
 
-                                                <TableCell align="left">{patientId.patientDob}</TableCell>
+                                                <TableCell width="10%" align="left">{patientId.patientDob}</TableCell>
 
                                                 {
                                                     description ?
@@ -235,7 +242,7 @@ const AllEquipmentOrder = () => {
                                                 }
 
                                                 {notes && notes?.length !== 0 ?
-                                                    <TableCell width="30%" align="left">
+                                                    <TableCell align="left">
                                                         <ReactShowMoreText
                                                             lines={1}
                                                             more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}
@@ -268,7 +275,7 @@ const AllEquipmentOrder = () => {
                                                     </Label>
                                                 </TableCell>
 
-                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
+
 
 
 

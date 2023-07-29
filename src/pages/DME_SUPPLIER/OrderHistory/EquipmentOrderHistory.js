@@ -13,6 +13,8 @@ import PopOver from '../../../components/Popover/PopOver';
 import { UserListHead } from '../../../sections/@dashboard/user';
 import Scrollbar from '../../../components/scrollbar';
 import { fDate } from '../../../utils/formatTime';
+import EditOrderModal from 'src/pages/Shared/EditOrderModal';
+import { useEffect } from 'react';
 
 
 
@@ -25,7 +27,6 @@ const TABLE_HEAD = [
     { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'status', label: 'Status', alignRight: false },
-    { id: 'Progress', label: 'Progress', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
 
@@ -62,7 +63,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
+const EquipmentOrderHistory = ({ orders, refetch, fromPage, deleteEquipmentOrder }) => {
 
     const [page, setPage] = useState(0);
 
@@ -85,6 +86,9 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
     let newReferralIsNotFound
     let row
 
+    const [openModal, setOpenModal] = useState(false)
+    const [editedOrderId, setEditedOrderId] = useState()
+
     const options = [
         { label: "Note Log" },
         { label: "Documents" },
@@ -92,6 +96,7 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
 
 
     fromPage === "patientStates" && options.push({ label: "Status" })
+    fromPage === "patientStates" && options.push({ label: "Edit", fromPage: "states" })
     fromPage === "patientStates" && !staffId && options.push({ label: "Delete" })
 
     const handleRequestSort = (event, property) => {
@@ -115,15 +120,6 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
     };
 
 
-    // const [statesLoading, orders] = useOutletContext();
-
-    // if (statesLoading) {
-    //     return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-    //         <CircularProgress />
-    //     </Box>
-    // }
-
-
     if (orders !== "No order found!" || orders.length !== 0) {
         newReferralOrders = orders
         newReferralEmptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - newReferralOrders.length) : 0;
@@ -135,6 +131,8 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
 
     return (
         <>
+            <EditOrderModal open={openModal} setOpen={setOpenModal} orderCategory={"equipment-order"}
+                order={orders.find(order => order._id === editedOrderId) || {}} refetch={refetch} orderId={editedOrderId} title="Edit Order" />
 
             <Card style={{ margin: "20px 0px" }}>
                 {
@@ -178,13 +176,13 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
                                                 <TableCell align="left">{fDate(createdAt)}</TableCell>
                                                 <TableCell align="left">{dateCompleted ? fDate(dateCompleted) : "Not Mentioned"}</TableCell>
 
-                                                <TableCell component="th" scope="row" padding="none">
+                                                <TableCell>
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
                                                         <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
                                                             style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             <Tooltip title="Profile">
-                                                                <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                                <Typography component={'span'} variant="subtitle2" nowrap="true">
                                                                     {patientId.fullName}
                                                                 </Typography>
                                                             </Tooltip>
@@ -236,10 +234,6 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
                                                     </Label>
                                                 </TableCell>
 
-                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
-
-
-
                                                 <TableCell >
                                                     <PopOver
                                                         key={index}
@@ -248,6 +242,8 @@ const EquipmentOrderHistory = ({ orders, fromPage, deleteEquipmentOrder }) => {
                                                         option={options}
                                                         id={row._id}
                                                         deleteOrder={deleteEquipmentOrder ? deleteEquipmentOrder : ""}
+                                                        setEditOrderModal={setOpenModal}
+                                                        setEditedOrderId={setEditedOrderId}
                                                     />
                                                 </TableCell>
 

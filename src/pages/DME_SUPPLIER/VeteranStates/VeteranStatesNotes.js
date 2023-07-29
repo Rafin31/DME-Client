@@ -90,7 +90,7 @@ function applySortFilter(array, comparator, query) {
     return stabilizedThis.map((el) => el[0]);
 }
 
-export default function ClientNotes({ patientId: noteFor }) {
+export default function VeteranStatesNotes({ patientId: noteFor }) {
 
     const [addNotesOpen, setAddNotesOpen] = useState(false)
 
@@ -281,7 +281,7 @@ export default function ClientNotes({ patientId: noteFor }) {
         <>
             <Container maxWidth="1350px">
 
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Typography variant="h4" gutterBottom>
                         Notes
                     </Typography>
@@ -293,8 +293,7 @@ export default function ClientNotes({ patientId: noteFor }) {
 
                 <AddNotesToPatientModal open={addNotesOpen} setOpen={setAddNotesOpen} handelFormSubmit={handelAddNotesToPatient} data={{ notes: "" }} title="Add Note" user={user} />
 
-                <PublishNoteModal open={publish} setOpen={setPublish} user={patient2} publishNote={publishNote}
-                    orderFor={"patient-notes-page"} title="Publish Note" />
+                <PublishNoteModal open={publish} setOpen={setPublish} user={patient2} publishNote={publishNote} orderFor={"veteran-notes-page"} title="Publish Note" />
 
 
                 <input type="text"

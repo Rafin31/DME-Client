@@ -20,22 +20,98 @@ import { fDate } from '../../../utils/formatTime';
 
 const TABLE_HEAD = [
     { id: 'dateCreated', label: 'Date Created', alignRight: false },
-    { id: 'dateCompleted', label: 'Date Completed', alignRight: false },
-    { id: 'Fullname', label: 'Full Name', alignRight: false },
-    { id: 'partsPo', label: 'Parts PO#', alignRight: false },
-    { id: 'labourPo', label: 'Labour PO#', alignRight: false },
+    { id: 'Fname', label: 'First Name', alignRight: false },
+    { id: 'Lname', label: 'Last Name', alignRight: false },
+    { id: 'lastFOur', label: 'Last Four#', alignRight: false },
     { id: 'status', label: 'status', alignRight: false },
+    { id: 'progress', label: 'Progress', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
-    { id: 'action', label: '', alignRight: false },
+    { id: 'action', label: 'Action', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "Fname") {
+        if (b.veteranId.firstName < a.veteranId.firstName) {
+            return -1;
+        }
+        if (b.veteranId.firstName > a.veteranId.firstName) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+    if (orderBy === "Lname") {
+        if (b.veteranId.lastName < a.veteranId.lastName) {
+            return -1;
+        }
+        if (b.veteranId.lastName > a.veteranId.lastName) {
+            return 1;
+        }
     }
+    if (orderBy === "dateCreated") {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "lastFOur") {
+        const dateA = parseInt(a.veteranId.lastFour);
+        const dateB = parseInt(b.veteranId.lastFour);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "firstAttempt") {
+        const dateA = new Date(a.firstAttempt);
+        const dateB = new Date(b.firstAttempt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "secondAttempt") {
+        const dateA = new Date(a.secondAttempt);
+        const dateB = new Date(b.secondAttempt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "schedule") {
+        const dateA = new Date(a.schedule);
+        const dateB = new Date(b.schedule);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+
+    else {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -62,7 +138,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const VeteranOrderHistory = ({ orders }) => {
+const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
 
     const [page, setPage] = useState(0);
 
@@ -77,12 +153,24 @@ const VeteranOrderHistory = ({ orders }) => {
     const [rowsPerPage, setRowsPerPage] = useState(100);
 
     const searchFieldRef = useRef(null)
+    let { staffId } = JSON.parse(localStorage.getItem('user'));
+
 
     let cancelledOrders
     let cancelledEmptyRows
     let filteredCancelledOrders
     let cancelledIsNotFound
     let row
+
+
+    const options = [
+        { label: "Note Log" },
+        { label: "Documents" },
+    ]
+
+
+    fromPage === "veteranStates" && options.push({ label: "Status" })
+    fromPage === "veteranStates" && !staffId && options.push({ label: "Delete" })
 
 
     const handleRequestSort = (event, property) => {
@@ -106,14 +194,6 @@ const VeteranOrderHistory = ({ orders }) => {
     };
 
 
-    // const [statesLoading, orders] = useOutletContext();
-
-    // if (statesLoading) {
-    //     return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-    //         <CircularProgress />
-    //     </Box>
-    // }
-
 
     if (orders !== "No order found!") {
         cancelledOrders = orders
@@ -135,7 +215,7 @@ const VeteranOrderHistory = ({ orders }) => {
                         width: "220px",
                     }}
                     ref={searchFieldRef}
-                    placeholder="Search Orders by Patient Name"
+                    placeholder="Search Orders by Veteran Name"
                     value={filterName}
                     onChange={handleFilterByName} />
 
@@ -156,7 +236,7 @@ const VeteranOrderHistory = ({ orders }) => {
 
                                 {
                                     row.map((row, index) => {
-                                        const { _id, createdAt, dateCompleted, veteranId, firstAttempt, secondAttempt, schedule, notes, status, labourPo, partsPo } = row;
+                                        const { _id, createdAt, veteranId, firstAttempt, secondAttempt, schedule, progress, notes, status, labourPo, partsPo } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
@@ -164,21 +244,19 @@ const VeteranOrderHistory = ({ orders }) => {
 
 
                                                 <TableCell align="left">{fDate(createdAt)}</TableCell>
-                                                <TableCell align="left">{dateCompleted ? fDate(dateCompleted) : "Not Mentioned"}</TableCell>
+                                                <TableCell align="left">{veteranId.firstName}</TableCell>
+                                                <TableCell align="left">{veteranId.lastName}</TableCell>
 
                                                 <TableCell component="th" scope="row" padding="none">
                                                     <Link to={`/DME-supplier/dashboard/user-profile/${veteranId._id}`}
                                                         style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                         <Tooltip title="Profile">
-                                                            <Typography component={'span'} style={{ wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
-                                                                {veteranId.fullName}
+                                                            <Typography variant="subtitle2" sx={{ textAlign: "center" }}>
+                                                                {veteranId.lastFour}
                                                             </Typography>
                                                         </Tooltip>
                                                     </Link>
                                                 </TableCell>
-
-                                                <TableCell align="left">{!partsPo ? "Not Mentioned" : partsPo}</TableCell>
-                                                <TableCell align="left">{!labourPo ? "Not Mentioned" : labourPo}</TableCell>
 
                                                 <TableCell align="left">
                                                     <Label
@@ -188,6 +266,8 @@ const VeteranOrderHistory = ({ orders }) => {
                                                         {sentenceCase(status)}
                                                     </Label>
                                                 </TableCell>
+
+                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
 
                                                 {
                                                     notes && notes?.length !== 0 ?
@@ -221,14 +301,11 @@ const VeteranOrderHistory = ({ orders }) => {
                                                         key={index}
                                                         source='veteran-order-page'
                                                         orderStatus="archived"
-                                                        option={[
-                                                            { label: "Note Log" },
-                                                            { label: "Documents" },
-                                                        ]}
+                                                        option={options}
                                                         id={row._id}
+                                                        deleteOrder={deleteVeteranOrder ? deleteVeteranOrder : ""}
                                                     />
                                                 </TableCell>
-
                                             </TableRow>
                                         )
                                     })

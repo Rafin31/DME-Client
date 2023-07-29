@@ -57,7 +57,8 @@ export default function AddPatientToTherapist({ open, setOpen, handelFormSubmit,
                                 >
                                     {
                                         patients.map((patient, index) => {
-                                            return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
+                                            return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName +
+                                                " (" + patient.dob + ")"}</MenuItem>
                                         })
                                     }
                                 </Select>

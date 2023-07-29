@@ -5,6 +5,7 @@ import { useQuery } from 'react-query';
 import EquipmentOrderPublish from '../DME_SUPPLIER/PublishOrder/EquipmentOrderPublish';
 import RepairOrderPublish from '../DME_SUPPLIER/PublishOrder/RepairOrderPublish';
 import { toast } from 'react-toastify';
+import VeteranOrderPublish from '../DME_SUPPLIER/PublishOrder/VeteranOrderPublish';
 
 
 const style = {
@@ -22,20 +23,28 @@ const style = {
 
 
 
-export default function PublishNoteModal({ open, setOpen, patient, publishNote, title, ...other }) {
+export default function PublishNoteModal({ open, setOpen, user, publishNote, orderFor, title, ...other }) {
 
 
-    const fetchData = async (patientId) => {
-        const equipmentPromise = AuthRequest.get(`/api/v1/order/patient/${patientId}`).then(data => data.data.data);
-        const repairPromise = AuthRequest.get(`/api/v1/repair-order/patient/${patientId}`).then(data => data.data.data);
 
-        const [equipmentOrder, repairOrder] = await Promise.all([equipmentPromise, repairPromise]);
+    const fetchOrderData = async (userId) => {
+        console.log("first")
+        if (orderFor === "patient-notes-page") {
+            const equipmentPromise = AuthRequest.get(`/api/v1/order/patient/${userId}`).then(data => data.data.data);
+            const repairPromise = AuthRequest.get(`/api/v1/repair-order/patient/${userId}`).then(data => data.data.data);
+            const [equipmentOrder, repairOrder] = await Promise.all([equipmentPromise, repairPromise]);
+            return { equipmentOrder, repairOrder };
+        }
+        if (orderFor === "veteran-notes-page") {
+            const veteranOrderPromise = AuthRequest.get(`/api/v1/veteran-order/veteran/${userId}`).then(data => data.data.data);
+            const [veteranOrder] = await Promise.all([veteranOrderPromise]);
+            return { veteranOrder };
+        }
 
-        return { equipmentOrder, repairOrder };
     }
 
-    const { isLoading, data } = useQuery(`combinedOrderData-${patient._id}`, () => fetchData(patient._id));
 
+    const { isLoading, data } = useQuery(`combinedOrderData-${user._id}`, () => fetchOrderData(user._id));
     const publishNoteHandle = (orderId, orderType) => {
         const data = {
             notes: publishNote.note,
@@ -43,7 +52,6 @@ export default function PublishNoteModal({ open, setOpen, patient, publishNote, 
             orderId
         }
 
-        console.log(data)
 
         if (orderType === "equipment-order") {
             AuthRequest.post(`/api/v1/order/publish-notes/${orderId}`, data)
@@ -59,8 +67,19 @@ export default function PublishNoteModal({ open, setOpen, patient, publishNote, 
                     toast.success("Note Published!")
                 });
         }
+        if (orderType === "veteran-order") {
+            AuthRequest.post(`/api/v1/veteran-order/publish-notes/${orderId}`, data)
+                .then(data => {
+                    setOpen(!open)
+                    toast.success("Note Published!")
+                });
+        }
 
     }
+
+    let veteranCurrentOrder
+    veteranCurrentOrder = data?.veteranOrder || data?.veteranCurrentOrder
+
 
     return (
         <div>
@@ -84,10 +103,12 @@ export default function PublishNoteModal({ open, setOpen, patient, publishNote, 
                             </Box>
                         }
 
-                        <p style={{ textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "larger" }}>{`Current orders of ${patient.fullName}`}</p>
+                        <p style={{ textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "larger" }}>{`Current orders of ${user.fullName}`}</p>
 
                         {
-                            data?.equipmentOrder !== "No order found!" && <div className="eqipmentOrder">
+
+                            data?.equipmentOrder && data?.equipmentOrder !== "No order found!" && <div className="eqipmentOrder">
+
                                 <Typography variant='h6' sx={{ pb: 1 }}>Equipment Order</Typography>
                                 <EquipmentOrderPublish
                                     orders={data?.equipmentOrder?.filter(eq => eq.status !== "Archived")}
@@ -95,18 +116,29 @@ export default function PublishNoteModal({ open, setOpen, patient, publishNote, 
                             </div>
                         }
                         {
-                            data?.repairOrder !== "No order found!" && <div className="repaireOrder">
+                            data?.repairOrder && data?.repairOrder !== "No order found!" && <div className="repaireOrder">
                                 <Typography variant='h6' sx={{ pb: 1 }}>Repair Order</Typography>
                                 <RepairOrderPublish
                                     orders={data?.repairOrder?.filter(eq => eq.status !== "Archived")}
                                     publishNoteHandle={publishNoteHandle} />
                             </div>
                         }
+                        {
+                            veteranCurrentOrder && veteranCurrentOrder !== "No order found!" && <div className="veteranOrder">
+
+                                <Typography variant='h6' sx={{ pb: 1 }}>Veteran Order</Typography>
+                                <VeteranOrderPublish
+                                    orders={veteranCurrentOrder.filter(eq => eq.status !== "Archived")}
+                                    publishNoteHandle={publishNoteHandle} />
+                            </div>
+                        }
 
 
                         {
-                            data?.equipmentOrder === "No order found!" && data?.repairOrder === "No order found!" &&
-                            <Typography variant='body' sx={{ py: 10, display: "block", textAlign: "center" }}>No Order for this Client!</Typography>
+                            data?.equipmentOrder === "No order found!" && data?.repairOrder === "No order found!" && (!veteranCurrentOrder || veteranCurrentOrder === "No order found!") &&
+                            <>
+                                <Typography variant='body' sx={{ py: 10, display: "block", textAlign: "center" }}>No Order found!</Typography>
+                            </>
                         }
 
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

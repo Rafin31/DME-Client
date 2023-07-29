@@ -15,7 +15,7 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
         setAnchorEl(event.currentTarget);
     };
 
-    const handleSubmit = (id, lebel) => {
+    const handleSubmit = (id, lebel, fromPage = "") => {
 
         if (source === "patient-page") {
             if (lebel === "Documents") {
@@ -48,8 +48,14 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
         }
 
         if (source === "veteran-page") {
+            if (lebel === "Profile") {
+                navigate(`/DME-supplier/dashboard/user-profile/${id}`)
+            }
             if (lebel === "Edit") {
                 navigate(`/DME-supplier/dashboard/edit-user-profile/${id}?user=veteran`)
+            }
+            if (lebel === "Notes") {
+                navigate(`/DME-supplier/dashboard/add-veteran-note/${id}`)
             }
             if (lebel === "Add VA Prosthetics") {
                 other.setAddedVeteran(other.user)
@@ -62,7 +68,12 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
 
         else if (source === "order-page") {
             if (lebel === "Edit") {
-                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
+                if (fromPage === "states") {
+                    other.setEditOrderModal(true)
+                    other.setEditedOrderId(id)
+                } else {
+                    navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=equipment-order`)
+                }
             }
             if (lebel === "Documents") {
                 navigate(`/DME-supplier/dashboard/order-document/${id}?orderCategory=equipment-order`)
@@ -87,7 +98,12 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
 
         else if (source === "repair-order-page") {
             if (lebel === "Edit") {
-                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
+                if (fromPage === "states") {
+                    other.setEditOrderModal(true)
+                    other.setEditedOrderId(id)
+                } else {
+                    navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=repair-order`)
+                }
             }
             if (lebel === "Documents") {
                 navigate(`/DME-supplier/dashboard/order-document/${id}?orderCategory=repair-order`)
@@ -138,10 +154,18 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
 
         else if (source === "veteran-notes-page") {
             if (lebel === "Edit") {
-                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
+                other.setEdit(true)
+                other.setEditNoteId(id)
+                setOpen(true)
             }
             if (lebel === "Delete") {
                 other.deleteFunction(id)
+            }
+            if (lebel === "Publish") {
+                const note = other.note
+                const writerId = other.writerId
+                other.setPublishNote({ note, writerId })
+                other.setPublish(true)
             }
         }
 
@@ -213,7 +237,7 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 {
                     option.map((item) => {
                         return (
-                            <MenuItem onClick={() => handleSubmit(id, item.label)}>{item.label}</MenuItem>
+                            <MenuItem onClick={() => handleSubmit(id, item.label, item?.fromPage)}>{item.label}</MenuItem>
                         )
                     })
                 }

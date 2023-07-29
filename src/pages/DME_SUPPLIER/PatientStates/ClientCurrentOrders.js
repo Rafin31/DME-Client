@@ -1,13 +1,15 @@
 import { Typography } from '@mui/material';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import EquipmentOrderHistory from '../OrderHistory/EquipmentOrderHistory';
 import RepairOrderHistory from '../OrderHistory/RepairOrderHistory';
 import { useConfirm } from 'material-ui-confirm';
 import { toast } from 'react-toastify';
 import { AuthRequest } from 'src/services/AuthRequest';
+import { memo } from 'react';
 
 const ClientCurrentOrders = () => {
+
 
     let { refetch, equipmentOrder, repairOrder } = useOutletContext();
 
@@ -90,26 +92,36 @@ const ClientCurrentOrders = () => {
     repairOrder = repairOrder !== "No order found!" ? repairOrder.filter(rp => rp.status !== "Archived") : []
 
 
-
-
     return (
         <div>
+
             {
                 equipmentOrder.length !== 0 && <div className="eqipmentOrder">
                     <Typography variant='h6' sx={{ pb: 1 }}>Equipment Order</Typography>
+                    {/* Here We use Equipment OrderHistory as the re-useable component. We pass the equipment current order as the parameter which is "equipmentOrder" */}
                     <EquipmentOrderHistory
                         orders={equipmentOrder}
+                        refetch={refetch}
                         fromPage={"patientStates"}
-                        deleteEquipmentOrder={deleteEquipmentOrder} />
+                        deleteEquipmentOrder={deleteEquipmentOrder}
+
+                    />
+
                 </div>
+
+
             }
             {
                 repairOrder.length !== 0 && <div className="repaireOrder">
                     <Typography variant='h6' sx={{ pb: 1 }}>Repair Order</Typography>
                     <RepairOrderHistory
                         orders={repairOrder}
+                        refetch={refetch}
                         fromPage={"patientStates"}
-                        deleteRepairOrder={deleteRepairOrder} />
+                        deleteRepairOrder={deleteRepairOrder}
+
+                    />
+
                 </div>
             }
 
@@ -121,4 +133,4 @@ const ClientCurrentOrders = () => {
     );
 };
 
-export default ClientCurrentOrders;
+export default memo(ClientCurrentOrders);

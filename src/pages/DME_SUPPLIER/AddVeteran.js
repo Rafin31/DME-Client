@@ -22,6 +22,9 @@ export default function AddVeteran() {
     const lastName = watch('lastName');
 
 
+    let { id: dmeSupplierId } = JSON.parse(localStorage.getItem('user'));
+
+
     const { mutateAsync, isLoading: addVeteranLoading } = useMutation((veteran) => {
 
         return AuthRequest.post(`/api/v1/users`, veteran)
@@ -94,6 +97,8 @@ export default function AddVeteran() {
             fullName: data.firstName + " " + data.lastName,
             userCategory: "63caa0348ceb169589e611c8",
             status: "63861954b3b3ded1ee267309",
+            dmeSupplier: dmeSupplierId
+
         }
 
 
@@ -102,6 +107,7 @@ export default function AddVeteran() {
         }
 
         mutateAsync(data)
+
 
     };
 
@@ -176,12 +182,11 @@ export default function AddVeteran() {
                                 <Grid item xs={12}>
                                     <TextField
                                         {...register("phoneNumber", {
-                                            required: "Field is required",
                                             minLength: { value: 6, message: "Phone number should be at last 6 characters" },
                                         })}
 
                                         error={errors.phoneNumber && true}
-                                        label="Phone Number*"
+                                        label="Phone Number"
                                         type={"tel"}
                                         fullWidth
                                         variant="outlined"
@@ -193,7 +198,7 @@ export default function AddVeteran() {
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        {...register("address", { required: "Field is required" })}
+                                        {...register("address")}
 
                                         label="Address"
                                         error={errors.address && true}
@@ -205,10 +210,10 @@ export default function AddVeteran() {
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
-                                        {...register("city", { required: "Field is required" })}
+                                        {...register("city")}
                                         error={errors.city && true}
 
-                                        label="City*"
+                                        label="City"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.city?.message}
@@ -217,10 +222,10 @@ export default function AddVeteran() {
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
-                                        {...register("state", { required: "Field is required" })}
+                                        {...register("state")}
                                         error={errors.state && true}
 
-                                        label="State*"
+                                        label="State"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.state?.message}
@@ -229,10 +234,10 @@ export default function AddVeteran() {
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
-                                        {...register("zip", { required: "Field is required" })}
+                                        {...register("zip")}
                                         error={errors.zip && true}
 
-                                        label="Zip*"
+                                        label="Zip"
                                         fullWidth
                                         variant="outlined"
                                         helperText={errors.zip?.message}
@@ -279,7 +284,7 @@ export default function AddVeteran() {
                                         {...register("confirmPassword")}
                                         error={errors.confirmPassword && true}
 
-                                        label="Confirm Password*"
+                                        label="Confirm Password"
                                         type={'password'}
                                         fullWidth
                                         variant="outlined"

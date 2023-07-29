@@ -83,6 +83,10 @@ import AllVeteranOrder from './pages/DME_SUPPLIER/VeteranOrders/AllVeteranOrder'
 import PatientStates from './pages/DME_SUPPLIER/PatientStates/PatientStates';
 import ClientCurrentOrders from './pages/DME_SUPPLIER/PatientStates/ClientCurrentOrders';
 import ClientOrderHistory from './pages/DME_SUPPLIER/PatientStates/ClientOrderHistory';
+import VeteranStates from './pages/DME_SUPPLIER/VeteranStates/VeteranStates';
+import VeteranCurrentOrders from './pages/DME_SUPPLIER/VeteranStates/VeteranCurrentOrder';
+import VeteranStatesOrderHistory from './pages/DME_SUPPLIER/VeteranStates/VeteranStatesOrderHistory';
+import VeteranNotes from './pages/DME_SUPPLIER/VeteranNotes';
 
 
 
@@ -171,6 +175,11 @@ export default function Router() {
           <Route path="completed" element={<VeteranCompleted />} />
         </Route>
 
+        <Route path='veteran-states/:id' element={<VeteranStates />} >
+          <Route index element={<VeteranCurrentOrders />} />
+          <Route path="order-history" element={<VeteranStatesOrderHistory />} />
+        </Route>
+
         <Route path='patient-states/:id' element={<PatientStates />} >
           <Route index element={<ClientCurrentOrders />} />
           <Route path="order-history" element={<ClientOrderHistory />} />
@@ -225,6 +234,7 @@ export default function Router() {
         <Route path='update-password/:id' element={<UpdatePassword />} />
         <Route path='edit-order/:id' element={<EditOrder />} />
         <Route path='add-patient-note/:id' element={<PatientNotes />} />
+        <Route path='add-veteran-note/:id' element={<VeteranNotes />} />
         <Route path='add-doctor-note/:id' element={<DoctorNotes />} />
         <Route path='settings/:id' element={<Settings />} />
         <Route path='order-note-log/:id' element={<AllOrderNotes />} />

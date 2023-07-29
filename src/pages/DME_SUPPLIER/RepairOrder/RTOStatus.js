@@ -21,7 +21,6 @@ const TABLE_HEAD = [
     { id: 'dob', label: 'Date of Birth', alignRight: false },
     { id: 'Description', label: 'Description', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
-    { id: 'progress', label: 'Progress', alignRight: false },
     { id: 'status', label: 'Status', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
@@ -60,6 +59,14 @@ function descendingComparator(a, b, orderBy) {
             return -1;
         }
         if (b.notes > a.notes) {
+            return 1;
+        }
+    }
+    if (orderBy === "status") {
+        if (b.status < a.status) {
+            return -1;
+        }
+        if (b.status > a.notes) {
             return 1;
         }
     }
@@ -203,13 +210,13 @@ const RTOStatus = () => {
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
 
 
-                                                <TableCell component="th" scope="row" padding="none">
+                                                <TableCell >
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
                                                         <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
                                                             style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             <Tooltip title="Profile">
-                                                                <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                                <Typography component={'span'} variant="subtitle2" nowrap="true">
                                                                     {patientId.fullName}
                                                                 </Typography>
                                                             </Tooltip>
@@ -252,7 +259,7 @@ const RTOStatus = () => {
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                 }
-                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
+
                                                 <TableCell align="left">
                                                     <Label
                                                         color={

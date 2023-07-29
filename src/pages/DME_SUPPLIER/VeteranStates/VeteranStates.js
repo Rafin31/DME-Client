@@ -1,134 +1,67 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, Card, Chip, CircularProgress, Container, Divider, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, Container, Divider, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { AuthRequest } from 'src/services/AuthRequest';
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import { Helmet } from 'react-helmet-async';
-import ClientNotes from './ClientNotes';
-import ClientDocuments from './ClientDocuments';
-import { useLoginUser } from 'src/services/CheckCategory';
-import Iconify from '../../../components/iconify/Iconify';
-import { toast } from 'react-toastify';
+import VeteranStatesNotes from './VeteranStatesNotes';
 
 
-const PatientStates = () => {
+const VeteranStates = () => {
 
     const [value, setValue] = useState(0);
-    const { id: patientId } = useParams()
+    const { id: veteranId } = useParams()
     const navigate = useNavigate()
-
-    const { loggedUser } = useLoginUser()
 
     const handleChange = useCallback((event, newValue) => {
         setValue(newValue)
     }, [])
 
-    const fetchData = async (patientId) => {
-        const equipmentPromise = AuthRequest.get(`/api/v1/order/patient/${patientId}`).then(data => data.data.data);
-        const repairPromise = AuthRequest.get(`/api/v1/repair-order/patient/${patientId}`).then(data => data.data.data);
-        const patientPromise = AuthRequest.get(`/api/v1/users/${patientId}`).then(data => data.data.data);
+    const fetchData = async (veteranId) => {
+        const veteranCurrentOrderPromise = AuthRequest.get(`/api/v1/veteran-order/veteran/${veteranId}`).then(data => data.data.data);
+        const veteranPromise = AuthRequest.get(`/api/v1/users/${veteranId}`).then(data => data.data.data);
 
 
         const [
-            equipmentOrder,
-            repairOrder,
-            patient,
-        ] = await Promise.all([equipmentPromise, repairPromise, patientPromise]);
+            veteranCurrentOrder,
+            veteran,
+        ] = await Promise.all([veteranCurrentOrderPromise, veteranPromise]);
 
-        return { equipmentOrder, repairOrder, patient };
+        return { veteranCurrentOrder, veteran };
     }
 
 
-    const { isLoading, refetch, data } = useQuery(`combinedOrderData-${patientId}`, () => fetchData(patientId));
+    const { isLoading, refetch, data: veteranData } = useQuery(`combinedOrderData-${veteranId}`, () => fetchData(veteranId));
 
 
     useEffect(() => {
         const path = window.location.pathname
-        if (path === `/DME-supplier/dashboard/patient-states/${patientId}`) return setValue(0)
-        if (path === `/DME-supplier/dashboard/patient-states/${patientId}/order-history`) return setValue(1)
+        if (path === `/DME-supplier/dashboard/veteran-states/${veteranId}`) return setValue(0)
+        if (path === `/DME-supplier/dashboard/veteran-states/${veteranId}/order-history`) return setValue(1)
 
         return () => {
             setValue(0)
         }
 
-    }, [handleChange, patientId])
-
-    const { mutateAsync: removeDoctor } = useMutation((data) => {
-
-        return AuthRequest.post(`/api/v1/dme/remove-doctor-from-patient`, data)
-            .then(res => {
-                refetch()
-                toast.success("Doctor Removed!", res, {
-                    toastId: 'success699'
-                })
-
-            })
-            .catch((err) => {
-                refetch()
-                toast.error(err.response.data.message, {
-                    toastId: 'error4'
-                })
-            })
-    })
-    const { mutateAsync: removeTherapist } = useMutation((data) => {
-
-        return AuthRequest.post(`/api/v1/dme/remove-therapist-from-patient`, data)
-            .then(res => {
-                refetch()
-                toast.success("Therapist Removed!", res, {
-                    toastId: 'success6899'
-                })
-
-            })
-            .catch((err) => {
-                refetch()
-                toast.error(err.response.data.message, {
-                    toastId: 'error94'
-                })
-            })
-    })
-
-    const handleChipClick = (id) => {
-        navigate(`/DME-supplier/dashboard/user-profile/${id}`)
-    }
+    }, [handleChange, veteranId])
 
 
-    const handleDeleteDoctorClick = async (doctorUserId) => {
-        const data = {
-            patientUserId: patient._id,
-            doctorUserId: doctorUserId
-        }
-        removeDoctor(data)
-    };
-
-    const handleTherapistDelete = (therapistUserId) => {
-        const data = {
-            patientUserId: patient._id,
-            therapistUserId: therapistUserId
-        }
-        removeTherapist(data)
-    };
-
-
-    if (isLoading || !data.patient) {
+    if (isLoading || !veteranData.veteran) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
     }
 
-    const { equipmentOrder, repairOrder, patient } = data
+    const { veteranCurrentOrder, veteran } = veteranData
 
-    const equipmentOrderHistory = equipmentOrder !== "No order found!" ? equipmentOrder?.filter(eq => eq.status === "Archived") : []
-    const repairOrderHistory = repairOrder !== "No order found!" ? repairOrder?.filter(rp => rp.status === "Archived") : []
-
-
+    const veteranCurrentOrderHistory = veteranCurrentOrder !== "No order found!" ? veteranCurrentOrder?.filter(eq => eq.status === "Archived") : []
 
 
     return (
         <>
             <Helmet>
-                <title>  Client States </title>
+                <title>  Veteran States </title>
             </Helmet>
             <Container maxWidth="1350px">
                 <Stack onClick={() => navigate(-1)} direction="row" spacing={1} style={{ cursor: "pointer", marginBottom: "15px", width: "150px" }} sx={{
@@ -143,11 +76,11 @@ const PatientStates = () => {
                 <Box>
                     <Typography variant="h6" mb={3}>
                         All activities of <Link
-                            to={`/DME-supplier/dashboard/user-profile/${patient?._id}`}
+                            to={`/DME-supplier/dashboard/user-profile/${veteran?._id}`}
                             style={{ color: "black", cursor: "pointer", marginLeft: "6px" }}
                             color="inherit" variant="subtitle2" nowrap="true"
                             rel="noopener noreferrer"
-                        >{`${patient?.fullName}'s`}</Link>
+                        >{`${veteran?.fullName}'s`}</Link>
                     </Typography>
 
 
@@ -159,47 +92,31 @@ const PatientStates = () => {
                         aria-label="basic tabs example"
                         style={{ marginBottom: "15px" }}>
 
-                        <Tab label="Current Orders" to={`/DME-supplier/dashboard/patient-states/${patientId}`} style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
+                        <Tab label="Current Orders" to={`/DME-supplier/dashboard/veteran-states/${veteranId}`} style={{ backgroundColor: "#f9fafc" }} component={Link} draggable="true" />
 
-                        <Tab label="Order History" style={{ backgroundColor: "#f9fafc" }} to={`/DME-supplier/dashboard/patient-states/${patientId}/order-history`} component={Link} draggable="true" />
+                        <Tab label="Order History" style={{ backgroundColor: "#f9fafc" }} to={`/DME-supplier/dashboard/veteran-states/${veteranId}/order-history`} component={Link} draggable="true" />
 
                     </Tabs>
                 </Box>
 
-                <Stack direction="row" spacing={1} style={{ marginBottom: "15px" }}>
-                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}
-                        onClick={() => { navigate('/DME-supplier/dashboard/add-order?orderCategory=equipment-order') }} >
-                        Equipment Order
-                    </Button>
-
-                    <Button variant="contained" color="warning" startIcon={<Iconify icon="eva:plus-fill" />}
-                        onClick={() => { navigate('/DME-supplier/dashboard/add-order?orderCategory=repair-order') }} >
-                        Repair Order
-                    </Button>
-                </Stack>
-
                 <main>
-                    <Outlet context={{ isLoading, refetch, equipmentOrder, repairOrder, patient, equipmentOrderHistory, repairOrderHistory }} />
+                    <Outlet context={{ isLoading, refetch, veteranCurrentOrder, veteran, veteranCurrentOrderHistory }} />
                 </main>
                 <Divider />
                 <Grid container spacing={1} justifyContent="center" sx={{ marginY: 1 }}>
                     <Grid item xs={12} sm={6}>
                         <Card variant='outlined' sx={{ paddingY: 1, paddingX: 1, marginY: 1, minHeight: "300px" }}
                             style={{ border: "1px solid #eaeeef", boxShadow: "none" }}>
-                            <ClientNotes patientId={patientId} />
+                            <VeteranStatesNotes patientId={veteranId} />
                         </Card>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <Card variant='outlined' sx={{ paddingY: 1, paddingX: 1, marginY: 1, minHeight: "300px" }}
-                            style={{ border: "1px solid #eaeeef", boxShadow: "none" }}>
-                            <ClientDocuments patientId={patientId} />
-                        </Card>
 
                     </Grid>
                 </Grid>
 
                 <Divider />
-                <Stack
+                {/* <Stack
                     direction="row"
                     alignItems="start"
                     spacing={2}
@@ -261,11 +178,11 @@ const PatientStates = () => {
 
                     }
 
-                </Stack>
+                </Stack> */}
 
             </Container>
         </>
     );
 };
 
-export default PatientStates;
+export default VeteranStates;

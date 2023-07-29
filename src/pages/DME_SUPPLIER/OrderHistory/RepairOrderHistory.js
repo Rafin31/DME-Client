@@ -12,6 +12,7 @@ import PopOver from '../../../components/Popover/PopOver';
 
 import { UserListHead } from '../../../sections/@dashboard/user';
 import Scrollbar from '../../../components/scrollbar';
+import EditOrderModal from 'src/pages/Shared/EditOrderModal';
 
 
 
@@ -58,7 +59,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const RepairOrderHistory = ({ orders, fromPage, deleteRepairOrder }) => {
+const RepairOrderHistory = ({ orders, refetch, fromPage, deleteRepairOrder }) => {
 
     const [page, setPage] = useState(0);
 
@@ -81,6 +82,8 @@ const RepairOrderHistory = ({ orders, fromPage, deleteRepairOrder }) => {
     let newReferralIsNotFound
     let row
 
+    const [openModal, setOpenModal] = useState(false)
+    const [editedOrderId, setEditedOrderId] = useState()
 
     const options = [
 
@@ -89,7 +92,7 @@ const RepairOrderHistory = ({ orders, fromPage, deleteRepairOrder }) => {
     ];
 
 
-    fromPage === "patientStates" && options.push({ label: "Edit" })
+    fromPage === "patientStates" && options.push({ label: "Edit", fromPage: "states" })
     fromPage === "patientStates" && options.push({ label: "Status" })
     fromPage === "patientStates" && !staffId && options.push({ label: "Delete" })
 
@@ -135,6 +138,9 @@ const RepairOrderHistory = ({ orders, fromPage, deleteRepairOrder }) => {
     return (
         <>
 
+            <EditOrderModal open={openModal} setOpen={setOpenModal} orderCategory={"repair-order"}
+                order={orders.find(order => order._id === editedOrderId) || {}} refetch={refetch} orderId={editedOrderId} title="Edit Order" />
+
             <Card style={{ margin: "20px 0px" }}>
                 {
                     fromPage !== "patientStates" && <input type="text"
@@ -172,13 +178,13 @@ const RepairOrderHistory = ({ orders, fromPage, deleteRepairOrder }) => {
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
 
 
-                                                <TableCell component="th" scope="row" padding="none">
+                                                <TableCell>
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
                                                         <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
                                                             style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                             <Tooltip title="Profile">
-                                                                <Typography component={'span'} style={{ paddingLeft: "20px", wordWrap: "break-word" }} variant="subtitle2" nowrap="true">
+                                                                <Typography component={'span'} variant="subtitle2" nowrap="true">
                                                                     {patientId.fullName}
                                                                 </Typography>
                                                             </Tooltip>
@@ -240,6 +246,8 @@ const RepairOrderHistory = ({ orders, fromPage, deleteRepairOrder }) => {
                                                         option={options}
                                                         id={row._id}
                                                         deleteOrder={deleteRepairOrder ? deleteRepairOrder : ""}
+                                                        setEditOrderModal={setOpenModal}
+                                                        setEditedOrderId={setEditedOrderId}
                                                     />
                                                 </TableCell>
 

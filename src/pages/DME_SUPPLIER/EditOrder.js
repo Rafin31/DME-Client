@@ -1,4 +1,4 @@
-import { Box, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Box, Autocomplete, Card, CircularProgress, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
@@ -15,11 +15,15 @@ import { fDate } from '../../utils/formatTime';
 import { render } from 'react-dom';
 
 
+
 export default function EditOrder() {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const [user, setUser] = useState()
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
+
+    let patientArray = []
+    const [toValue, setToValue] = useState("")
 
     const { search } = window.location;
     const params = new URLSearchParams(search);
@@ -62,10 +66,10 @@ export default function EditOrder() {
     const { isLoading: patientLoading, data: patients } = useQuery('patient',
         async () => {
             if (orderCategory === "veteran-order") {
-                return AuthRequest.get(`/api/v1/veteran`)
+                return AuthRequest.get(`/api/v1/veteran/byDmeSupplier?dmeSupplier=${id}`)
                     .then(data => data.data.data)
             }
-            return AuthRequest.get(`/api/v1/patient`).then(data => data.data.data)
+            return AuthRequest.get(`/api/v1/patient/byDmeSupplier?dmeSupplier=${id}`).then(data => data.data.data)
         }
     )
 
@@ -120,7 +124,8 @@ export default function EditOrder() {
     })
 
     const onSubmit = data => {
-        const { patientId, notes, description, status } = data
+        const { notes, description, status } = data
+        const patientId = toValue?.id
 
         const updatedOrder = {
             dmeSupplierId: id,
@@ -159,6 +164,22 @@ export default function EditOrder() {
             <CircularProgress />
         </Box>
     }
+
+
+
+    patients?.map(pt => {
+        const patientInfo = {
+            id: pt?.userId?._id,
+            label: pt?.userId?.fullName,
+        }
+
+        if (pt.dob) patientInfo.dob = pt.dob
+        if (pt.lastFour) patientInfo.lastFour = pt.lastFour
+
+        patientArray.push(patientInfo)
+        return patientArray
+    })
+
 
     return (
         <>
@@ -209,27 +230,26 @@ export default function EditOrder() {
 
                                 <Grid item xs={6} style={{ margin: "10px 0px" }}>
                                     <FormControl fullWidth>
-                                        <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Patient</InputLabel>
-                                        <Select
-                                            variant="outlined"
-                                            size="small"
-                                            error={errors.patient && true}
-                                            rows={2}
-                                            {...register("patientId",
-                                                { required: "Filed Required" })}
-                                            helperText={errors.patient?.message}
-                                            defaultValue={
-                                                orderCategory === "veteran-order" ? order[0]?.veteranId?._id
-                                                    : order.patientId?._id
-                                            }
 
-                                        >
-                                            {
-                                                patients.map((patient, index) => {
-                                                    return <MenuItem key={index} value={patient.userId._id}>{patient.userId.fullName}</MenuItem>
-                                                })
-                                            }
-                                        </Select>
+                                        <Autocomplete
+                                            disablePortal
+                                            id="combo-box-demo"
+                                            isOptionEqualToValue={(option, value) => option.value === value.value}
+                                            options={patientArray}
+                                            required
+                                            sx={{ width: "100%" }}
+                                            defaultValue={order[0]?.veteranId ? order[0].veteranId.fullName : order?.patientId?.fullName}
+                                            onChange={(e, newValue) => { setToValue(newValue) }}
+                                            renderInput={(params) => <TextField {...params} label={orderCategory === "veteran-order" ? "Veteran" : "Patients"} />}
+                                            renderOption={(props, option, state) => (
+                                                <li {...props} key={option.id} style={{ backgroundColor: state.selected ? 'white' : 'dark' }}>
+                                                    {`${option.label} ${option.dob ? "(" + option.dob + ")" :
+                                                        "(" + option.lastFour + ")"} `}
+                                                </li>
+                                            )}
+
+
+                                        />
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={6} style={{ margin: "10px 0px" }}>
@@ -363,7 +383,7 @@ export default function EditOrder() {
                                                     { required: "Filed Required" }
                                                 )}
                                                 helperText={errors.orderStatus?.message}
-                                                defaultValue={order[0]?.status ? order[0].status : ""}
+                                                defaultValue={order[0]?.status ? order[0]?.status : ""}
                                             >
                                                 {
                                                     order[0].status === "Equip" &&

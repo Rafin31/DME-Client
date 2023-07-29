@@ -30,6 +30,7 @@ export default function AddOrder() {
     let patientArray = []
     const [loading, setLoading] = useState(false)
     const [toValue, setToValue] = useState("")
+
     const [toStatus, setToStatus] = useState(orderCategory === "equipment-order" ? "New-Referral" :
         orderCategory === "repair-order" ? "PRR" :
             orderCategory === "veteran-order" && "Equip")
@@ -37,7 +38,7 @@ export default function AddOrder() {
     const navigate = useNavigate()
 
 
-    const { id } = JSON.parse(localStorage.getItem('user'));
+    const { id: dmeSupplierId } = JSON.parse(localStorage.getItem('user')); //dmeSupplierId
 
 
     const [firstAttempt, setFirstAttempt] = useState(null);
@@ -174,12 +175,12 @@ export default function AddOrder() {
 
 
     const loadUserInfo = useCallback(() => {
-        AuthRequest.get(`/api/v1/users/${id}`)
+        AuthRequest.get(`/api/v1/users/${dmeSupplierId}`)
             .then(res => {
                 setUser(res.data.data)
                 setLoading(false)
             })
-    }, [id])
+    }, [dmeSupplierId])
 
 
 
@@ -192,9 +193,9 @@ export default function AddOrder() {
     const { isLoading: patientLoading, data: patients } = useQuery('patient',
         async () => {
             if (orderCategory === "veteran-order") {
-                return AuthRequest.get(`/api/v1/veteran`).then(data => data.data.data)
+                return AuthRequest.get(`/api/v1/veteran/byDmeSupplier?dmeSupplier=${dmeSupplierId}`).then(data => data.data.data)
             } else {
-                return AuthRequest.get(`/api/v1/patient/byDmeSupplier?dmeSupplier=${id}`).then(data => data.data.data)
+                return AuthRequest.get(`/api/v1/patient/byDmeSupplier?dmeSupplier=${dmeSupplierId}`).then(data => data.data.data)
             }
 
         }
@@ -251,13 +252,12 @@ export default function AddOrder() {
 
     const onSubmit = useCallback((data) => {
         const { description, notes } = data
-        console.log(toValue)
         const patientId = toValue?.id
 
         if (!patientId) return toast.error("Please Select Patient")
 
         const order = {
-            dmeSupplierId: id,
+            dmeSupplierId: dmeSupplierId,
             patientId,
             description,
             notes,
@@ -283,14 +283,20 @@ export default function AddOrder() {
         </Box>
     }
 
-    patients.map(pt => {
+    patients?.map(pt => {
         const patientInfo = {
             id: pt?.userId?._id,
-            label: pt?.userId?.fullName
+            label: pt?.userId?.fullName,
         }
+
+        if (pt.dob) patientInfo.dob = pt.dob
+        if (pt.lastFour) patientInfo.lastFour = pt.lastFour
+
         patientArray.push(patientInfo)
         return patientArray
     })
+
+
 
     return (
         <>
@@ -356,8 +362,9 @@ export default function AddOrder() {
                                                 onChange={(e, newValue) => { setToValue(newValue) }}
                                                 renderInput={(params) => <TextField {...params} label={orderCategory === "veteran-order" ? "Veteran" : "Patients"} />}
                                                 renderOption={(props, option, state) => (
-                                                    <li {...props} style={{ backgroundColor: state.selected ? 'white' : 'dark' }}>
-                                                        {option.label}
+                                                    <li {...props} key={option.id} style={{ backgroundColor: state.selected ? 'white' : 'dark' }}>
+                                                        {`${option.label} ${option.dob ? "(" + option.dob + ")" :
+                                                            "(" + option.lastFour + ")"} `}
                                                     </li>
                                                 )}
 

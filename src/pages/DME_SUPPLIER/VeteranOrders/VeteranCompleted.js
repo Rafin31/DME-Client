@@ -23,15 +23,10 @@ const TABLE_HEAD = [
     { id: 'Fname', label: 'First Name', alignRight: false },
     { id: 'Lname', label: 'Last Name', alignRight: false },
     { id: 'lastFOur', label: 'Last Four#', alignRight: false },
-    { id: 'partsPo', label: 'Parts PO#', alignRight: false },
-    { id: 'labourPo', label: 'Labour PO#', alignRight: false },
-    { id: 'firstAttempt', label: '1st Attempt', alignRight: false },
-    { id: 'secondAttempt', label: '2nd Attempt', alignRight: false },
-    { id: 'schedule', label: 'Schedule', alignRight: false },
     { id: 'status', label: 'status', alignRight: false },
     { id: 'progress', label: 'Progress', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
-    { id: 'action', label: '', alignRight: false },
+    { id: 'action', label: 'Action', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -271,13 +266,6 @@ const VeteranCompleted = () => {
                                                         </Tooltip>
                                                     </Link>
                                                 </TableCell>
-
-                                                <TableCell align="left">{!partsPo ? "Not Mentioned" : partsPo}</TableCell>
-                                                <TableCell align="left">{!labourPo ? "Not Mentioned" : labourPo}</TableCell>
-
-                                                <TableCell align="left">{!firstAttempt ? "Not Mentioned" : firstAttempt}</TableCell>
-                                                <TableCell align="left">{!secondAttempt ? "Not Mentioned" : secondAttempt}</TableCell>
-                                                <TableCell align="left">{!schedule ? "Not Mentioned" : schedule}</TableCell>
 
                                                 <TableCell align="left">
                                                     <Label

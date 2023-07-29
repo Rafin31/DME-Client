@@ -206,7 +206,7 @@ export default function PatientPage() {
 
     const exportPatient = async () => {
 
-        const resp = await AuthRequest.get("/api/v1/users/export-patient", {
+        const resp = await AuthRequest.get(`/api/v1/users/export-patient?dmeSupplier=${dmeSupplierId}`, {
             responseType: 'arraybuffer',
             headers: { 'Content-Type': 'blob' },
         })

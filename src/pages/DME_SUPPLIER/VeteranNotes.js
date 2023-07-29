@@ -90,7 +90,7 @@ function applySortFilter(array, comparator, query) {
     return stabilizedThis.map((el) => el[0]);
 }
 
-export default function PatientNotes() {
+export default function VeteranNotes() {
 
     const [addNotesOpen, setAddNotesOpen] = useState(false)
 
@@ -144,14 +144,14 @@ export default function PatientNotes() {
         }
     )
 
-    const { isLoading: patientLoading, data: patient2 } = useQuery('patient2',
+    const { isLoading: veteranLoading, data: veteranData } = useQuery('veteranData',
         async () => {
             return AuthRequest.get(`/api/v1/users/${noteFor}`)
                 .then(data => data.data.data)
         }
     )
 
-    if (!notes || !user || !patient2) {
+    if (!notes || !user || !veteranData) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
@@ -277,10 +277,11 @@ export default function PatientNotes() {
         index: PropTypes.number.isRequired,
         value: PropTypes.number.isRequired,
     };
+
     return (
         <>
             <Helmet>
-                <title> Client Notes</title>
+                <title> Veteran Notes</title>
             </Helmet>
 
             <Container maxWidth="1350px">
@@ -300,7 +301,7 @@ export default function PatientNotes() {
                             style={{ color: "black", cursor: "pointer", marginLeft: "6px" }}
                             color="inherit" variant="subtitle2" underline="hover" nowrap="true"
                             target="_blank" rel="noopener noreferrer"
-                        >{patient2.fullName}</Link>
+                        >{veteranData.fullName}</Link>
                     </Typography>
                     <Button variant="contained" onClick={() => { setAddNotesOpen(true) }} startIcon={
                         <Iconify icon="material-symbols:add" />}>
@@ -310,7 +311,7 @@ export default function PatientNotes() {
 
                 <AddNotesToPatientModal open={addNotesOpen} setOpen={setAddNotesOpen} handelFormSubmit={handelAddNotesToPatient} data={{ notes: "" }} title="Add Note" user={user} />
 
-                <PublishNoteModal open={publish} setOpen={setPublish} user={patient2} publishNote={publishNote} orderFor={"patient-notes-page"} title="Publish Note" />
+                <PublishNoteModal open={publish} setOpen={setPublish} user={veteranData} publishNote={publishNote} orderFor={"veteran-notes-page"} title="Publish Note" />
 
                 <Card className='new-referal'>
                     <input type="text"
@@ -363,7 +364,7 @@ export default function PatientNotes() {
                                                 <TableCell >
                                                     <PopOver
                                                         key={_id}
-                                                        source="patient-notes-page"
+                                                        source="veteran-notes-page"
                                                         option={[
                                                             { label: "Edit" },
                                                             { label: "Delete" },
