@@ -24,7 +24,6 @@ const TABLE_HEAD = [
     { id: 'Lname', label: 'Last Name', alignRight: false },
     { id: 'lastFOur', label: 'Last Four#', alignRight: false },
     { id: 'status', label: 'status', alignRight: false },
-    { id: 'progress', label: 'Progress', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
@@ -277,7 +276,7 @@ const AllVeteranOrder = () => {
                                                     </Label>
                                                 </TableCell>
 
-                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
+
 
                                                 {
                                                     notes && notes?.length !== 0 ?

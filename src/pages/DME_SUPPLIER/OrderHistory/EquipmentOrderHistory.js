@@ -228,7 +228,7 @@ const EquipmentOrderHistory = ({ orders, refetch, fromPage, deleteEquipmentOrder
                                                 <TableCell align="left">{fDate(createdAt)}</TableCell>
                                                 <TableCell align="left">{dateCompleted ? fDate(dateCompleted) : "Not Mentioned"}</TableCell>
 
-                                                <TableCell width="30%">
+                                                <TableCell>
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
                                                         <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
@@ -243,7 +243,7 @@ const EquipmentOrderHistory = ({ orders, refetch, fromPage, deleteEquipmentOrder
                                                     </Stack>
                                                 </TableCell>
 
-                                                <TableCell width="30%" align="left">{patientId.patientDob}</TableCell>
+                                                <TableCell align="left">{patientId.patientDob}</TableCell>
 
                                                 {
                                                     description ?
@@ -265,7 +265,7 @@ const EquipmentOrderHistory = ({ orders, refetch, fromPage, deleteEquipmentOrder
                                                         </ReactShowMoreText >
                                                     </TableCell>
                                                     :
-                                                    <TableCell width="30%" align="left">
+                                                    <TableCell width="10%" align="left">
                                                         <ReactShowMoreText
                                                             lines={1}
                                                             more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}

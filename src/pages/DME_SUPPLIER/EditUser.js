@@ -132,9 +132,9 @@ export default function EditUser() {
                             <Grid
                                 container
                                 rowSpacing={2}
-                                columnSpacing={{ xs: 2, sm: 3, md: 5, lg: 5 }}
+                                columnSpacing={{ xs: 1, sm: 1, md: 1, lg: 1 }}
                             >
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <TextField
                                         {...register("firstName", { required: "Field is required" })}
                                         error={errors.Fname && true}
@@ -147,7 +147,7 @@ export default function EditUser() {
 
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <TextField
                                         {...register("lastName", { required: "Field is required" })}
                                         error={errors.Lname && true}
@@ -161,6 +161,188 @@ export default function EditUser() {
 
                                     />
                                 </Grid>
+                                {
+                                    userCategory === "patient" &&
+                                    <Grid item xs={4}>
+                                        <FormControl fullWidth>
+                                            <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Gender*</InputLabel>
+                                            <Select
+                                                variant="outlined"
+                                                size="small"
+                                                error={errors.gender && true}
+                                                helperText={errors.gender?.message}
+                                                rows={2}
+                                                defaultValue={user.details.gender.toLowerCase()}
+                                                {...register("gender", { required: "Field is required" })}
+                                            >
+                                                <MenuItem value={"male"}>Male</MenuItem>
+                                                <MenuItem value={"female"}>Female</MenuItem>
+                                                <MenuItem value={"other"}>Other</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                }
+                                {
+                                    userCategory === "veteran" &&
+                                    <Grid item xs={4}>
+                                        <TextField
+                                            {...register("lastFour", { required: "Field is required" })}
+                                            error={errors.lastFour && true}
+                                            defaultValue={user.details.lastFour}
+                                            label="Last Four*"
+                                            fullWidth
+                                            variant="outlined"
+                                            helperText={errors.lastFour?.message}
+
+                                        />
+                                    </Grid>
+                                }
+
+                                {
+                                    userCategory === "patient" &&
+                                    <Grid item xs={6}>
+                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                            <DatePicker
+                                                label="Date of Birth"
+                                                value={dob}
+                                                onChange={(newValue) => {
+                                                    setDob(newValue);
+                                                }}
+                                                renderInput={(params) => <TextField {...params} fullWidth />}
+                                            />
+                                        </LocalizationProvider>
+                                        {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
+                                    </Grid>
+                                }
+
+                                {
+                                    userCategory === "patient" &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("weight")}
+                                            error={errors.weight && true}
+
+                                            type={'number'}
+                                            label="Weight (lbs)"
+                                            fullWidth
+                                            variant="outlined"
+                                            defaultValue={user.details.weight}
+                                            helperText={errors.weight?.message}
+
+                                        />
+                                    </Grid>
+                                }
+
+
+                                <Grid item xs={12}>
+                                    <TextField
+                                        {...register("phoneNumber", {
+                                            minLength: { value: 6, message: "Phone number should be at last 6 characters" },
+                                        })}
+
+                                        error={errors.phoneNumber && true}
+                                        label="Phone Number"
+                                        type={"tel"}
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details?.phoneNumber}
+                                        helperText={errors?.phoneNumber?.message}
+
+                                    />
+
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <TextField
+                                        {...register("address")}
+
+                                        label="Address"
+                                        error={errors.address && true}
+                                        fullWidth
+                                        multiline
+                                        helperText={errors.address?.message}
+                                        defaultValue={user.details?.address}
+                                        rows={4}
+                                        variant="outlined" />
+                                </Grid>
+
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("city")}
+                                        error={errors.city && true}
+
+                                        label="City"
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details.city}
+                                        helperText={errors.city?.message}
+
+                                    />
+                                </Grid>
+
+
+
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("state")}
+                                        error={errors.state && true}
+
+                                        label="State"
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details.state}
+                                        helperText={errors.state?.message}
+
+                                    />
+                                </Grid>
+
+                                <Grid item xs={4}>
+                                    <TextField
+                                        {...register("zip")}
+                                        error={errors.zip && true}
+
+                                        label="Zip"
+                                        fullWidth
+                                        variant="outlined"
+                                        defaultValue={user.details.zip}
+                                        helperText={errors.zip?.message}
+
+                                    />
+                                </Grid>
+                                {
+                                    userCategory === "patient" &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("primaryInsurance")}
+                                            error={errors.primaryInsurance && true}
+                                            type="text"
+                                            label="Primary Insurance"
+                                            fullWidth
+                                            defaultValue={user.details?.primaryInsurance}
+                                            variant="outlined"
+                                            helperText={errors.primaryInsurance?.message}
+
+                                        />
+                                    </Grid>
+                                }
+
+                                {
+                                    userCategory === "patient" &&
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            {...register("secondaryInsurance")}
+                                            error={errors.secondaryInsurance && true}
+                                            type="text"
+                                            label="Secondary Insurance"
+                                            fullWidth
+                                            defaultValue={user.details?.secondaryInsurance}
+                                            variant="outlined"
+                                            helperText={errors.secondaryInsurance?.message}
+
+                                        />
+                                    </Grid>
+                                }
+
                                 {
                                     (userCategory === "doctor" || userCategory === "therapist") &&
                                     <Grid item xs={6}>
@@ -228,179 +410,6 @@ export default function EditUser() {
                                 }
 
                                 {
-                                    userCategory === "veteran" &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("lastFour", { required: "Field is required" })}
-                                            error={errors.lastFour && true}
-                                            defaultValue={user.details.lastFour}
-                                            label="Last Four*"
-                                            fullWidth
-                                            variant="outlined"
-                                            helperText={errors.lastFour?.message}
-
-                                        />
-                                    </Grid>
-                                }
-
-
-                                {
-                                    userCategory === "patient" &&
-                                    <Grid item xs={6}>
-                                        <FormControl fullWidth>
-                                            <InputLabel style={{ width: "auto", textAlign: "center", backgroundColor: "white" }} >Gender*</InputLabel>
-                                            <Select
-                                                variant="outlined"
-                                                size="small"
-                                                error={errors.gender && true}
-                                                helperText={errors.gender?.message}
-                                                rows={2}
-                                                defaultValue={user.details.gender.toLowerCase()}
-                                                {...register("gender", { required: "Field is required" })}
-                                            >
-                                                <MenuItem value={"male"}>Male</MenuItem>
-                                                <MenuItem value={"female"}>Female</MenuItem>
-                                                <MenuItem value={"other"}>Other</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                }
-
-                                {
-                                    userCategory === "patient" &&
-                                    <Grid item xs={6}>
-                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                            <DatePicker
-                                                label="Date of Birth"
-                                                value={dob}
-                                                onChange={(newValue) => {
-                                                    setDob(newValue);
-                                                }}
-                                                renderInput={(params) => <TextField {...params} fullWidth />}
-                                            />
-                                        </LocalizationProvider>
-                                        {dbError && <Alert sx={{ py: 0 }} severity="error">Date can not be future!</Alert>}
-                                    </Grid>
-                                }
-
-                                {
-                                    userCategory === "patient" &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("weight")}
-                                            error={errors.weight && true}
-
-                                            type={'number'}
-                                            label="Weight (lbs)"
-                                            fullWidth
-                                            variant="outlined"
-                                            defaultValue={user.details.weight}
-                                            helperText={errors.weight?.message}
-
-                                        />
-                                    </Grid>
-                                }
-
-
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("zip")}
-                                        error={errors.zip && true}
-
-                                        label="Zip"
-                                        fullWidth
-                                        variant="outlined"
-                                        defaultValue={user.details.zip}
-                                        helperText={errors.zip?.message}
-
-                                    />
-                                </Grid>
-
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("city")}
-                                        error={errors.city && true}
-
-                                        label="City"
-                                        fullWidth
-                                        variant="outlined"
-                                        defaultValue={user.details.city}
-                                        helperText={errors.city?.message}
-
-                                    />
-                                </Grid>
-
-
-
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("state")}
-                                        error={errors.state && true}
-
-                                        label="State"
-                                        fullWidth
-                                        variant="outlined"
-                                        defaultValue={user.details.state}
-                                        helperText={errors.state?.message}
-
-                                    />
-                                </Grid>
-
-
-                                <Grid item xs={6}>
-                                    <TextField
-                                        {...register("phoneNumber", {
-                                            minLength: { value: 6, message: "Phone number should be at last 6 characters" },
-                                        })}
-
-                                        error={errors.phoneNumber && true}
-                                        label="Phone Number"
-                                        type={"tel"}
-                                        fullWidth
-                                        variant="outlined"
-                                        defaultValue={user.details?.phoneNumber}
-                                        helperText={errors?.phoneNumber?.message}
-
-                                    />
-
-                                </Grid>
-
-
-                                {
-                                    userCategory === "patient" &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("primaryInsurance")}
-                                            error={errors.primaryInsurance && true}
-                                            type="text"
-                                            label="Primary Insurance"
-                                            fullWidth
-                                            defaultValue={user.details?.primaryInsurance}
-                                            variant="outlined"
-                                            helperText={errors.primaryInsurance?.message}
-
-                                        />
-                                    </Grid>
-                                }
-
-                                {
-                                    userCategory === "patient" &&
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            {...register("secondaryInsurance")}
-                                            error={errors.secondaryInsurance && true}
-                                            type="text"
-                                            label="Secondary Insurance"
-                                            fullWidth
-                                            defaultValue={user.details?.secondaryInsurance}
-                                            variant="outlined"
-                                            helperText={errors.secondaryInsurance?.message}
-
-                                        />
-                                    </Grid>
-                                }
-
-                                {
                                     (userCategory === "doctor" || userCategory === "therapist") &&
                                     <Grid item xs={6}>
                                         <TextField
@@ -431,20 +440,6 @@ export default function EditUser() {
                                         />
                                     </Grid>
                                 }
-
-                                <Grid item xs={12}>
-                                    <TextField
-                                        {...register("address")}
-
-                                        label="Address"
-                                        error={errors.address && true}
-                                        fullWidth
-                                        multiline
-                                        helperText={errors.address?.message}
-                                        defaultValue={user.details?.address}
-                                        rows={4}
-                                        variant="outlined" />
-                                </Grid>
 
 
                                 <Grid item xs={12}>

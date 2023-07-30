@@ -13,6 +13,7 @@ import PopOver from '../../../components/Popover/PopOver';
 import { UserListHead } from '../../../sections/@dashboard/user';
 import Scrollbar from '../../../components/scrollbar';
 import { fDate } from '../../../utils/formatTime';
+import EditOrderModal from 'src/pages/Shared/EditOrderModal';
 
 
 
@@ -24,7 +25,6 @@ const TABLE_HEAD = [
     { id: 'Lname', label: 'Last Name', alignRight: false },
     { id: 'lastFOur', label: 'Last Four#', alignRight: false },
     { id: 'status', label: 'status', alignRight: false },
-    { id: 'progress', label: 'Progress', alignRight: false },
     { id: 'notes', label: 'Notes', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
 ];
@@ -138,7 +138,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 
-const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
+const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder, refetch }) => {
 
     const [page, setPage] = useState(0);
 
@@ -162,6 +162,8 @@ const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
     let cancelledIsNotFound
     let row
 
+    const [openModal, setOpenModal] = useState(false)
+    const [editedOrderId, setEditedOrderId] = useState()
 
     const options = [
         { label: "Note Log" },
@@ -170,6 +172,7 @@ const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
 
 
     fromPage === "veteranStates" && options.push({ label: "Status" })
+    fromPage === "veteranStates" && options.push({ label: "Edit", fromPage: "states" })
     fromPage === "veteranStates" && !staffId && options.push({ label: "Delete" })
 
 
@@ -206,6 +209,10 @@ const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
 
     return (
         <>
+            {
+                editedOrderId && <EditOrderModal open={openModal} setOpen={setOpenModal} orderCategory={"veteran-order"}
+                    order={orders.find(order => order._id === editedOrderId) || {}} refetch={refetch} orderId={editedOrderId} title="Edit Order" />
+            }
 
             <Card style={{ margin: "20px 0px" }}>
                 <input type="text"
@@ -247,11 +254,11 @@ const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
                                                 <TableCell align="left">{veteranId.firstName}</TableCell>
                                                 <TableCell align="left">{veteranId.lastName}</TableCell>
 
-                                                <TableCell component="th" scope="row" padding="none">
+                                                <TableCell>
                                                     <Link to={`/DME-supplier/dashboard/user-profile/${veteranId._id}`}
                                                         style={{ display: "block", fontSize: "small", color: "black", cursor: "pointer" }} underline="hover" nowrap="true">
                                                         <Tooltip title="Profile">
-                                                            <Typography variant="subtitle2" sx={{ textAlign: "center" }}>
+                                                            <Typography variant="subtitle2">
                                                                 {veteranId.lastFour}
                                                             </Typography>
                                                         </Tooltip>
@@ -267,7 +274,7 @@ const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
                                                     </Label>
                                                 </TableCell>
 
-                                                <TableCell align="left">{!progress ? "Not Mentioned" : progress}</TableCell>
+
 
                                                 {
                                                     notes && notes?.length !== 0 ?
@@ -304,6 +311,8 @@ const VeteranOrderHistory = ({ orders, fromPage, deleteVeteranOrder }) => {
                                                         option={options}
                                                         id={row._id}
                                                         deleteOrder={deleteVeteranOrder ? deleteVeteranOrder : ""}
+                                                        setEditOrderModal={setOpenModal}
+                                                        setEditedOrderId={setEditedOrderId}
                                                     />
                                                 </TableCell>
                                             </TableRow>

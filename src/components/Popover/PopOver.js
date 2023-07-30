@@ -131,7 +131,12 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
 
         else if (source === "veteran-order-page") {
             if (lebel === "Edit") {
-                navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
+                if (fromPage === "states") {
+                    other.setEditOrderModal(true)
+                    other.setEditedOrderId(id)
+                } else {
+                    navigate(`/DME-supplier/dashboard/edit-order/${id}?orderCategory=veteran-order`)
+                }
             }
             if (lebel === "Documents") {
                 navigate(`/DME-supplier/dashboard/order-document/${id}?orderCategory=veteran-order`)

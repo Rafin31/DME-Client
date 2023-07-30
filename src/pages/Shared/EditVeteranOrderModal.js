@@ -5,10 +5,12 @@ import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { fDate } from '../../utils/formatTime';
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton, LocalizationProvider } from '@mui/lab';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
 import Iconify from '../../components/iconify/Iconify';
+import { useRef } from 'react';
+import { memo } from 'react';
 
 
 
@@ -26,7 +28,8 @@ const style = {
 };
 
 
-function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId, title, ...other }) {
+function EditVeteranOrderModal({ open, setOpen, orderCategory, order, refetch, orderId, title, ...other }) {
+
 
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
@@ -195,24 +198,14 @@ function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId,
         }
     }, [loadUserInfo])
 
-    useEffect(() => {
-        if (orderCategory === "veteran-order") {
-            if (order?.firstAttempt) setFirstAttempt(order?.firstAttempt)
-            if (order?.secondAttempt) setSecondAttempt(order?.secondAttempt)
-            if (order?.schedule) setSchedule(order?.schedule)
-        }
-
-    }, [open, order.firstAttempt, order.secondAttempt, order.schedule, orderCategory])
 
 
-    if (!user || !order || order?.length === 0 || patientLoading || loading) {
+
+    if (!user || order?.length === 0 || patientLoading || loading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
     }
-
-
-
 
     patients?.map(pt => {
         const patientInfo = {
@@ -440,42 +433,42 @@ function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId,
                                                                 { required: "Filed Required" }
                                                             )}
                                                             helperText={errors.orderStatus?.message}
-                                                            defaultValue={order.status ? order.status : ""}
+                                                            defaultValue={order[0]?.status ? order[0].status : ""}
                                                         >
                                                             {
-                                                                order.status === "Equip" &&
+                                                                order[0].status === "Equip" &&
                                                                 <MenuItem value={"New Repair"}>New Repair</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "New Repair" &&
+                                                                order[0].status === "New Repair" &&
                                                                 <MenuItem value={"Rcvd-pending-scheduling"}>Rcvd pending scheduling</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "Rcvd-pending-scheduling" &&
+                                                                order[0].status === "Rcvd-pending-scheduling" &&
                                                                 <MenuItem value={"Estimate-sent-pending-po"}>Estimate sent pending po</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "Estimate-sent-pending-po" &&
+                                                                order[0].status === "Estimate-sent-pending-po" &&
                                                                 <MenuItem value={"Po-Received"}>Po Received</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "Po-Received" &&
+                                                                order[0].status === "Po-Received" &&
                                                                 <MenuItem value={"Parts-ordered-by-VAMC"}>Parts ordered by VAMC</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "Parts-ordered-by-VAMC" &&
+                                                                order[0].status === "Parts-ordered-by-VAMC" &&
                                                                 <MenuItem value={"Parts-ordered-by-GCM"}>Parts ordered by GCM</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "Parts-ordered-by-GCM" &&
+                                                                order[0].status === "Parts-ordered-by-GCM" &&
                                                                 <MenuItem value={"Pending-scheduling"}>Pending Scheduling</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "Pending-scheduling" &&
+                                                                order[0].status === "Pending-scheduling" &&
                                                                 <MenuItem value={"Completed"}>Completed</MenuItem>
                                                             }
                                                             {
-                                                                order.status === "Completed" &&
+                                                                order[0].status === "Completed" &&
                                                                 <MenuItem value={"Archived"}>Archived</MenuItem>
                                                             }
 
@@ -497,7 +490,7 @@ function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId,
                                                             error={errors.partsPo && true}
                                                             fullWidth
                                                             helperText={errors.partsPo?.message}
-                                                            defaultValue={order?.partsPo}
+                                                            defaultValue={order[0]?.partsPo}
                                                             variant="outlined" />
                                                     </Grid>
                                                     <Grid item xs={6}>
@@ -508,12 +501,12 @@ function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId,
                                                             error={errors.labourPo && true}
                                                             fullWidth
                                                             helperText={errors.labourPo?.message}
-                                                            defaultValue={order?.labourPo}
+                                                            defaultValue={order[0]?.labourPo}
                                                             variant="outlined" />
                                                     </Grid>
 
-                                                    <Grid item xs={6}>
-                                                        <LocalizationProvider dateAdapter={AdapterDateFns} >
+                                                    <Grid item xs={6} >
+                                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
                                                             <DatePicker
                                                                 label="1st Attempt"
                                                                 value={firstAttempt}
@@ -524,12 +517,11 @@ function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId,
                                                             />
                                                         </LocalizationProvider>
                                                     </Grid>
-
                                                     <Grid item xs={6} >
                                                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                                                             <DatePicker
                                                                 label="2nd Attempt"
-                                                                defaultValue={order?.secondAttempt}
+                                                                defaultValue={order[0]?.secondAttempt}
                                                                 value={secondAttempt}
                                                                 onChange={(newValue) => {
                                                                     setSecondAttempt(newValue);
@@ -538,12 +530,11 @@ function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId,
                                                             />
                                                         </LocalizationProvider>
                                                     </Grid>
-
                                                     <Grid item xs={6} >
                                                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                                                             <DatePicker
                                                                 label="Scheduled/Deliver"
-                                                                defaultValue={order?.schedule}
+                                                                defaultValue={order[0]?.schedule}
                                                                 value={schedule}
                                                                 onChange={(newValue) => {
                                                                     setSchedule(newValue);
@@ -621,4 +612,4 @@ function EditOrderModal({ open, setOpen, orderCategory, order, refetch, orderId,
     );
 };
 
-export default (EditOrderModal);
+export default (EditVeteranOrderModal);

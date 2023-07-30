@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Card, CircularProgress, Container, Divider, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Button, Card, CircularProgress, Container, Divider, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { AuthRequest } from 'src/services/AuthRequest';
 import { useQuery } from 'react-query';
 import { Helmet } from 'react-helmet-async';
 import VeteranStatesNotes from './VeteranStatesNotes';
+import Iconify from '../../../components/iconify/Iconify';
+import VeteranStatesDocument from './VeteranStatesDocument';
 
 
 const VeteranStates = () => {
@@ -99,6 +101,14 @@ const VeteranStates = () => {
                     </Tabs>
                 </Box>
 
+                <Stack direction="row" spacing={1} style={{ marginBottom: "15px" }}>
+                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}
+                        onClick={() => { navigate('/DME-supplier/dashboard/add-order?orderCategory=veteran-order') }} >
+                        New Order
+                    </Button>
+
+                </Stack>
+
                 <main>
                     <Outlet context={{ isLoading, refetch, veteranCurrentOrder, veteran, veteranCurrentOrderHistory }} />
                 </main>
@@ -108,6 +118,12 @@ const VeteranStates = () => {
                         <Card variant='outlined' sx={{ paddingY: 1, paddingX: 1, marginY: 1, minHeight: "300px" }}
                             style={{ border: "1px solid #eaeeef", boxShadow: "none" }}>
                             <VeteranStatesNotes patientId={veteranId} />
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Card variant='outlined' sx={{ paddingY: 1, paddingX: 1, marginY: 1, minHeight: "300px" }}
+                            style={{ border: "1px solid #eaeeef", boxShadow: "none" }}>
+                            <VeteranStatesDocument veteranId={veteranId} />
                         </Card>
                     </Grid>
                     <Grid item xs={12} sm={6}>

@@ -62,7 +62,8 @@ const VeteranCurrentOrders = () => {
                     <VeteranOrderHistory
                         orders={veteranCurrentOrder}
                         fromPage={"veteranStates"}
-                        deleteVeteranOrder={deleteVeteranCurrentOrder} />
+                        deleteVeteranOrder={deleteVeteranCurrentOrder}
+                        refetch={refetch} />
                 </div>
             }
 
