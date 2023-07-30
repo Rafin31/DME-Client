@@ -42,7 +42,6 @@ import { useConfirm } from 'material-ui-confirm';
 const TABLE_HEAD = [
     { id: 'dob', label: 'Date of Birth', alignRight: false },
     { id: 'Fname', label: 'Full  Name', alignRight: false },
-    { id: 'email', label: 'Email', alignRight: false },
     { id: 'gender', label: 'Gender', alignRight: false },
     { id: 'action', label: 'Action', alignRight: false },
     // { id: '' },
@@ -429,7 +428,6 @@ export default function PatientPage() {
                                                     </Tooltip>
                                                 </TableCell>
 
-                                                <TableCell align="left">{userId.email}</TableCell>
                                                 <TableCell align="left">{gender}</TableCell>
 
                                                 <TableCell >

@@ -9,6 +9,7 @@ import { sentenceCase } from 'change-case';
 import ReactShowMoreText from 'react-show-more-text';
 import Label from '../../../components/label';
 import PopOver from '../../../components/Popover/PopOver';
+import { fDate } from '../../../utils/formatTime';
 
 import { UserListHead } from '../../../sections/@dashboard/user';
 import Scrollbar from '../../../components/scrollbar';
@@ -18,6 +19,7 @@ import EditOrderModal from 'src/pages/Shared/EditOrderModal';
 
 
 const TABLE_HEAD = [
+    { id: 'CreatedAt', label: 'Date Created', alignRight: false },
     { id: 'PatientName', label: 'Patient Name', alignRight: false },
     { id: 'dob', label: 'Date of Birth', alignRight: false },
     { id: 'Description', label: 'Description', alignRight: false },
@@ -27,14 +29,66 @@ const TABLE_HEAD = [
 ];
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "CreatedAt") {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+
+    if (orderBy === "PatientName") {
+        if (b.patientId.lastName < a.patientId.lastName) {
+            return -1;
+        }
+        if (b.patientId.lastName > a.patientId.lastName) {
+            return 1;
+        }
     }
+    if (orderBy === "dob") {
+        const dateA = new Date(a.patientId.patientDob);
+        const dateB = new Date(b.patientId.patientDob);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "Description") {
+        if (b.description < a.description) {
+            return -1;
+        }
+        if (b.description > a.description) {
+            return 1;
+        }
+    }
+    if (orderBy === "notes") {
+        if (b.notes < a.notes) {
+            return -1;
+        }
+        if (b.notes > a.notes) {
+            return 1;
+        }
+    }
+    if (orderBy === "status") {
+        if (b.status < a.status) {
+            return -1;
+        }
+        if (b.status > a.status) {
+            return 1;
+        }
+    }
+
     return 0;
 }
+
 
 function getComparator(order, orderBy) {
     return order === 'desc'
@@ -172,12 +226,12 @@ const RepairOrderHistory = ({ orders, refetch, fromPage, deleteRepairOrder }) =>
 
                                 {
                                     row.map((row, index) => {
-                                        const { _id, patientId, status, notes, description } = row;
+                                        const { _id, createdAt, patientId, status, notes, description } = row;
                                         const selectedUser = selected.indexOf(row._id) !== -1;
                                         return (
                                             <TableRow hover key={index} tabIndex={-1} selected={selectedUser}>
 
-
+                                                <TableCell align="left">{fDate(createdAt)}</TableCell>
                                                 <TableCell>
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}

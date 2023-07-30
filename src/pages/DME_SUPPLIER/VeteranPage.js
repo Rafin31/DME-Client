@@ -41,7 +41,6 @@ const TABLE_HEAD = [
     { id: 'id', label: 'ID#', alignRight: false },
     { id: 'Fname', label: 'Full  Name', alignRight: false },
     { id: 'lastFour', label: 'Last  Four#', alignRight: false },
-    { id: 'email', label: 'Email', alignRight: false },
     { id: 'phone', label: 'Phone#', alignRight: false },
     { id: 'city', label: 'City', alignRight: false },
     { id: 'assignedVA', label: 'Assigned VA', alignRight: false },
@@ -425,7 +424,6 @@ export default function VeteranPage() {
                                                 </TableCell>
 
                                                 <TableCell align="left">{lastFour ? lastFour : "Not Given!"}</TableCell>
-                                                <TableCell align="left">{userId.email}</TableCell>
                                                 <TableCell align="left">{!phoneNumber ? "Not Given!" : phoneNumber}</TableCell>
                                                 <TableCell align="left">{!city ? "Not Given!" : city}</TableCell>
 
@@ -445,6 +443,7 @@ export default function VeteranPage() {
                                                             { label: "Profile" },
                                                             { label: "Edit" },
                                                             { label: "Notes" },
+                                                            { label: "Documents" },
                                                             { label: "Add VA Prosthetics" },
                                                             { label: "Order History" },
                                                         ]}

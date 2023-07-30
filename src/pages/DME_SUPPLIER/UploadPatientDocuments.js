@@ -11,7 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
 import { fDateTime } from '../../utils/formatTime';
-
+import { useConfirm } from 'material-ui-confirm';
 
 const style = {
     position: 'absolute',
@@ -29,6 +29,8 @@ const style = {
 
 
 export default function UploadPatientDocuments() {
+
+    const confirm = useConfirm();
 
     const { id: patientId } = useParams()
     const submitButtonRef = useRef(null)
@@ -70,23 +72,45 @@ export default function UploadPatientDocuments() {
 
     const deleteDocumentRequest = async (docId, patientId) => {
 
-        await AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=patient-document`, { data: { patientId } })
-            .then(res => {
-                refetch()
-                toast.success("Deleted!", res, {
-                    toastId: 'success6'
-                })
+        try {
+            confirm({
+                description: "Are you sure you want to Delete this File Permanently?",
+                confirmationText: "Yes",
+                confirmationButtonProps: { variant: "outlined", color: "error" },
             })
-            .catch((err) => {
-                refetch()
-                toast.error(err.response.data.message, {
-                    toastId: 'error4'
+                .then(() => {
+                    toast.promise(
+                        AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=patient-document`, { data: { patientId } })
+                            .then(res => {
+                                refetch()
+                            })
+                            .catch((err) => {
+                                refetch()
+                                toast.error(err.response.data.message, {
+                                    toastId: 'error4'
+                                })
+                            }),
+                        {
+                            pending: "Deleting File...",
+                            success: "File Deleted",
+                            error: "Something Went Wrong!",
+                        },
+                        {
+                            toastId: "deleteOrder",
+                        }
+                    );
                 })
-            })
+                .catch(() => {
+                    return
+                });
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     const handleUploadButtonClick = (e) => {
         e.preventDefault()
+        setUploadedFileName(e.target.files[0].name)
         submitButtonRef.current.click()
     }
     const handleFormSubmit = (e) => {
@@ -100,7 +124,7 @@ export default function UploadPatientDocuments() {
         formData.append('title', title)
         formData.append('description', description)
 
-        if (!!formData.entries().next().value) {
+        if (!!formData.entries().next().value && file) {
             formData.append('uploaderId', loggedUser.id)
             setUploadedFileName("")
             setModal(!showModal)
@@ -109,7 +133,7 @@ export default function UploadPatientDocuments() {
         } else {
             setModal(!showModal)
             setUploadedFileName("")
-            toast.warning('Upload documents', {
+            toast.warning('Please select a file to Upload a document!', {
                 toastId: "warning1"
             })
         }

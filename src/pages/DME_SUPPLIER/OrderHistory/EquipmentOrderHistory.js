@@ -31,12 +31,64 @@ const TABLE_HEAD = [
 ];
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+
+    if (orderBy === "create") {
+
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
+
+    if (orderBy === "PatientName") {
+        if (b.patientId.lastName < a.patientId.lastName) {
+            return -1;
+        }
+        if (b.patientId.lastName > a.patientId.lastName) {
+            return 1;
+        }
     }
+    if (orderBy === "dob") {
+        const dateA = new Date(a.patientId.patientDob);
+        const dateB = new Date(b.patientId.patientDob);
+
+        if (dateB < dateA) {
+            return -1;
+        }
+        if (dateB > dateA) {
+            return 1;
+        }
+    }
+    if (orderBy === "Description") {
+        if (b.description < a.description) {
+            return -1;
+        }
+        if (b.description > a.description) {
+            return 1;
+        }
+    }
+    if (orderBy === "notes") {
+        if (b.notes < a.notes) {
+            return -1;
+        }
+        if (b.notes > a.notes) {
+            return 1;
+        }
+    }
+    if (orderBy === "status") {
+        if (b.status < a.status) {
+            return -1;
+        }
+        if (b.status > a.status) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -176,7 +228,7 @@ const EquipmentOrderHistory = ({ orders, refetch, fromPage, deleteEquipmentOrder
                                                 <TableCell align="left">{fDate(createdAt)}</TableCell>
                                                 <TableCell align="left">{dateCompleted ? fDate(dateCompleted) : "Not Mentioned"}</TableCell>
 
-                                                <TableCell>
+                                                <TableCell width="30%">
                                                     <Stack direction="row" alignItems="center" spacing={10}>
                                                         {/* <Avatar alt={name} src={avatarUrl} /> */}
                                                         <Link to={`/DME-supplier/dashboard/user-profile/${patientId._id}`}
@@ -191,7 +243,7 @@ const EquipmentOrderHistory = ({ orders, refetch, fromPage, deleteEquipmentOrder
                                                     </Stack>
                                                 </TableCell>
 
-                                                <TableCell align="left">{patientId.patientDob}</TableCell>
+                                                <TableCell width="30%" align="left">{patientId.patientDob}</TableCell>
 
                                                 {
                                                     description ?
@@ -201,7 +253,7 @@ const EquipmentOrderHistory = ({ orders, refetch, fromPage, deleteEquipmentOrder
                                                 }
 
                                                 {notes && notes?.length !== 0 ?
-                                                    <TableCell width="30%" align="left">
+                                                    <TableCell align="left">
                                                         <ReactShowMoreText
                                                             lines={1}
                                                             more={<ExpandMoreIcon style={{ cursor: "pointer", margin: '0px', padding: '0px' }} color='primary' />}

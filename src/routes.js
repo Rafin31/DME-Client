@@ -87,6 +87,7 @@ import VeteranStates from './pages/DME_SUPPLIER/VeteranStates/VeteranStates';
 import VeteranCurrentOrders from './pages/DME_SUPPLIER/VeteranStates/VeteranCurrentOrder';
 import VeteranStatesOrderHistory from './pages/DME_SUPPLIER/VeteranStates/VeteranStatesOrderHistory';
 import VeteranNotes from './pages/DME_SUPPLIER/VeteranNotes';
+import UploadVeteranDocuments from './pages/DME_SUPPLIER/UploadVeteranDocument';
 
 
 
@@ -223,6 +224,7 @@ export default function Router() {
 
 
         <Route path='patient-document/:id' element={<UploadPatientDocuments />} />
+        <Route path='veteran-document/:id' element={<UploadVeteranDocuments />} />
         <Route path='order-history/:id' element={<OrderHistory />} />
         <Route path='order-document/:id' element={<UploadOrderDocuments />} />
         <Route path='edit-tasks/:id' element={<EditTasks />} />

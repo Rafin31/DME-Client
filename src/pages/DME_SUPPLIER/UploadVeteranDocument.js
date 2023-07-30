@@ -1,18 +1,18 @@
 
 import { Helmet } from 'react-helmet-async';
 import { React, useRef, useState } from 'react';
-import { Backdrop, Box, Button, Card, CircularProgress, Container, Fade, Grid, IconButton, Modal, Stack, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
+import { Backdrop, Box, Button, Card, CircularProgress, Container, Fade, Grid, IconButton, Modal, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Iconify from '../../components/iconify';
 import { AuthRequest } from '../../services/AuthRequest';
 import { fDateTime } from '../../utils/formatTime';
-import { isArray } from 'lodash';
 import { useConfirm } from 'material-ui-confirm';
+
 
 const style = {
     position: 'absolute',
@@ -28,37 +28,31 @@ const style = {
 };
 
 
-export default function UploadOrderDocuments() {
+
+export default function UploadVeteranDocuments() {
 
     const confirm = useConfirm();
 
-
-    const { id: orderId } = useParams()
+    const { id: veteranId } = useParams()
     const submitButtonRef = useRef(null)
-    const navigate = useNavigate()
     const [showModal, setModal] = useState(false)
     const [uploadedFileName, setUploadedFileName] = useState()
 
-    const { search } = window.location;
-    const params = new URLSearchParams(search);
-    const orderCategory = params.get('orderCategory');
+    const navigate = useNavigate()
+
+    let loggedUser = localStorage.getItem('user');
+    loggedUser = JSON.parse(loggedUser);
 
 
-    const { isLoading: orderLoading, refetch, data: order } = useQuery(`order-${orderId}`,
+    const { isLoading: veteran3Loading, refetch, data: veteran3 } = useQuery(`veteran-${veteranId}`,
         async () => {
-            if (orderCategory === "equipment-order") {
-                return AuthRequest.get(`/api/v1/order/${orderId}`).then(data => data.data.data)
-            } else if (orderCategory === "repair-order") {
-                return AuthRequest.get(`/api/v1/repair-order/${orderId}`).then(data => data.data.data)
-            } else if (orderCategory === "veteran-order") {
-                return AuthRequest.get(`/api/v1/veteran-order/${orderId}`).then(data => data.data.data)
-            }
+            return AuthRequest.get(`/api/v1/users/${veteranId}`).then(data => data.data.data)
         }
     )
 
-    const { mutateAsync, isLoading: orderDocumentsLoading } = useMutation((orderDocuments) => {
+    const { mutateAsync, isLoading: veteranDocumentsLoading } = useMutation((veteranDocuments) => {
 
-        return AuthRequest.post(`/api/v1/dme/upload-order-document`, orderDocuments,
+        return AuthRequest.post(`/api/v1/dme/upload-veteran-document/${veteranId}`, veteranDocuments,
             {
                 headers: { "Content-Type": "multipart/form-data" }
             }
@@ -66,20 +60,18 @@ export default function UploadOrderDocuments() {
             .then(res => {
                 refetch()
                 toast.success("Uploaded!", res, {
-                    toastId: 'success6'
+                    toastId: 'success7'
                 })
-
             })
             .catch((err) => {
                 refetch()
                 toast.error(err.response.data.message, {
-                    toastId: 'error4'
+                    toastId: 'error6'
                 })
             })
     })
 
-    const deleteDocumentRequest = async (docId, orderId, orderCategory) => {
-
+    const deleteDocumentRequest = async (docId, veteranId) => {
         try {
             confirm({
                 description: "Are you sure you want to Delete this File Permanently?",
@@ -88,7 +80,7 @@ export default function UploadOrderDocuments() {
             })
                 .then(() => {
                     toast.promise(
-                        AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=order-documents&orderCategory=${orderCategory}`, { data: { orderId } })
+                        AuthRequest.delete(`/api/v1/dme/delete-document/${docId}?document=veteran-document`, { data: { veteranId } })
                             .then(res => {
                                 refetch()
                             })
@@ -115,34 +107,35 @@ export default function UploadOrderDocuments() {
             console.error(err);
         }
 
+
     }
 
     const handleUploadButtonClick = (e) => {
         e.preventDefault()
         setUploadedFileName(e.target.files[0].name)
-
+        submitButtonRef.current.click()
     }
     const handleFormSubmit = (e) => {
+
         e.preventDefault()
         const file = e.target.uploadFile.files[0]
         const title = e.target.docTitle.value
         const description = e.target.docDescription.value
         const formData = new FormData()
-        formData.append('order-document', file)
+        formData.append('veteran-documents', file)
         formData.append('title', title)
         formData.append('description', description)
 
+
         if (!!formData.entries().next().value && file) {
-            if (orderCategory !== "veteran-order") formData.append('uploaderId', order.patientId._id)
-            if (orderCategory === "veteran-order") formData.append('uploaderId', order[0].veteranId._id)
-            formData.append('orderId', orderId)
-            formData.append('orderCategory', orderCategory)
+            formData.append('uploaderId', loggedUser.id)
             setUploadedFileName("")
             setModal(!showModal)
             mutateAsync(formData)
 
         } else {
             setModal(!showModal)
+            setUploadedFileName("")
             toast.warning('Please select a file to Upload a document!', {
                 toastId: "warning1"
             })
@@ -150,7 +143,7 @@ export default function UploadOrderDocuments() {
     }
 
     const downloadDocument = async (doc) => {
-        const url = `${process.env.REACT_APP_SERVER}/api/v1/dme/get-document?document=order-documents/${doc.split('/')[1]}`
+        const url = `${process.env.REACT_APP_SERVER}/api/v1/dme/get-document?document=veteran-documents/${doc.split('/')[1]}`
         const a = document.createElement('a');
         a.href = url
         a.download = doc.split('/')[1];
@@ -158,27 +151,20 @@ export default function UploadOrderDocuments() {
     }
 
     const deleteDocument = async (docId) => {
-        deleteDocumentRequest(docId, orderId, orderCategory)
+        deleteDocumentRequest(docId, veteranId)
     }
 
     // 
-    if (orderLoading || orderDocumentsLoading) {
+    if (veteran3Loading || veteranDocumentsLoading) {
         return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress />
         </Box>
-    }
-    let plainOrder
-
-    if (order && isArray(order)) {
-        plainOrder = order[0]
-    } else {
-        plainOrder = order
     }
 
     return (
         <>
             <Helmet>
-                <title> Order Documents </title>
+                <title> Veteran Documents </title>
             </Helmet>
             <Container maxWidth="1350px">
 
@@ -190,44 +176,30 @@ export default function UploadOrderDocuments() {
                     <ArrowBackIcon /> <span>Back</span>
                 </Stack>
 
-                <Stack
-                    sx={{
-                        flexDirection: { xs: "column", md: "row" }, alignItems: { xs: "start", md: "center" }
-                    }} justifyContent="space-between" mb={5}>
-                    <Typography variant="h5">Upload Order Documents for
-                        {
-                            !isArray(order) && orderCategory !== "veteran-order" &&
-                            <Link
-                                to={`/DME-supplier/dashboard/user-profile/${order?.patientId?._id}`}
-                                style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
-                                color="inherit" variant="subtitle2" underline="hover" nowrap="true"
-                                target="_blank" rel="noopener noreferrer"
-                            >{order?.patientId?.fullName}
-                            </Link>
-                        }
-                        {
-                            isArray(order) && orderCategory === "veteran-order" &&
-                            <Link
-                                to={`/DME-supplier/dashboard/user-profile/${order[0]?.veteranId?._id}`}
-                                style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
-                                color="inherit" variant="subtitle2" underline="hover" nowrap="true"
-                                target="_blank" rel="noopener noreferrer"
-                            >{order[0]?.veteranId?.fullName}
-                            </Link>
-                        }
-                        Order
+                <Stack sx={{
+                    flexDirection: { xs: "column", md: "row" }, alignItems: { xs: "start", md: "center" }
+                }} justifyContent="space-between" mb={5}>
+                    <Typography variant="h5">Upload veteran Documents for
+                        <Link
+                            to={`/DME-supplier/dashboard/user-profile/${veteran3._id}`}
+                            style={{ color: "black", cursor: "pointer", margin: "0px 10px" }}
+                            color="inherit" variant="subtitle2" underline="hover" nowrap="true"
+                            target="_blank" rel="noopener noreferrer"
+                        >{veteran3.fullName}
+                        </Link>
                     </Typography>
-                    <form onSubmit={(e) => handleFormSubmit(e)}>
-                        {
-                            order &&
-                            <Button variant="contained" onClick={() => { setModal(!showModal) }} startIcon={
-                                <Iconify icon="material-symbols:cloud-upload" />}>
-                                Upload Document
-                            </Button>
-                        }
-                        <input ref={submitButtonRef} hidden type="submit" />
-                    </form>
+
+                    {
+                        veteran3 &&
+                        <Button variant="contained" onClick={() => { setModal(!showModal) }} startIcon={
+                            <Iconify icon="material-symbols:cloud-upload" />}>
+                            Upload Document
+                        </Button>
+                    }
+
+
                 </Stack>
+
 
                 <Grid
                     container
@@ -237,7 +209,7 @@ export default function UploadOrderDocuments() {
                     style={{ minHeight: '100vh', marginTop: '40px' }}
                 >
                     {
-                        plainOrder?.document?.length !== 0 ? plainOrder?.document?.map((data, index) => {
+                        veteran3?.details?.document.length !== 0 ? veteran3.details.document.map((data, index) => {
                             return (
                                 <Card
                                     key={index}
@@ -309,7 +281,6 @@ export default function UploadOrderDocuments() {
                     }
                 </Grid>
 
-
                 {/* -------------------------------------Modal Start------------------------------------ */}
 
                 <Modal
@@ -372,9 +343,6 @@ export default function UploadOrderDocuments() {
                 </Modal>
 
                 {/* -------------------------------------Modal End------------------------------------ */}
-
-
-
 
             </Container>
         </>
