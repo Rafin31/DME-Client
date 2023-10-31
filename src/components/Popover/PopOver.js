@@ -6,11 +6,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Iconify from '../iconify';
 
 
-export default function PopOver({ source = "null", option, id, setOpen = null, ...other }) {
+export default function PopOver({ source = "null", option = [], id, setOpen = null, ...other }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const navigate = useNavigate()
     const open = Boolean(anchorEl);
-
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -209,6 +208,18 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
             }
         }
 
+        else if (source === "assigned-task-page") {
+            if (lebel === "Accept") {
+                other.handleAssignTaskUpdate(["Accepted", id])
+            }
+            if (lebel === "Reject") {
+                other.handleAssignTaskUpdate(["Rejected", id])
+            }
+            if (lebel === "Completed") {
+                other.handleAssignTaskUpdate(["Completed", id])
+            }
+        }
+
         else if (source === "va-staff-registered-page") {
             if (lebel === "Edit") {
                 navigate(`/DME-supplier/dashboard/edit-va-prosthetics-staff/${id}`)
@@ -243,9 +254,16 @@ export default function PopOver({ source = "null", option, id, setOpen = null, .
                 style={{ width: "200px" }}
             >
                 {
-                    option.map((item) => {
+                    option.length !== 0 && option.map((item) => {
                         return (
-                            <MenuItem onClick={() => handleSubmit(id, item.label, item?.fromPage)}>{item.label}</MenuItem>
+                            <MenuItem sx={{ color: item?.color }} onClick={() => handleSubmit(id, item.label, item?.fromPage)}>
+                                {
+                                    item?.icon && item.icon
+                                }
+                                {
+                                    item.label
+                                }
+                            </MenuItem>
                         )
                     })
                 }

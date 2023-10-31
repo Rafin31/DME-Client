@@ -14,6 +14,12 @@ const PrivateMessageContext = ({ children }) => {
         }
     )
 
+    const { isLoading: allActiveDmeStaffLoading, data: allActiveDmeStaff } = useQuery(`allActiveDmeStaff`,
+        async () => {
+            return AuthRequest.get(`/api/v1/dme/active-dme-staff`,).then(data => data.data.data)
+        }
+    )
+
     const { isLoading: allActiveUsersLoading, data: allActiveUsers } = useQuery(`allActiveUser`,
         async () => {
             return AuthRequest.get(`/api/v1/users/active-user`,).then(data => data.data.data)
@@ -61,7 +67,9 @@ const PrivateMessageContext = ({ children }) => {
             value={{
                 allActiveUsersLoading: allActiveUsersLoading,
                 allActiveDmeLoading: allActiveDmeLoading,
+                allActiveDmeStaffLoading: allActiveDmeStaffLoading,
                 allActiveDme: allActiveDme,
+                allActiveDmeStaff: allActiveDmeStaff,
                 allActiveUsers: allActiveUsers,
                 fromLoading: fromLoading,
                 fromUsers: fromUsers,
@@ -73,6 +81,7 @@ const PrivateMessageContext = ({ children }) => {
             }}>
 
             {children}
+
         </MessageContext.Provider>
     );
 };

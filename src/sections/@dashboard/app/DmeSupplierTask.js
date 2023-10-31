@@ -23,9 +23,7 @@ DmeSupplierTask.propTypes = {
 
 export default function DmeSupplierTask({ id, title, subheader, list, ...other }) {
   return (
-    <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
-
+    <Card sx={{ p: 0, boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;" }}>
       <Scrollbar>
         <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
           {list.map((news) => (
@@ -35,12 +33,6 @@ export default function DmeSupplierTask({ id, title, subheader, list, ...other }
       </Scrollbar>
 
       <Divider />
-
-      {/* <Box sx={{ p: 2, textAlign: 'right' }}>
-        <Button size="small" color="inherit" endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
-          View all
-        </Button>
-      </Box> */}
     </Card>
   );
 }
@@ -56,7 +48,6 @@ NewsItem.propTypes = {
 };
 
 function NewsItem({ news }) {
-  console.log(news)
   const { id, title, patientId, patientName, description, postedAt, rftch: refetch } = news;
   const [open, setOpen] = useState(null);
   const navigate = useNavigate()

@@ -7,6 +7,7 @@ import Header from './header';
 import Nav from './nav';
 import { AuthRequest } from '../../services/AuthRequest';
 import { Box, CircularProgress } from '@mui/material';
+import { useAssignedTaskContext } from 'src/Context/AssignedTaskContext';
 
 // ----------------------------------------------------------------------
 
@@ -68,17 +69,24 @@ export default function DmeDashboardLayout() {
     loadUserInfo()
   }, [])
 
+  const {
+    PendingAssignedTaskLoading,
+    fetchPendingAssignedTask,
+    pendingAssignedTask
+  } = useAssignedTaskContext()
 
-  if (loading || !user) {
+
+  if (loading || !user || PendingAssignedTaskLoading) {
     return <Box style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <CircularProgress />
     </Box>
   }
 
+
   return (
 
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} id={id} user={user} />
+      <Header onOpenNav={() => setOpen(true)} id={id} user={user} pendingAssignedTask={pendingAssignedTask} />
 
       <Nav openNav={open} onCloseNav={() => setOpen(false)}
         user={user}

@@ -88,6 +88,10 @@ import VeteranCurrentOrders from './pages/DME_SUPPLIER/VeteranStates/VeteranCurr
 import VeteranStatesOrderHistory from './pages/DME_SUPPLIER/VeteranStates/VeteranStatesOrderHistory';
 import VeteranNotes from './pages/DME_SUPPLIER/VeteranNotes';
 import UploadVeteranDocuments from './pages/DME_SUPPLIER/UploadVeteranDocument';
+import { AssignedTask } from './Context/AssignedTaskContext';
+import AssignedTaskRoot from './pages/DME_SUPPLIER/AssignedTask/AssignedTaskRoot';
+import MyAssignedTask from './pages/DME_SUPPLIER/AssignedTask/MyAssignedTask';
+import AllAssignedTask from './pages/DME_SUPPLIER/AssignedTask/AllAssignedTask';
 
 
 
@@ -123,12 +127,18 @@ export default function Router() {
       <Route path='/DME-supplier/dashboard' element={
         <AuthRoute>
           <CheckCategory category={"DME-Supplier, DME-Staff"}>
-            <DmeDashboardLayout />
+            <AssignedTask>
+              <DmeDashboardLayout />
+            </AssignedTask>
           </CheckCategory>
         </AuthRoute>
       }>
         <Route index element={<Navigate to="/DME-supplier/dashboard/app" />} />
-        <Route path='app' element={<DmeDashboard />} />
+        <Route path='app' element={
+          <PrivateMessageContext>
+            <DmeDashboard />
+          </PrivateMessageContext>
+        } />
 
 
         <Route path='equipment-order' element={<EquipmentOrder />}>
@@ -175,6 +185,22 @@ export default function Router() {
           <Route path="pending-scheduling" element={<VeteranPendingScheduling />} />
           <Route path="completed" element={<VeteranCompleted />} />
         </Route>
+
+
+        <Route path='assigned-task' element={
+          <PrivateMessageContext>
+            <AssignedTask>
+              <AssignedTaskRoot />
+            </AssignedTask>
+          </PrivateMessageContext>
+
+
+        }>
+          <Route index element={<MyAssignedTask />} />
+          <Route path="all-assigned-task" element={<AllAssignedTask />} />
+        </Route>
+
+
 
         <Route path='veteran-states/:id' element={<VeteranStates />} >
           <Route index element={<VeteranCurrentOrders />} />

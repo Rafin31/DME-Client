@@ -13,7 +13,6 @@ import { AuthContext } from './Context/AuthContext';
 import { ConfirmProvider } from 'material-ui-confirm';
 
 
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -21,6 +20,8 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+
 axios.defaults.baseURL = process.env.REACT_APP_SERVER;
 
 
@@ -30,6 +31,7 @@ root.render(
 
   <HelmetProvider>
     <BrowserRouter>
+
       <QueryClientProvider client={queryClient}>
         <AuthContext>
           <ConfirmProvider>
@@ -37,6 +39,7 @@ root.render(
           </ConfirmProvider>
         </AuthContext>
       </QueryClientProvider>
+
     </BrowserRouter>
   </HelmetProvider>
 );
